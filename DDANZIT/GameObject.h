@@ -8,9 +8,9 @@
 class GameObject : Pipeline
 {
 public:
-	ObjectData data;
-	ObjectVisual visual;
-	ObjectLogic logic;
+	ObjectData data;		// 얘네가 간이(고정) 컴포넌트 역할인거지 결국
+	ObjectVisual visual;	// 그럼 프레임워크 아래에서 코드를 짤때는
+	ObjectLogic logic;		// 얘네를 상속해서 이어서 짜면 될라나
 
 	GameObject();
 	~GameObject();
@@ -18,7 +18,12 @@ public:
 	static GameObject* Instantiate();	// 이런식으로?
 	static void Destroy(GameObject* instance);
 	static std::vector<GameObject*> GetObjList();
+	static GameObject* GetObject(long index);	// 근데 뭘 갖다 찾지
+	static GameObject* GetObject(ObjectData data);	// 음.. 컴포넌트로 찾기
+	static GameObject* GetObject(ObjectVisual visual);
+	static GameObject* GetObject(ObjectLogic logic);
 private:
+	long index;			// ? 필요하지 않을까
 	void RegisterObj(GameObject* pGameObject);
 	void taltoe(GameObject* pGameObject);
 };
