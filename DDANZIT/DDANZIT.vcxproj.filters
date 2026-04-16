@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\사용해보기">
+      <UniqueIdentifier>{92a78153-c504-49d2-af32-901cdb3fd62b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DDANZIT.cpp">
@@ -30,14 +33,17 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="NewObject.cpp">
+    <ClCompile Include="Pipeline.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="MngObject.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
-    <ClCompile Include="Pipeline.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="NewObject.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
+    <ClCompile Include="NewVisual.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
