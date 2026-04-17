@@ -126,6 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DDANZIT.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MngObject.cpp" />
     <ClCompile Include="NewObject.cpp" />
     <ClCompile Include="NewVisual.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="Pipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DDANZIT.h" />
     <ClInclude Include="ObjectData.h" />
     <ClInclude Include="ObjectLogic.h" />
     <ClInclude Include="GameObject.h" />

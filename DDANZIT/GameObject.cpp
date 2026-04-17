@@ -8,6 +8,8 @@ GameObject::GameObject() : data(new ObjectData), visual(nullptr), logic(nullptr)
 GameObject::~GameObject() {
 	// 할당된거 다 해제
 	delete(data);
+	// 왜됨? 값을 변경하는게 아닌가?
+	// 적어도 가리키는걸 nullptr로 돌려버리는 정도는.. 직접해야되는가보네
 
 	if (visual != nullptr)
 		delete(visual);
@@ -18,6 +20,22 @@ GameObject::~GameObject() {
 	QuitObj(this);
 }
 
+#pragma region Component
+
+// Not for use now...
+template <std::derived_from<ObjectVisual> T> bool GameObject::TryAddVisual(T*& derivedVisual) {
+	return false;
+}
+
+// Not for use now...
+template <std::derived_from<ObjectLogic> T> bool GameObject::TryAddLogic(T*& derivedLogic) {
+	return false;
+}
+
+#pragma endregion
+
+#pragma region ManageObject
+
 GameObject* GameObject::Instantiate() {
 	// 동적할당~~
 	// 자체적으로도 가지고 있는게 낫나?
@@ -25,19 +43,9 @@ GameObject* GameObject::Instantiate() {
 	return newInstance;
 }
 
-template <typename T> T* GameObject::AddVisual() {
-	// 근데 얘가 ObjectVisual을 상속하는걸 어케 보장하지?
-	visual = new T();
-
-	return visual;
+void GameObject::Instantiate(GameObject& gameObject) {
+	GameObject* newInstance = new GameObject;
 }
-
-template <typename T> T* GameObject::AddLogic() {
-	logic = new T();
-
-	return logic;
-}
-
 
 void GameObject::Destroy(GameObject* instance) {
 	// instance를 참조하고있는 다른 객체가 있다면 다 통보를 또 해줘야되겠는데? ..그런 경우가 있겠지?
@@ -57,7 +65,10 @@ std::vector<GameObject*> GameObject::GetObjList() {
 	return objList;
 }
 
-// 얘네들 다 널체크 해주자
+#pragma endregion
+
+#pragma region Pipeline
+
 void GameObject::Init() {
 	// 아직 여기서 생각할건 아니지만..
 	// 한번만 실행이니까 이런건 음 오브젝트의 init을 한번만 가져가서 실행하게 해야겠네
@@ -87,3 +98,5 @@ void GameObject::Close() {
 	if (visual != nullptr)
 		visual->Close();
 }
+
+#pragma endregion
