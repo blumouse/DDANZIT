@@ -3,7 +3,11 @@
 #include "ObjectData.h"
 #include "ObjectVisual.h"
 #include "ObjectLogic.h"
+#include "Component.h"
 #include <vector>
+// 나중에 이것도 한번 정리해야겠다
+
+// 점점 읽기 어려워진닷!!
 
 class GameObject : public Pipeline
 {
@@ -13,30 +17,68 @@ public:
 
 #pragma region Component
 
-	const ObjectData* data;		// 얘네가 간이(고정) 컴포넌트 역할인거지 결국
+	// 기본제공 데이터 타입을 안쓰고 싶을수도 있자나?
+	ObjectData* data;		// 얘네가 간이(고정) 컴포넌트 역할인거지 결국
 	ObjectVisual* visual;	// 그럼 프레임워크 아래에서 코드를 짤때는
 	ObjectLogic* logic;		// 얘네를 상속해서 이어서 짜면 될라나
 	// 왜 get만 두고싶지
 
-	/*bool LinkComponent(ObjectVisual* visual);
-	bool LinkComponent(ObjectLogic* logic);*/
 
 	// 뭐야이게
+	template <std::derived_from<ObjectData> T>
+	T* AddComponent() {
+		if (data != nullptr)
+		{
+			delete data;
+		}
+
+		data = new T();
+		data->gameObject = this;
+
+		return data;
+	}
+
 	template <std::derived_from<ObjectVisual> T>
-	T* AddVisual() {
+	T* AddComponent() {
+		if (visual != nullptr)
+		{
+			delete visual;
+		}
+
 		visual = new T();
+		visual->gameObject = this;
 
 		return visual;
 	}
 
 	template <std::derived_from<ObjectLogic> T>
-	T* AddLogic() {
+	T* AddComponent() {
+		if (logic != nullptr)
+		{
+			delete logic;
+		}
+
 		logic = new T();
+		logic->gameObject = this;
 
 		return logic;
 	}
-	template <std::derived_from<ObjectVisual> T> bool TryAddVisual(T*& derivedVisual);
-	template <std::derived_from<ObjectLogic> T> bool TryAddLogic(T*& derivedLogic);
+
+	// 뉴타입 컴포넌트는 명시적으로 분리
+	template <std::derived_from<Component> T>
+	void RegisterComponent(T* component) {
+		components.push_back(component);
+	}
+
+	template <std::derived_from<Component> T>
+	T* GetComponent() {
+		// 컴포넌트 찾아!
+	}
+
+	// 같은 컴포넌트를 여러개 달수 있어야 하나..?
+
+	// template <std::derived_from<ObjectVisual> T> bool TryAddVisual(T*& derivedVisual);
+	// template <std::derived_from<ObjectLogic> T> bool TryAddLogic(T*& derivedLogic);
 
 #pragma endregion
 
@@ -67,6 +109,8 @@ public:
 
 private:
 	long index;			// ? 필요하지 않을까
+	std::vector<Component*> components;
+
 	void RegisterObj(GameObject* pGameObject);
 	void QuitObj(GameObject* pGameObject);
 };
@@ -92,4 +136,6 @@ private:
 // 원래 쓰던 방식을 참고를 좀더 해보고싶은데.. 코드를 봐야겠어
 // 아직 뭔가뭔가 부족함 좀더 사용도 해보고...
 // 다른 객체를 가져와서 함수 호출 -> 이 통신
-// 
+// 근데 이걸 뭐 따로 만들수 있나..? 걍 함수호출이지
+// -> 정말 통신 로직을 참고해보는것도 엔드포인트 만들고 포트연결 해놓고...
+// 모듈 추가는 음 일단 입력쪽 기능 모듈로 만들면서 해보자

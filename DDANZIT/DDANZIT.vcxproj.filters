@@ -48,6 +48,9 @@
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ObjectLogic.h">
@@ -66,6 +69,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DDANZIT.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -125,6 +125,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="DDANZIT.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MngObject.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="Pipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Component.h" />
     <ClInclude Include="DDANZIT.h" />
     <ClInclude Include="ObjectData.h" />
     <ClInclude Include="ObjectLogic.h" />

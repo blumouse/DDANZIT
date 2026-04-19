@@ -1,44 +1,60 @@
 #pragma once
+#include "GameObject.h"
+#include "Component.h"
+
+#pragma region Types
 
 typedef struct Pos2D {
-	float XPos;
-	float YPos;
+	float xPos;
+	float yPos;
 };
 
 typedef struct Scale2D {
-	float XScale;
-	float YScale;
+	float xScale;
+	float yScale;
 };
 
 class Shape {
 
 };
 
-class None : Shape {
+class None : public Shape {
 
 };
 
-class Sqaure : Shape {
+class Square : public Shape {
 
 };
 
-// 등등..
+// 등등.. 근데 enum 있다니까 걍 그게 나을듯
 
-class ObjectData
+enum _Shape
+{
+	None,
+	Point,
+	Square,
+	Ellipse,
+};
+
+
+#pragma endregion
+
+
+// 기본제공 컴포넌트 역할을 한다
+class ObjectData : public Component
 {
 public:
 	Pos2D pos;
-	Shape shape;
+	Shape* shape;
 	float rotate;
 	Scale2D scale;
+	short depth;
+
+	ObjectData();
+	~ObjectData();
 };
 
 // 오브젝트가 공통으로 가질법한 데이터? 속성?
 // 모양을.. enum처럼 갈아끼우고싶은데 사전세트로 <- 확장도 돼야하지 않나?
 // 아 이것도 상속시키면되자나 ?되나
 // 기본 (탬플릿이나 업캐스팅)큐같은걸 두고 거기다가 넣게할까
-
-// 이쪽이 확실히 핵심이란말이지
-// 여길 중점으로 visual과 logic이 통신하듯이
-// 뭔가 데이터지향이 되어가는 느낌이..
-// 
