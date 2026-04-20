@@ -50,7 +50,7 @@ public:
 	Scale2D scale;
 	short depth;
 
-	ObjectData();
+	ObjectData(GameObject* gameObject);
 	~ObjectData();
 };
 

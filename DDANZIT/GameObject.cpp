@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <vector>
 
-GameObject::GameObject() : data(nullptr), visual(nullptr), logic(nullptr){
+GameObject::GameObject() : data(new ObjectData(this)), visual(nullptr), logic(nullptr){
 	RegisterObj(this);
 }
 
@@ -67,6 +67,7 @@ void GameObject::Init() {
 	if (visual != nullptr)
 		visual->Init();
 	// TODO: 확장 컴포넌트도 추가...
+	// 파이프라인을 상속하고, 함수포인터 변수에 할당이 돼있으면 그걸 실행
 }
 
 void GameObject::Update() {

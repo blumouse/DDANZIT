@@ -11,9 +11,9 @@ public:
 	// 를 상위에서 갈무리해서 실행하는거지
 
 
-	void (*Init)();
-	void (*Update)();
-	void (*LateUpdate)();
-	void (*Close)();
+	void (Pipeline::*_Init)();		// nullptr 초기화
+	void (Pipeline::*_Update)();
+	void (Pipeline::*_LateUpdate)();
+	void (Pipeline::*_Close)();
 };
 

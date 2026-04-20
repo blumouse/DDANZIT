@@ -11,21 +11,31 @@
 
 class GameObject : public Pipeline
 {
+#pragma region Field
+
+public:
+
+private:
+	long index;			// ? 필요하지 않을까
+
+	ObjectData* const data;		// 얘네가 간이(고정) 컴포넌트 역할인거지 결국
+	ObjectVisual* visual;	// 그럼 프레임워크 아래에서 코드를 짤때는
+	ObjectLogic* logic;		// 얘네를 상속해서 이어서 짜면 될라나
+	// 왜 get만 두고싶지
+	std::vector<Component*> components;
+
+#pragma endregion
+
+
 public:
 	GameObject();
 	~GameObject();
 
 #pragma region Component
 
-	// 기본제공 데이터 타입을 안쓰고 싶을수도 있자나?
-	ObjectData* data;		// 얘네가 간이(고정) 컴포넌트 역할인거지 결국
-	ObjectVisual* visual;	// 그럼 프레임워크 아래에서 코드를 짤때는
-	ObjectLogic* logic;		// 얘네를 상속해서 이어서 짜면 될라나
-	// 왜 get만 두고싶지
-
 
 	// 뭐야이게
-	template <std::derived_from<ObjectData> T>
+	/*template <std::derived_from<ObjectData> T>
 	T* AddComponent() {
 		if (data != nullptr)
 		{
@@ -36,7 +46,7 @@ public:
 		data->gameObject = this;
 
 		return data;
-	}
+	}*/
 
 	template <std::derived_from<ObjectVisual> T>
 	T* AddComponent() {
@@ -108,9 +118,6 @@ public:
 
 
 private:
-	long index;			// ? 필요하지 않을까
-	std::vector<Component*> components;
-
 	void RegisterObj(GameObject* pGameObject);
 	void QuitObj(GameObject* pGameObject);
 };
