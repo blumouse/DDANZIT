@@ -76,6 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)Core;$(ProjectDir)Util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,6 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)Core;$(ProjectDir)Util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)Core;$(ProjectDir)Util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +121,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)Core;$(ProjectDir)Util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,7 +129,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="Core\Component.cpp" />
+    <ClCompile Include="Core\Game.cpp" />
+    <ClCompile Include="Core\IDrawable.cpp" />
+    <ClCompile Include="Core\MyGameObject.cpp" />
+    <ClCompile Include="Core\NzWndBase.cpp" />
+    <ClCompile Include="Core\Transform.cpp" />
     <ClCompile Include="DDANZIT.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MngObject.cpp" />
@@ -136,15 +145,27 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="ObjectVisual.cpp" />
     <ClCompile Include="Pipeline.cpp" />
+    <ClCompile Include="Util\GameTimer.cpp" />
+    <ClCompile Include="Util\RenderHelp.cpp" />
+    <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Component.h" />
+    <ClInclude Include="Core\Component.h" />
+    <ClInclude Include="Core\Game.h" />
+    <ClInclude Include="Core\IDrawable.h" />
+    <ClInclude Include="Core\MyGameObject.h" />
+    <ClInclude Include="Core\NzWndBase.h" />
+    <ClInclude Include="Core\Transform.h" />
     <ClInclude Include="DDANZIT.h" />
     <ClInclude Include="ObjectData.h" />
     <ClInclude Include="ObjectLogic.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="ObjectVisual.h" />
     <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="Util\GameTimer.h" />
+    <ClInclude Include="Util\INC_Windows.h" />
+    <ClInclude Include="Util\RenderHelp.h" />
+    <ClInclude Include="Util\Utillity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

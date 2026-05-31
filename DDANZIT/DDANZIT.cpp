@@ -1,30 +1,616 @@
-﻿#include "GameObject.h"
+﻿#include "DDANZIT.h"
+#include "INC_Windows.h"
 
-// 어떤 게임을 위한 프레임워크느느냐
-// 물리x 2D 캐주얼 비주얼강조
+#include "GameTimer.h"
+#include "MyGameObject.h"
+#include "IDrawable.h"
+#include "Transform.h"
 
-// 일단 좀 편하게 볼려면 뭐라도 렌더링이 있어야할거같아..
-// cli 비트마스크로라도 대강 그릴까
+#include "RenderHelp.h"
 
-// ? 렌더러도 추상화해서 갈아끼울수도 있는거 아님?
 
-//int main()
+
+//
+// TODO 소기의 목표
+// 
+// 일단 이식하기! 제네릭 자료구조 적극사용
+// 이름들 똑같이 바꾸기
+// 전역으로 바꿀것들 바꾸기
+// 추상화/옵션 지점들 - 렌더러, 디버거, 2d/3d - 등 고려하기
+// 원본코드에(유틸) 있던것들 필요한거 갈무리 정리 쳐내기
+// 오류 정보들 필요한거 던져주기
+//
+
+
+// 여기에 내부함수를 두면 된다
+// 선언부
+namespace
+{
+    // TODO: Time 네임스페이스 / 클래스로 분리할 필요가 있다
+    GameTimer* pGameTimer = nullptr;
+    float fDeltaTime = 0.0f;
+    float fFrameCount = 0.0f;
+
+
+    HWND g_hWnd = HWND();
+    unsigned int g_width = 0;
+    unsigned int g_height = 0;
+
+    HDC hFrontDC = nullptr;
+    HDC hBackDC = nullptr;
+    HBITMAP hBackBitmap = nullptr;
+    HBITMAP hDefaultBitmap = nullptr;
+
+
+    #define MAX_GAME_OBJECT_COUNT 1000
+    GameObjectBase** ppGameObjects = nullptr;
+    int gameObjectsIndex = 0;
+
+    #define MAX_LAYER_NUM 5
+    IDrawable** ppDrawableLayers[MAX_LAYER_NUM];
+
+
+    #define MAX_BMI_NUM 10
+    BitmapInfo* ppBitmapResources[MAX_BMI_NUM];
+    int bmiIndex = 0;
+
+    bool PreLoadResources(const wchar_t** pfilePath, unsigned int size);
+
+
+
+    // Pipeline
+    void _Update();
+    void _Render();
+
+
+    // Lifecycles
+    void Awake();
+    void Start();
+    void Update();
+    void FixedUpdate();
+    void OnDestroy();
+
+
+    // Input Events ...추가 예정
+    void _OnMouseMove(int x, int y);
+    void _OnLButtonDown(int x, int y);
+    void _OnLButtonUp(int x, int y);
+    void _OnRButtonDown(int x, int y);
+    void _OnRButtonUp(int x, int y);
+
+
+    void _OnResize(int width, int height);
+    void _OnClose();
+}
+
+
+// 파라미터로 뭘 받아야할까 설정값들
+// 창 이름 창 크기*2 리소스(초기) 정보
+
+bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height) {
+
+    pGameTimer = new GameTimer();
+    pGameTimer->Reset();
+
+    const wchar_t* className = L"DDANZIT";
+
+    if (!Create(className, windowName, width, height))
+        return false;
+
+
+    RECT rcClient = {};
+    GetClientRect(g_hWnd, &rcClient);
+    width = rcClient.right - rcClient.left;
+    height = rcClient.bottom - rcClient.top;
+
+    hFrontDC = GetDC(g_hWnd);
+    hBackDC = CreateCompatibleDC(hFrontDC);
+    hBackBitmap = CreateCompatibleBitmap(hFrontDC, width, height);
+
+    hDefaultBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
+
+
+    // 게임 초기화
+    ppGameObjects = new GameObjectBase * [MAX_GAME_OBJECT_COUNT];
+
+    for (int i = 0; i < MAX_GAME_OBJECT_COUNT; ++i)
+    {
+        ppGameObjects[i] = nullptr;
+    }
+
+    gameObjectsIndex = 0;
+
+    for (int i = 0; i < MAX_LAYER_NUM; i++)
+    {
+        ppDrawableLayers[i] = new IDrawable * [MAX_GAME_OBJECT_COUNT];
+
+        for (int j = 0; j < MAX_GAME_OBJECT_COUNT; j++)
+            ppDrawableLayers[i][j] = nullptr;
+    }
+
+
+    return true;
+}
+
+void DDANZIT_Run() {
+
+    MSG msg = { 0 };
+    while (msg.message != WM_QUIT)
+    {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_MOUSEMOVE)
+            {
+                _OnMouseMove(LOWORD(msg.lParam), HIWORD(msg.lParam));
+            }
+            else if (msg.message == WM_LBUTTONDOWN)
+            {
+                _OnLButtonDown(LOWORD(msg.lParam), HIWORD(msg.lParam));
+            }
+            else if (msg.message == WM_RBUTTONDOWN)
+            {
+                _OnRButtonDown(LOWORD(msg.lParam), HIWORD(msg.lParam));
+            }
+            else if (msg.message == WM_LBUTTONUP)
+            {
+                _OnLButtonUp(LOWORD(msg.lParam), HIWORD(msg.lParam));
+            }
+            else if (msg.message == WM_RBUTTONUP)
+            {
+                _OnRButtonUp(LOWORD(msg.lParam), HIWORD(msg.lParam));
+            }
+            else
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        else
+        {
+            _Update();
+            _Render();
+        }
+    }
+}
+
+// 오버로딩
+static bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize) 
+{
+    if (!PreLoadResources(pfilePath, resourceSize))
+        return false;
+
+    return DDANZIT_Initialize(windowName, width, height);
+}
+
+
+void DDANZIT_Finalize() {
+
+    delete pGameTimer;
+    pGameTimer = nullptr;
+
+    for (int i = 0; i < MAX_LAYER_NUM; i++)
+    {
+        if (ppDrawableLayers[i])
+        {
+            delete ppDrawableLayers[i];
+            ppDrawableLayers[i] = nullptr;
+        }
+    }
+
+    if (ppGameObjects)
+    {
+        for (int i = 0; i < gameObjectsIndex; ++i)
+        {
+            if (ppGameObjects[i])
+            {
+                ppGameObjects[i]->OnDestroy();
+
+                delete ppGameObjects[i];
+                ppGameObjects[i] = nullptr;
+            }
+        }
+        delete ppGameObjects;
+        ppGameObjects = nullptr;
+    }
+
+    DestroyWnd();
+}
+
+
+BitmapInfo* LoadResource(const wchar_t* filePath)
+{
+    if (bmiIndex == MAX_BMI_NUM)
+        return nullptr;
+
+    ppBitmapResources[bmiIndex++] = renderHelp::CreateBitmapInfo(filePath);
+
+    return ppBitmapResources[bmiIndex];
+}
+
+
+void RegisterObject(GameObjectBase* gameObject)
+{
+    // TODO: 오브젝트 관리 / 검색 방식 강화 및 다양화
+
+    for (int i = 0; i < gameObjectsIndex; i++)
+    {
+        if (ppGameObjects[i] == nullptr)
+        {
+            ppGameObjects[i] = gameObject;
+
+            // TODO: Awake / Start 실행 큐에 등록
+            gameObject->Awake();
+
+            return;
+        }
+    }
+
+
+    if (gameObjectsIndex == MAX_GAME_OBJECT_COUNT)
+        return;
+
+    ppGameObjects[gameObjectsIndex++] = gameObject;
+
+    // TODO: 동일
+    gameObject->Awake();
+}
+
+
+void RegisterDrawable(IDrawable* drawable)
+{
+    for (int i = 0; i < gameObjectsIndex; i++)
+    {
+        if (ppDrawableLayers[0][i] == nullptr)
+        {
+            ppDrawableLayers[0][i] = drawable;
+            break;
+        }
+    }
+}
+
+void RegisterDrawable(IDrawable* drawable, int layer)
+{
+    if (layer < 0 || layer > MAX_LAYER_NUM)
+        return;
+
+    for (int i = 0; i < gameObjectsIndex; i++)
+    {
+        if (ppDrawableLayers[layer][i] == nullptr)
+        {
+            ppDrawableLayers[layer][i] = drawable;
+            break;
+        }
+    }
+}
+
+void QuitDrawable(IDrawable* drawable)
+{
+    for (int i = 0; i < MAX_LAYER_NUM; i++)
+    {
+        for (int j = 0; j < gameObjectsIndex; j++)
+        {
+            if (ppDrawableLayers[i][j] && ppDrawableLayers[i][j] == drawable)
+            {
+                ppDrawableLayers[i] = nullptr;
+                break;
+            }
+        }
+    }
+}
+
+void QuitDrawable(IDrawable* drawable, int layer)
+{
+    for (int i = 0; i < gameObjectsIndex; i++)
+    {
+        if (ppDrawableLayers[layer][i] && ppDrawableLayers[layer][i] == drawable)
+        {
+            ppDrawableLayers[layer] = nullptr;
+            break;
+        }
+    }
+}
+
+void Destroy(GameObjectBase* gameObject)
+{
+    IDrawable* drawable = dynamic_cast<IDrawable*>(gameObject);
+    if (drawable)
+        QuitDrawable(drawable, drawable->GetLayer());
+
+    for (int i = 0; i < gameObjectsIndex; i++)
+    {
+        if (ppGameObjects[i] && ppGameObjects[i] == gameObject)
+        {
+            ppGameObjects[i] = nullptr;
+
+            gameObject->OnDestroy();
+            delete gameObject;
+
+            return;
+        }
+    }
+}
+
+
+//GameObjectBase* GetObjectWithPos(int mouseX, int mouseY)
 //{
-//	// 초기화가 있어야할거고
-//	// 초기화에서 유저코드 (게임오브젝트를 상속하는?) 전부 가져와주기?
+//    GameObjectBase* gameObject = nullptr;
 //
-//	// 이게 게임 메인루프
-//	while (true)
-//	{
-//		GameObject::GetObjList().front()->Update();
-//		// 순회로 해야겠지
-//		// 파이프라인으로 업캐스팅했을때 또 이점이 있을거같은데
-//		// 좀더 크게 보면 이것도 여기서 직접호출하면 안되고 렌더러에 넘겨주는 식이 될거같아
-//	}
+//    for (int i = 0; i < gameObjectsIndex; i++)
+//    {
+//        if (ppTransforms[i] && ppTransforms[i]->IsIntersectPoint(mouseX, mouseY))
+//        {
+//            gameObject = dynamic_cast<GameObjectBase*>(ppTransforms[i]);
+//            break;
+//        }
+//    }
 //
-//	// 끝날때 실행할게 있어야겠지
+//    return gameObject;
+//}
+//
+//bool TryGetObjectWithPos(int mouseX, int mouseY, GameObjectBase*& pGameObject)
+//{
+//    GameObjectBase* gameObject = nullptr;
+//
+//    for (int i = 0; i < gameObjectsIndex; i++)
+//    {
+//        if (ppTransforms[i] && ppTransforms[i]->IsIntersectPoint(mouseX, mouseY))
+//        {
+//            // 어 그 주소 go 맞아.. 더 확실하게 보장시킬수 없나 transform에?
+//            if (gameObject = dynamic_cast<GameObjectBase*>(ppTransforms[i]))
+//            {
+//                pGameObject = gameObject;
+//                return true;
+//            }
+//        }
+//    }
+//
+//    return false;
 //}
 
-// 스레드를 쓸수있나..?
-// 적어도 게임 루프 자체는 하나여야 될테고 데이터 가져오는정도의 잡무는 할수 있겠지
-// 잡무처리(단순화)해서 큐에 넣어놓고 메인에서 다시 중앙처리하고...
+
+
+// 내부함수들..
+// 구현부
+namespace 
+{
+    bool PreLoadResources(const wchar_t** pfilePath, unsigned int size)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            if (bmiIndex == MAX_BMI_NUM)
+            {
+                // 오류..
+                return false;
+            }
+
+            ppBitmapResources[bmiIndex++] = renderHelp::CreateBitmapInfo(pfilePath[i]);
+        }
+
+        return true;
+    }
+
+
+    void _Update()
+    {
+        pGameTimer->Tick();
+
+        Update();
+
+        fDeltaTime = pGameTimer->DeltaTimeMS();
+        fFrameCount += fDeltaTime;
+
+        while (fFrameCount >= 200.0f)
+        {
+            FixedUpdate();
+            fFrameCount -= 200.0f;
+        }
+    }
+
+    // TODO: 배경색 스카이박스 설정 가능하게 (내부함수로)
+    void _Render()
+    {
+        HBRUSH hGrayBrush = CreateSolidBrush(RGB(216, 216, 216));
+        HBRUSH hOldBrush = (HBRUSH)SelectObject(hBackDC, hGrayBrush);
+
+        ::PatBlt(hBackDC, 0, 0, g_width, g_height, PATCOPY);
+
+        SelectObject(hBackDC, hOldBrush);
+        DeleteObject(hGrayBrush);
+
+
+        // 0번 레이어가 가장 위
+        for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
+        {
+            for (int j = 0; j < gameObjectsIndex; ++j)
+            {
+                if (ppDrawableLayers[i][j])
+                    ppDrawableLayers[i][j]->Draw(hBackDC);
+            }
+        }
+
+
+        BitBlt(hFrontDC, 0, 0, g_width, g_height, hBackDC, 0, 0, SRCCOPY);
+    }
+
+
+    // TODO: 자료구조로 반영, 별도의 Awake / Start 큐에 등록 및 호출..
+    void Awake() 
+    {
+        for (int i = 0; i < gameObjectsIndex; ++i)
+        {
+            if (ppGameObjects[i])
+            {
+                ppGameObjects[i]->Awake();
+            }
+        }
+    }
+
+
+    void Start()
+    {
+        for (int i = 0; i < gameObjectsIndex; ++i)
+        {
+            if (ppGameObjects[i])
+            {
+                ppGameObjects[i]->Start();
+            }
+        }
+    }
+
+
+    void Update()
+    {
+        for (int i = 0; i < gameObjectsIndex; ++i)
+        {
+            if (ppGameObjects[i])
+            {
+                ppGameObjects[i]->Update(fDeltaTime);
+            }
+        }
+    }
+
+
+    void FixedUpdate()
+    {
+        for (int i = 0; i < gameObjectsIndex; ++i)
+        {
+            if (ppGameObjects[i])
+            {
+                ppGameObjects[i]->FixedUpdate();
+            }
+        }
+    }
+
+
+    // TODO: 이벤트 등록된 함수 호출
+    void _OnMouseMove(int x, int y)
+    {
+    }
+
+    void _OnLButtonDown(int x, int y)
+    {
+    }
+
+    void _OnRButtonDown(int x, int y)
+    {
+    }
+
+    void _OnLButtonUp(int x, int y)
+    {
+    }
+
+    void _OnRButtonUp(int x, int y)
+    {
+    }
+
+
+
+    void _OnResize(int width, int height)
+    {
+        learning::SetScreenSize(width, height);
+
+        OnResize(width, height);
+
+        hBackBitmap = CreateCompatibleBitmap(hFrontDC, g_width, g_height);
+
+        HANDLE hPrevBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
+
+        DeleteObject(hPrevBitmap);
+    }
+
+
+    void _OnClose()
+    {
+        SelectObject(hBackDC, hDefaultBitmap);
+
+        DeleteObject(hBackBitmap);
+        DeleteDC(hBackDC);
+
+        ReleaseDC(g_hWnd, hFrontDC);
+    }
+
+
+
+    LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+    {
+
+        switch (msg)
+        {
+        case WM_SIZE:
+        {
+            GetWindowLongPtr(hwnd, GWLP_USERDATA);
+            _OnResize(LOWORD(lparam), HIWORD(lparam));
+        }
+
+        case WM_CLOSE:
+        {
+            GetWindowLongPtr(hwnd, GWLP_USERDATA);
+            _OnClose();
+            PostQuitMessage(0);
+            break;
+        }
+
+
+        default:
+            return::DefWindowProc(hwnd, msg, wparam, lparam);
+        }//switch
+
+        return NULL;
+    }
+
+
+    bool Create(const wchar_t* className, const wchar_t* windowName, int width, int height)
+    {
+        WNDCLASSEX wc = {};
+        wc.cbSize = sizeof(WNDCLASSEX);
+        wc.lpszClassName = className;
+        wc.lpfnWndProc = WndProc;
+
+
+        ATOM classId = 0;
+        if (!GetClassInfoEx(HINSTANCE(), className, &wc))
+        {
+            classId = RegisterClassEx(&wc);
+
+            if (0 == classId) return false;
+        }
+
+        g_width = width;
+        g_height = height;
+
+        RECT rc = { 0, 0, width, height };
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
+
+        g_hWnd = CreateWindowEx(NULL, MAKEINTATOM(classId), L"",
+            WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT,
+            rc.right - rc.left, rc.bottom - rc.top, HWND(), HMENU(), HINSTANCE(), NULL);
+
+        if (NULL == g_hWnd) return false;
+
+        ::SetWindowText((HWND)g_hWnd, windowName);
+
+        //SetWindowLongPtr((HWND)g_hWnd, GWLP_USERDATA, (LONG_PTR)this);
+
+        ShowWindow((HWND)g_hWnd, SW_SHOW);
+        UpdateWindow((HWND)g_hWnd);
+
+        return true;
+    }
+
+    // 이름 바꿔야겠는데
+    void DestroyWnd()
+    {
+        if (NULL != g_hWnd)
+        {
+            DestroyWindow((HWND)g_hWnd);
+            g_hWnd = NULL;
+        }
+    }
+
+    void OnResize(int width, int height)
+    {
+        g_width = width;
+        g_height = height;
+    }
+
+}

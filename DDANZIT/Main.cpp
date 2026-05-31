@@ -1,28 +1,12 @@
-#include <iostream>
-#include "GameObject.h"
 #include "DDANZIT.h"
 
-// 어떤 게임을 위한 프레임워크느느냐
-// 물리x 2D 캐주얼 비주얼강조
-
-// 일단 좀 편하게 볼려면 뭐라도 렌더링이 있어야할거같아..
-// cli 비트마스크로라도 대강 그릴까
-
-// ? 렌더러도 추상화해서 갈아끼울수도 있는거 아님?
 
 int main()
 {
-	// 초기화가 있어야할거고
-	// 초기화에서 유저코드 (게임오브젝트를 상속하는?) 전부 가져와주기?
-	DDANZIT_Initialize();
+	if (!DDANZIT_Initialize(L"Game", 1024, 760))
+		return;
 
-	// 이게 게임 메인루프
-	DDANZIT_Game();
+	DDANZIT_Run();
 
-	// 끝날때 실행할게 있어야겠지
-	DDANZIT_Quit();
+	DDANZIT_Finalize();
 }
-
-// 스레드를 쓸수있나..?
-// 적어도 게임 루프 자체는 하나여야 될테고 데이터 가져오는정도의 잡무는 할수 있겠지
-// 잡무처리(단순화)해서 큐에 넣어놓고 메인에서 다시 중앙처리하고...
