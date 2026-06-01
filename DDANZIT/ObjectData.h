@@ -14,21 +14,10 @@ typedef struct Scale2D {
 	float yScale;
 };
 
-class Shape {
-
-};
-
-class None : public Shape {
-
-};
-
-class Square : public Shape {
-
-};
-
 // 등등.. 근데 enum 있다니까 걍 그게 나을듯
+// 근데! 결국에는 클래스정의가 필요할텐데! 음.. 아닌가
 
-enum _Shape
+enum Shape
 {
 	None,
 	Point,
@@ -45,7 +34,7 @@ class ObjectData : public Component
 {
 public:
 	Pos2D pos;
-	Shape* shape;
+	Shape shape;
 	float rotate;
 	Scale2D scale;
 	short depth;

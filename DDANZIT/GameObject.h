@@ -85,7 +85,14 @@ public:
 		// 컴포넌트 찾아!
 	}
 
+	template <std::derived_from<Component> T>
+	void DeleteComponent() {
+		// 찾고지웟
+	}
+
+
 	// 같은 컴포넌트를 여러개 달수 있어야 하나..?
+	// 여러개 단다고 치면 컴포넌트에도 뭔가 식별자가 필요해지겠고
 
 	// template <std::derived_from<ObjectVisual> T> bool TryAddVisual(T*& derivedVisual);
 	// template <std::derived_from<ObjectLogic> T> bool TryAddLogic(T*& derivedLogic);
