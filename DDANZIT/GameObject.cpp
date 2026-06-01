@@ -1,93 +1,156 @@
 #include "GameObject.h"
-#include <vector>
 
-GameObject::GameObject() : data(nullptr), visual(nullptr), logic(nullptr){
-	RegisterObj(this);
+#include "DDANZIT.h"
+#include "Transform.h"
+#include "Component.h"
+
+// TODO: MAX_...어쩌고를 인덱스 넘으려고 하면 방어를 해주고싶은데
+// 그냥 팩토리면 방어되나? new를 가리고 friend로 빼주고서..
+// ...강제는 못하겠고 차피 뭐 게임에서 돌아갈라면 등록을 해야되니까
+// 컴포넌트도 맡기는 함수가 있어야겠다 암튼 (결국)
+// 하이라키에 등록하거나 Instantiate하거나 하면 그후에 내부에서 등록.. 할때!
+// 아닌가 굳이 방어할거 없나..? 이건 너무 예외처리 영역인데 일단 킵
+
+using namespace std;
+
+
+#pragma region Constructor
+
+GameObject::GameObject() : _active(true), _tag(Tag::Default)
+{
+	_transform = new Transform(this);
 }
 
-GameObject::~GameObject() {
-	// 할당된거 다 해제
-	if (data != nullptr)
-		delete data;
-
-	if (visual != nullptr)
-		delete visual;
-
-	if (logic != nullptr)
-		delete logic;
-
-	QuitObj(this);
-}
-
-#pragma region Component
-
-#pragma endregion
-
-#pragma region ManageObject
-
-GameObject* GameObject::Instantiate() {
-	// 동적할당~~
-	// 자체적으로도 가지고 있는게 낫나?
-	GameObject* newInstance = new GameObject;
-	return newInstance;
-}
-
-void GameObject::Instantiate(GameObject& gameObject) {
-	GameObject* newInstance = new GameObject;
-}
-
-void GameObject::Destroy(GameObject* instance) {
-	// instance를 참조하고있는 다른 객체가 있다면 다 통보를 또 해줘야되겠는데? ..그런 경우가 있겠지?
-	delete instance;
-}
-
-void GameObject::RegisterObj(GameObject* pGameObject) {
-	GetObjList().push_back(pGameObject);
-}
-
-void GameObject::QuitObj(GameObject* pGameObject) {
-	// 찾아서 지워!
-}
-
-std::vector<GameObject*> GameObject::GetObjList() {
-	static std::vector<GameObject*> objList;		// 한번 생성되면 유지된대
-	return objList;
+GameObject::~GameObject()
+{
+	for (Component* comp : pComponentList)
+		delete comp;
 }
 
 #pragma endregion
 
-#pragma region Pipeline
 
-void GameObject::Init() {
-	// 아직 여기서 생각할건 아니지만..
-	// 한번만 실행이니까 이런건 음 오브젝트의 init을 한번만 가져가서 실행하게 해야겠네
-	
-	if (logic != nullptr)
-		logic->Init();		// 흠 이거 함수포인터로 받은뒤에 조건걸어서 거를수도 있겠는데?
-	if (visual != nullptr)
-		visual->Init();
-	// TODO: 확장 컴포넌트도 추가...
+
+#pragma region Properties
+
+Transform* const GameObject::transform()
+{
+	return _transform;
 }
 
-void GameObject::Update() {
-	if (logic != nullptr)
-		logic->Update();
-	if (visual != nullptr)
-		visual->Update();
+#pragma endregion
+
+
+
+#pragma region Methods
+
+void GameObject::SetActive(bool newActive) 
+{
+	if (_active == newActive)
+		return;
+
+	if (newActive /*== true*/)
+	{
+		// TODO: OnEnable 리스트에 추가
+	}
+	else
+	{
+		// 유사
+	}
+
+	_active = newActive;
 }
 
-void GameObject::LateUpdate() {
-	if (logic != nullptr)
-		logic->LateUpdate();
-	if (visual != nullptr)
-		visual->LateUpdate();
+#pragma endregion
+
+
+
+#pragma region LifeCycles
+
+void GameObject::Awake()
+{
+	for (Component* comp : pComponentList)
+		comp->Awake();
 }
 
-void GameObject::Close() {
-	if (logic != nullptr)
-		logic->Close();
-	if (visual != nullptr)
-		visual->Close();
+void GameObject::OnEnable()
+{
+
+}
+
+void GameObject::Start()
+{
+	for (Component* comp : pComponentList)
+		comp->Start();
+}
+
+void GameObject::Update()
+{
+	for (Component* comp : pComponentList)
+		comp->Update();
+}
+
+void GameObject::FixedUpdate()
+{
+	for (Component* comp : pComponentList)
+		comp->FixedUpdate();
+}
+
+void GameObject::OnDestroy()
+{
+	for (Component* comp : pComponentList)
+		comp->OnDestroy();
+}
+
+#pragma endregion
+
+
+
+#pragma region StaticMethods
+
+GameObject* GameObject::Instantiate(GameObject* gameObject)
+{
+	if (gameObject == nullptr)
+		return nullptr;
+
+}
+
+static GameObject* Instantiate(GameObject* gameObject, Transform* parent) 
+{
+	if (gameObject == nullptr)
+		return nullptr;
+
+}
+
+static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float angle) 
+{
+	if (gameObject == nullptr)
+		return nullptr;
+
+}
+
+//static GameObject* Instantiate(GameObject* gameObject, Scene scene)
+//{
+//	if (gameObject == nullptr)
+//		return nullptr;
+//
+//}
+
+void GameObject::Destroy(GameObject*& gameObject) 
+{
+	if (gameObject == nullptr)
+		return;
+
+}
+
+GameObject* GameObject::Find(string name) 
+{
+
+}
+
+GameObject* GameObject::FindWithTag(Tag tag) 
+{
+
 }
 
 #pragma endregion

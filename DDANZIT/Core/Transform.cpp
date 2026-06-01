@@ -1,19 +1,54 @@
 #include "Transform.h"
-#include "Game.h"
+#include "GameObject.h"
 
-Transform::Transform() : pos(Vector2(0,0)), scale(Vector2{ 1,1 })
+using namespace std;
+
+
+#pragma region Constructor
+
+Transform::Transform(GameObject* pGameObject) : 
+	Component(pGameObject), _parent(nullptr), _position(Vector2(0, 0)), _rotation(Vector2(1, 0)), _angle(0), _scale(Vector2(1, 1)), _depth(0)
 {
-	Game::GetInstance()->RegisterTransform(this);
+	//RegisterTransform(this);
+}
+
+#pragma endregion
+
+
+
+#pragma region Tree
+
+void Transform::SetParent(Transform* parent)
+{
+	if (_parent == parent)
+		return;
+
+	if (_parent != nullptr)
+		_parent->RemoveChild(this);
+
+	if (parent != nullptr)
+		parent->AddChild(this);
+
+	_parent = parent;
+}
+
+Transform* Transform::GetChild(int index) const
+{
+	if (index < 0 || index > pChildList.size())
+		return nullptr;
+
+	return pChildList[index];
 }
 
 
-bool Transform::IsIntersectPoint(int x, int y)
+void Transform::AddChild(Transform* child)
 {
-	if (pos.x - (scale.x / 2.0f) < x && x < pos.x + (scale.x / 2.0f))
-	{
-		if (pos.y - (scale.y / 2.0f) < y && y < pos.y + (scale.y / 2.0f))
-			return true;
-	}
-
-	return false;
+	pChildList.push_back(child);
 }
+
+void Transform::RemoveChild(Transform* child)
+{
+	pChildList.erase(std::remove(pChildList.begin(), pChildList.end(), child), pChildList.end());
+}
+
+#pragma endregion

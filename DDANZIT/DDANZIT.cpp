@@ -1,13 +1,19 @@
 ﻿#include "DDANZIT.h"
-#include "INC_Windows.h"
+#include "DefineOption.h"
 
 #include "GameTimer.h"
+#include "Scene.h"
 #include "MyGameObject.h"
 #include "IDrawable.h"
 #include "Transform.h"
 
+#include "INC_Windows.h"
 #include "RenderHelp.h"
 
+#include <vector>
+#include <queue>
+
+using namespace std;
 
 
 //
@@ -47,15 +53,17 @@ namespace
     HBITMAP hDefaultBitmap = nullptr;
 
 
-    #define MAX_GAME_OBJECT_COUNT 1000
+    vector<Scene*> pSceneList;
+
+
+    // TODO: 벡터든 큐든 뭐.. 바꾸기.. 이전에 씬 / 하이라키로 넣기
+
     GameObjectBase** ppGameObjects = nullptr;
     int gameObjectsIndex = 0;
 
-    #define MAX_LAYER_NUM 5
     IDrawable** ppDrawableLayers[MAX_LAYER_NUM];
 
 
-    #define MAX_BMI_NUM 10
     BitmapInfo* ppBitmapResources[MAX_BMI_NUM];
     int bmiIndex = 0;
 
@@ -116,9 +124,9 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
 
     // 게임 초기화
-    ppGameObjects = new GameObjectBase * [MAX_GAME_OBJECT_COUNT];
+    ppGameObjects = new GameObjectBase * [MAX_GAME_OBJECT_NUM];
 
-    for (int i = 0; i < MAX_GAME_OBJECT_COUNT; ++i)
+    for (int i = 0; i < MAX_GAME_OBJECT_NUM; ++i)
     {
         ppGameObjects[i] = nullptr;
     }
@@ -127,9 +135,9 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
     for (int i = 0; i < MAX_LAYER_NUM; i++)
     {
-        ppDrawableLayers[i] = new IDrawable * [MAX_GAME_OBJECT_COUNT];
+        ppDrawableLayers[i] = new IDrawable * [MAX_GAME_OBJECT_NUM];
 
-        for (int j = 0; j < MAX_GAME_OBJECT_COUNT; j++)
+        for (int j = 0; j < MAX_GAME_OBJECT_NUM; j++)
             ppDrawableLayers[i][j] = nullptr;
     }
 
@@ -230,109 +238,6 @@ BitmapInfo* LoadResource(const wchar_t* filePath)
     ppBitmapResources[bmiIndex++] = renderHelp::CreateBitmapInfo(filePath);
 
     return ppBitmapResources[bmiIndex];
-}
-
-
-void RegisterObject(GameObjectBase* gameObject)
-{
-    // TODO: 오브젝트 관리 / 검색 방식 강화 및 다양화
-
-    for (int i = 0; i < gameObjectsIndex; i++)
-    {
-        if (ppGameObjects[i] == nullptr)
-        {
-            ppGameObjects[i] = gameObject;
-
-            // TODO: Awake / Start 실행 큐에 등록
-            gameObject->Awake();
-
-            return;
-        }
-    }
-
-
-    if (gameObjectsIndex == MAX_GAME_OBJECT_COUNT)
-        return;
-
-    ppGameObjects[gameObjectsIndex++] = gameObject;
-
-    // TODO: 동일
-    gameObject->Awake();
-}
-
-
-void RegisterDrawable(IDrawable* drawable)
-{
-    for (int i = 0; i < gameObjectsIndex; i++)
-    {
-        if (ppDrawableLayers[0][i] == nullptr)
-        {
-            ppDrawableLayers[0][i] = drawable;
-            break;
-        }
-    }
-}
-
-void RegisterDrawable(IDrawable* drawable, int layer)
-{
-    if (layer < 0 || layer > MAX_LAYER_NUM)
-        return;
-
-    for (int i = 0; i < gameObjectsIndex; i++)
-    {
-        if (ppDrawableLayers[layer][i] == nullptr)
-        {
-            ppDrawableLayers[layer][i] = drawable;
-            break;
-        }
-    }
-}
-
-void QuitDrawable(IDrawable* drawable)
-{
-    for (int i = 0; i < MAX_LAYER_NUM; i++)
-    {
-        for (int j = 0; j < gameObjectsIndex; j++)
-        {
-            if (ppDrawableLayers[i][j] && ppDrawableLayers[i][j] == drawable)
-            {
-                ppDrawableLayers[i] = nullptr;
-                break;
-            }
-        }
-    }
-}
-
-void QuitDrawable(IDrawable* drawable, int layer)
-{
-    for (int i = 0; i < gameObjectsIndex; i++)
-    {
-        if (ppDrawableLayers[layer][i] && ppDrawableLayers[layer][i] == drawable)
-        {
-            ppDrawableLayers[layer] = nullptr;
-            break;
-        }
-    }
-}
-
-void Destroy(GameObjectBase* gameObject)
-{
-    IDrawable* drawable = dynamic_cast<IDrawable*>(gameObject);
-    if (drawable)
-        QuitDrawable(drawable, drawable->GetLayer());
-
-    for (int i = 0; i < gameObjectsIndex; i++)
-    {
-        if (ppGameObjects[i] && ppGameObjects[i] == gameObject)
-        {
-            ppGameObjects[i] = nullptr;
-
-            gameObject->OnDestroy();
-            delete gameObject;
-
-            return;
-        }
-    }
 }
 
 
