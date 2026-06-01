@@ -6,6 +6,7 @@
 #include "DefineOption.h"
 
 class Component;
+class Scene;
 
 
 // TODO_LATER: 오브젝트를 상속받기? 는 나중에 고려
@@ -165,7 +166,7 @@ public:
 	static GameObject* Instantiate(GameObject* gameObject);
 	static GameObject* Instantiate(GameObject* gameObject, Transform* parent);
 	static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float angle);
-	//static GameObject* Instantiate(GameObject* gameObject, Scene scene);
+	static GameObject* Instantiate(GameObject* gameObject, Scene scene);
 
 	static void Destroy(GameObject*& gameObject);
 

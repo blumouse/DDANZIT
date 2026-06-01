@@ -3,6 +3,7 @@
 #include "DDANZIT.h"
 #include "Transform.h"
 #include "Component.h"
+#include "Scene.h"
 
 // TODO: MAX_...어쩌고를 인덱스 넘으려고 하면 방어를 해주고싶은데
 // 그냥 팩토리면 방어되나? new를 가리고 friend로 빼주고서..
@@ -129,12 +130,12 @@ static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float a
 
 }
 
-//static GameObject* Instantiate(GameObject* gameObject, Scene scene)
-//{
-//	if (gameObject == nullptr)
-//		return nullptr;
-//
-//}
+static GameObject* Instantiate(GameObject* gameObject, Scene scene)
+{
+	if (gameObject == nullptr)
+		return nullptr;
+
+}
 
 void GameObject::Destroy(GameObject*& gameObject) 
 {

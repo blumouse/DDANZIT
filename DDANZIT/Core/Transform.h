@@ -35,8 +35,8 @@ public:
 
 #pragma region Properties
 
-	// 이것도 매크로로 받아와서 2d / 3d 구분해주기?
-#ifdef USE_2D
+	// TODO: 부모 오브젝트 기준으로 움직이게 하기
+#ifdef USE_MODE_2D
 	
 private:
 	Vector2 _position;
@@ -74,19 +74,19 @@ public:
 	const int& depth() const { return _depth; }
 
 
-#endif // USE_2D
+#endif // USE_MODE_2D
 
 
 #pragma endregion
 
 
 
-#pragma region Tree
+#pragma region HierarchyTree
 
 private:
 	Transform* _parent;
 public:
-	// nullptr이 Root
+	// nullptr이면 root, root는 리스트로 씬에서 갖기
 	Transform* parent() const { return _parent; }
 
 

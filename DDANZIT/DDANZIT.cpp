@@ -64,7 +64,7 @@ namespace
     IDrawable** ppDrawableLayers[MAX_LAYER_NUM];
 
 
-    BitmapInfo* ppBitmapResources[MAX_BMI_NUM];
+    BitmapInfo* ppBitmapResources[MAX_RESOURCE_NUM];
     int bmiIndex = 0;
 
     bool PreLoadResources(const wchar_t** pfilePath, unsigned int size);
@@ -78,9 +78,13 @@ namespace
 
     // Lifecycles
     void Awake();
+    //void OnEnable();
     void Start();
+
     void Update();
     void FixedUpdate();
+
+    //void OnDisable();
     void OnDestroy();
 
 
@@ -95,6 +99,7 @@ namespace
     void _OnResize(int width, int height);
     void _OnClose();
 }
+
 
 
 // 파라미터로 뭘 받아야할까 설정값들
@@ -145,6 +150,15 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     return true;
 }
 
+bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize)
+{
+    if (!PreLoadResources(pfilePath, resourceSize))
+        return false;
+
+    return DDANZIT_Initialize(windowName, width, height);
+}
+
+
 void DDANZIT_Run() {
 
     MSG msg = { 0 };
@@ -186,15 +200,6 @@ void DDANZIT_Run() {
     }
 }
 
-// 오버로딩
-static bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize) 
-{
-    if (!PreLoadResources(pfilePath, resourceSize))
-        return false;
-
-    return DDANZIT_Initialize(windowName, width, height);
-}
-
 
 void DDANZIT_Finalize() {
 
@@ -232,7 +237,7 @@ void DDANZIT_Finalize() {
 
 BitmapInfo* LoadResource(const wchar_t* filePath)
 {
-    if (bmiIndex == MAX_BMI_NUM)
+    if (bmiIndex == MAX_RESOURCE_NUM)
         return nullptr;
 
     ppBitmapResources[bmiIndex++] = renderHelp::CreateBitmapInfo(filePath);
@@ -287,7 +292,7 @@ namespace
     {
         for (int i = 0; i < size; i++)
         {
-            if (bmiIndex == MAX_BMI_NUM)
+            if (bmiIndex == MAX_RESOURCE_NUM)
             {
                 // 오류..
                 return false;

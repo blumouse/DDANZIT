@@ -2,10 +2,28 @@
 
 #include "GameObject.h"
 
+using namespace std;
+
+
 // TODO: 큐로 바꾸기
 
+#pragma region Hierarchy
 
-void Scene::RegisterObject(GameObject* gameObject)
+vector<GameObject*> Scene::GetRootGameObjects() const 
+{
+
+}
+
+const int& Scene::rootCount() const 
+{
+
+}
+
+#pragma endregion
+
+
+
+void Scene::RegisterGameObject(GameObject* gameObject)
 {
     // TODO: 오브젝트 관리 / 검색 방식 강화 및 다양화
 
@@ -30,6 +48,26 @@ void Scene::RegisterObject(GameObject* gameObject)
 
     // TODO: 동일
     gameObject->Awake();
+}
+
+void Scene::QuitGameObject(GameObject* gameObject)
+{
+    IDrawable* drawable = dynamic_cast<IDrawable*>(gameObject);
+    if (drawable)
+        QuitDrawable(drawable, drawable->GetLayer());
+
+    for (int i = 0; i < gameObjectsIndex; i++)
+    {
+        if (ppGameObjects[i] && ppGameObjects[i] == gameObject)
+        {
+            ppGameObjects[i] = nullptr;
+
+            gameObject->OnDestroy();
+            delete gameObject;
+
+            return;
+        }
+    }
 }
 
 
@@ -86,24 +124,3 @@ void Scene::QuitDrawable(IDrawable* drawable, int layer)
         }
     }
 }
-
-void Scene::Destroy(GameObject* gameObject)
-{
-    IDrawable* drawable = dynamic_cast<IDrawable*>(gameObject);
-    if (drawable)
-        QuitDrawable(drawable, drawable->GetLayer());
-
-    for (int i = 0; i < gameObjectsIndex; i++)
-    {
-        if (ppGameObjects[i] && ppGameObjects[i] == gameObject)
-        {
-            ppGameObjects[i] = nullptr;
-
-            gameObject->OnDestroy();
-            delete gameObject;
-
-            return;
-        }
-    }
-}
-

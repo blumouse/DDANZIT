@@ -16,7 +16,7 @@ Transform::Transform(GameObject* pGameObject) :
 
 
 
-#pragma region Tree
+#pragma region HierarchyTree
 
 void Transform::SetParent(Transform* parent)
 {
