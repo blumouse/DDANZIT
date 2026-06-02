@@ -34,24 +34,15 @@
     <Filter Include="소스 파일\DDANZIT">
       <UniqueIdentifier>{9e320377-1461-4863-a5e5-830995a7f2f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\사용해보기\Origin">
+      <UniqueIdentifier>{738550ec-451c-4c2f-b7f1-aa779c3d3bd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MngObject.cpp">
-      <Filter>소스 파일\사용해보기</Filter>
-    </ClCompile>
-    <ClCompile Include="NewObject.cpp">
-      <Filter>소스 파일\사용해보기</Filter>
-    </ClCompile>
-    <ClCompile Include="NewVisual.cpp">
-      <Filter>소스 파일\사용해보기</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
     <ClCompile Include="Core\Component.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Game.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\IDrawable.cpp">
@@ -90,14 +81,35 @@
     <ClCompile Include="ObjectVisual.cpp">
       <Filter>소스 파일\DDANZIT</Filter>
     </ClCompile>
-    <ClCompile Include="Pipeline.cpp">
+    <ClCompile Include="Lifecycle.cpp">
+      <Filter>소스 파일\DDANZIT</Filter>
+    </ClCompile>
+    <ClCompile Include="MonoBehavior.cpp">
+      <Filter>소스 파일\DDANZIT</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>소스 파일\DDANZIT</Filter>
+    </ClCompile>
+    <ClCompile Include="MngObject.cpp">
+      <Filter>소스 파일\사용해보기\Origin</Filter>
+    </ClCompile>
+    <ClCompile Include="NewObject.cpp">
+      <Filter>소스 파일\사용해보기\Origin</Filter>
+    </ClCompile>
+    <ClCompile Include="NewVisual.cpp">
+      <Filter>소스 파일\사용해보기\Origin</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.h">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
+    <ClCompile Include="MyObject.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DDANZIT_Core.cpp">
       <Filter>소스 파일\DDANZIT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Game.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Component.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
@@ -140,7 +152,19 @@
     <ClInclude Include="ObjectVisual.h">
       <Filter>헤더 파일\DDANZIT</Filter>
     </ClInclude>
-    <ClInclude Include="Pipeline.h">
+    <ClInclude Include="Lifecycle.h">
+      <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="DefineOption.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MonoBehavior.h">
+      <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DDANZIT_Core.h">
       <Filter>헤더 파일\DDANZIT</Filter>
     </ClInclude>
   </ItemGroup>

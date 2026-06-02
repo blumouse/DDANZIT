@@ -2,24 +2,41 @@
 
 #include <string>
 #include <vector>
+#include <queue>
 
 #include "DefineOption.h"
+#include "Scene.h"
 
 class Component;
-class Scene;
+class Lifecycle;
+class MonoBehavior;
+
+namespace learning 
+{
+	struct Vector2f;
+}
+
+using Vector2 = learning::Vector2f;
 
 
 // TODO_LATER: 오브젝트를 상속받기? 는 나중에 고려
 class GameObject
 {
 public:
+	//friend class Scene;
+	friend class Component;
 	friend class Transform;
+	friend class MonoBehavior;
 
+	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
+	friend void DDANZIT_Run();
+	friend void DDANZIT_Finalize();
 
 #pragma region Constructor
 
 protected:
 	GameObject();
+	GameObject(Scene* scene);
 	GameObject(const GameObject&) = default;		// 헷갈린당 가리고 friend가 맞나..?
 
 public:
@@ -32,7 +49,13 @@ public:
 #pragma region Properties
 
 private:
-	long index;
+	long index;		// TODO: 이거 할당 ....?
+
+protected:
+	Scene* _scene;
+	//Scene& scene() { return _scene; }					// 이걸로 관리하지 않아
+public:
+	Scene* const scene() { return _scene; }
 
 
 protected:
@@ -51,7 +74,7 @@ public:
 
 protected:
 	bool _active;
-	bool& active() { return _active; }
+	//bool& active() { return _active; }
 public:
 	const bool& active() const { return _active; }
 
@@ -59,16 +82,35 @@ public:
 private:
 	Transform* _transform;
 public:
-	Transform* const transform();
+	Transform* const transform() { return _transform; }
 
+
+	
+	// 내부용
+private:
+	// 나는 아니고~ 부모가 활/비활이래
+	bool parentActive = true;
+
+	// Destroy 마킹 (필요 없을수도)
+	bool isKilled = false;
 
 #pragma endregion
 
 
-	// 이것들은 잠시 치워두기로...
-	//ObjectData* data;
-	//ObjectVisual* visual;
-	//ObjectLogic* logic;
+
+#pragma region Methods
+
+public:
+	void SetActive(bool newActive);
+
+
+	// 내부용
+private:
+	void SetParentActive(bool newActive);
+
+#pragma endregion
+
+
 
 #pragma region Component
 
@@ -121,23 +163,47 @@ public:
 	}
 
 
+protected:
+	// 컴포넌트 등록 함수
+	// 오브젝트 생성자에서 호출해야함
+	// 스크립트 아닌 기본 컴포넌트도 이걸로 등록
+	template <std::derived_from<Component> T>
+	T* AddComponent()
+	{
+		// TODO_LATER: 디버그 메세지
+		if (pComponentList.size() == MAX_COMPONENT_NUM)
+		{
+			return;
+		}
 
-	// TODO_LATER: 이건 좀 후순위로.. 유니티에 동일한 동작이 뭐가있지? 없나..?
-	//template <std::derived_from<Component> T>
-	//void RegisterComponent(T* component) {
-	//	components.push_back(component);
-	//}
+		
+		T* component = new T(this);
 
-#pragma endregion
+		pComponentList.push_back(component);
 
 
+		if (Lifecycle* lifecycle = dynamic_cast<Lifecycle*>(component))
+		{
+			if (lifecycle->activeAwake)
+				_scene->awakeExecQueue.push(lifecycle);
 
-#pragma region Methods
-
-public:
-	void SetActive(bool newActive);
+			if (lifecycle->activeStart)
+				_scene->startExecQueue.push(lifecycle);
 
 
+			if (lifecycle->activeFixedUpdate)
+				_scene->fixedUpdateExecList.push_back(lifecycle);
+
+			if (lifecycle->activeUpdate)
+				_scene->updateExecList.push_back(lifecycle);
+
+			if (lifecycle->activeLateUpdate)
+				_scene->lateUpdateExecList.push_back(lifecycle);
+
+			// TODO?: 다른 On 함수들은 해당 시점에 검사 및 추가
+			// 남은거: OnEnable / OnDisable
+		}
+	}
 
 #pragma endregion
 
@@ -145,20 +211,22 @@ public:
 
 #pragma region Lifecycle
 
-	virtual void Awake();
-	virtual void OnEnable();
-	virtual void Start();
-	virtual void Update();
-	virtual void FixedUpdate();
-
-	virtual void OnDisable();
-	virtual void OnDestroy();
+//public:
+//	virtual void Awake();
+//	virtual void OnEnable();
+//	virtual void Start();
+//
+//	virtual void Update();
+//	virtual void FixedUpdate();
+//	virtual void LateUpdate();
+//
+//	virtual void OnDisable();
+//	virtual void OnDestroy();
 
 #pragma endregion
 
 
 
-	// 이방식이 생각보다 맞았다; (유니티 기준) 클래스 정적메서드
 #pragma region StaticMethods
 
 	// TODO_LATER: 이것들 원래는 Object의 메서드임
@@ -166,9 +234,11 @@ public:
 	static GameObject* Instantiate(GameObject* gameObject);
 	static GameObject* Instantiate(GameObject* gameObject, Transform* parent);
 	static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float angle);
-	static GameObject* Instantiate(GameObject* gameObject, Scene scene);
+	static GameObject* Instantiate(GameObject* gameObject, Transform* parent, Vector2 position, float angle);
+	static GameObject* Instantiate(GameObject* gameObject, Scene* scene);
+	static GameObject* Instantiate(GameObject* gameObject, Scene* scene, Vector2 position, float angle);
 
-	static void Destroy(GameObject*& gameObject);
+	static void Destroy(GameObject* gameObject);
 
 	static GameObject* Find(std::string name);
 	static GameObject* FindWithTag(Tag tag);
@@ -183,13 +253,7 @@ private:
 	// 이런것들은 접근 못하게 하는군...
 	//static std::vector<GameObject*> GetObjList();
 	//static GameObject* Find(long index);
-	
-
-	//static GameObject* GetObject(ObjectData* data);
-	//static GameObject* GetObject(ObjectVisual* visual);
-	//static GameObject* GetObject(ObjectLogic* logic);
 
 #pragma endregion
-
 
 };

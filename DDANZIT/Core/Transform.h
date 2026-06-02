@@ -18,6 +18,9 @@ class Transform : public Component
 public:
 	friend class GameObject;
 
+	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
+	friend void DDANZIT_Run();
+	friend void DDANZIT_Finalize();
 
 #pragma region Constructor
 
@@ -52,6 +55,7 @@ public:
 	const Vector2& scale() const { return _scale; }
 
 	// TODO: rotation <-> angle 상호 변환해야함 Set 함수를 써야겠네
+	// 아니면.. 오퍼레이터 정의해도됨 헉!
 private:
 	Vector2 _rotation;
 public:
@@ -62,6 +66,7 @@ public:
 private:
 	float _angle;
 public:
+	// 보기좋은 degree
 	float& angle() { return _angle; }
 	const float& angle() const { return _angle; }
 

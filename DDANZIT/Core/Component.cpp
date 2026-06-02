@@ -3,7 +3,7 @@
 
 #pragma region Constructor
 
-Component::Component(GameObject* pGameObject) : _gameObject(pGameObject) 
+Component::Component(GameObject* pGameObject) : _gameObject(pGameObject), _active(true)
 {
 	
 }
@@ -23,7 +23,22 @@ GameObject* const Component::gameObject()
 
 
 
-#pragma region LifeCycles
+#pragma region Methods
 
+void Component::SetActive(bool newActive)
+{
+	if (_active == newActive)
+		return;
+
+	_active = newActive;
+}
+
+void Component::SetParentActive(bool newActive)
+{
+	if (_active == newActive)
+		return;
+
+	_active = newActive;
+}
 
 #pragma endregion

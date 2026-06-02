@@ -1,9 +1,12 @@
 #include "GameObject.h"
 
 #include "DDANZIT.h"
-#include "Transform.h"
-#include "Component.h"
+#include "DDANZIT_Core.h"
 #include "Scene.h"
+#include "Component.h"
+#include "Lifecycle.h"
+
+#include "Transform.h"
 
 // TODO: MAX_...어쩌고를 인덱스 넘으려고 하면 방어를 해주고싶은데
 // 그냥 팩토리면 방어되나? new를 가리고 friend로 빼주고서..
@@ -19,6 +22,27 @@ using namespace std;
 
 GameObject::GameObject() : _active(true), _tag(Tag::Default)
 {
+	if (DDANZIT_Core::mainScene)
+		_scene = DDANZIT_Core::mainScene;
+	else 
+	{
+		// 굉장한 오류
+		return;
+	}
+
+	_transform = new Transform(this);		// ?? 이건 괜찮나? 뭐 고정이긴 한데..
+}
+
+GameObject::GameObject(Scene* scene) : _active(true), _tag(Tag::Default)
+{
+	if (scene)
+		_scene = scene;
+	else
+	{
+		// 오류
+		return;
+	}
+
 	_transform = new Transform(this);
 }
 
@@ -26,6 +50,8 @@ GameObject::~GameObject()
 {
 	for (Component* comp : pComponentList)
 		delete comp;
+
+	delete _transform;
 }
 
 #pragma endregion
@@ -50,14 +76,29 @@ void GameObject::SetActive(bool newActive)
 	if (_active == newActive)
 		return;
 
-	if (newActive /*== true*/)
-	{
-		// TODO: OnEnable 리스트에 추가
-	}
-	else
-	{
-		// 유사
-	}
+
+	for (Transform* tr : _transform->pChildList)
+		tr->_gameObject->SetParentActive(newActive);
+
+	for (Component* comp : pComponentList)
+		comp->SetParentActive(newActive);
+
+	// 모노비헤이비어 단에서 큐 넣어줌;
+
+	_active = newActive;
+}
+
+void GameObject::SetParentActive(bool newActive)
+{
+	if (_active == newActive)
+		return;
+
+
+	for (Transform* tr : _transform->pChildList)
+		tr->_gameObject->SetParentActive(newActive);
+
+	for (Component* comp : pComponentList)
+		comp->SetParentActive(newActive);
 
 	_active = newActive;
 }
@@ -68,40 +109,46 @@ void GameObject::SetActive(bool newActive)
 
 #pragma region LifeCycles
 
-void GameObject::Awake()
-{
-	for (Component* comp : pComponentList)
-		comp->Awake();
-}
+//void GameObject::Awake()
+//{
+//	for (Component* comp : pComponentList)
+//		comp->Awake();
+//}
+//
+//void GameObject::OnEnable()
+//{
+//
+//}
+//
+//void GameObject::Start()
+//{
+//	for (Component* comp : pComponentList)
+//		comp->Start();
+//}
+//
+//void GameObject::Update()
+//{
+//	for (Component* comp : pComponentList)
+//		comp->Update();
+//}
+//
+//void GameObject::FixedUpdate()
+//{
+//	for (Component* comp : pComponentList)
+//		comp->FixedUpdate();
+//}
+//
+//void GameObject::OnDestroy()
+//{
+//	for (Component* comp : pComponentList)
+//		comp->OnDestroy();
+//}
 
-void GameObject::OnEnable()
-{
+#pragma endregion
 
-}
 
-void GameObject::Start()
-{
-	for (Component* comp : pComponentList)
-		comp->Start();
-}
 
-void GameObject::Update()
-{
-	for (Component* comp : pComponentList)
-		comp->Update();
-}
-
-void GameObject::FixedUpdate()
-{
-	for (Component* comp : pComponentList)
-		comp->FixedUpdate();
-}
-
-void GameObject::OnDestroy()
-{
-	for (Component* comp : pComponentList)
-		comp->OnDestroy();
-}
+#pragma region Component
 
 #pragma endregion
 
@@ -114,34 +161,69 @@ GameObject* GameObject::Instantiate(GameObject* gameObject)
 	if (gameObject == nullptr)
 		return nullptr;
 
+	// 메인 씬 루트에 추가
 }
 
-static GameObject* Instantiate(GameObject* gameObject, Transform* parent) 
+GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent)
+{
+	if (gameObject == nullptr)
+		return nullptr;
+
+	// 부모 씬 부모 자식으로 추가
+}
+
+GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, float angle)
 {
 	if (gameObject == nullptr)
 		return nullptr;
 
 }
 
-static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float angle) 
+GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent, Vector2 position, float angle)
 {
 	if (gameObject == nullptr)
 		return nullptr;
 
 }
 
-static GameObject* Instantiate(GameObject* gameObject, Scene scene)
+GameObject* GameObject::Instantiate(GameObject* gameObject, Scene* scene)
+{
+	if (gameObject == nullptr)
+		return nullptr;
+
+	// 해당 씬 루트에 추가
+}
+
+GameObject* GameObject::Instantiate(GameObject* gameObject, Scene* scene, Vector2 position, float angle)
 {
 	if (gameObject == nullptr)
 		return nullptr;
 
 }
 
-void GameObject::Destroy(GameObject*& gameObject) 
+
+// 실제 파괴는 프레임 가장 마지막에 일어난다
+// 에엑 제대로 더 미뤄야해
+void GameObject::Destroy(GameObject* gameObject) 
 {
-	if (gameObject == nullptr)
+	if (gameObject == nullptr || gameObject->isKilled)
 		return;
 
+	gameObject->isKilled = true;
+
+	for (Transform* tr : gameObject->_transform->pChildList)
+	{
+		Destroy(tr->_gameObject);
+	}
+
+	for (Component* comp : gameObject->pComponentList)
+	{
+		if (Lifecycle* lc = dynamic_cast<Lifecycle*>(comp))
+		{
+			if (lc->activeOnDestroy)
+				gameObject->_scene->onDestroyExecQueue.push(lc);
+		}
+	}
 }
 
 GameObject* GameObject::Find(string name) 

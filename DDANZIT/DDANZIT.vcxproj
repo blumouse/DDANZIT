@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Component.cpp" />
-    <ClCompile Include="Core\Game.cpp" />
+    <ClCompile Include="Core\DDANZIT_Core.cpp" />
     <ClCompile Include="Core\IDrawable.cpp" />
     <ClCompile Include="Core\MyGameObject.cpp" />
     <ClCompile Include="Core\NzWndBase.cpp" />
@@ -138,32 +138,36 @@
     <ClCompile Include="DDANZIT.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MngObject.cpp" />
+    <ClCompile Include="MonoBehavior.cpp" />
+    <ClCompile Include="MyObject.cpp" />
     <ClCompile Include="NewObject.cpp" />
     <ClCompile Include="NewVisual.cpp" />
     <ClCompile Include="ObjectData.cpp" />
     <ClCompile Include="ObjectLogic.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="ObjectVisual.cpp" />
-    <ClCompile Include="Pipeline.cpp" />
+    <ClCompile Include="Lifecycle.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Script.h" />
     <ClCompile Include="Util\GameTimer.cpp" />
     <ClCompile Include="Util\RenderHelp.cpp" />
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Component.h" />
-    <ClInclude Include="Core\Game.h" />
+    <ClInclude Include="Core\DDANZIT_Core.h" />
     <ClInclude Include="Core\IDrawable.h" />
     <ClInclude Include="Core\MyGameObject.h" />
     <ClInclude Include="Core\NzWndBase.h" />
     <ClInclude Include="Core\Transform.h" />
     <ClInclude Include="DDANZIT.h" />
     <ClInclude Include="DefineOption.h" />
+    <ClInclude Include="MonoBehavior.h" />
     <ClInclude Include="ObjectData.h" />
     <ClInclude Include="ObjectLogic.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="ObjectVisual.h" />
-    <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="Lifecycle.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Util\GameTimer.h" />
     <ClInclude Include="Util\INC_Windows.h" />

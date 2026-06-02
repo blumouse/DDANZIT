@@ -2,9 +2,15 @@
 #include "DefineOption.h"
 
 #include "GameTimer.h"
+
+#include "DDANZIT_Core.h"
+
 #include "Scene.h"
-#include "MyGameObject.h"
+
 #include "IDrawable.h"
+#include "GameObject.h"
+
+#include "Lifecycle.h"
 #include "Transform.h"
 
 #include "INC_Windows.h"
@@ -14,6 +20,11 @@
 #include <queue>
 
 using namespace std;
+
+
+// 지금 하고있는것...
+// 하이라키 타입 만들기 씬에서 관리
+// 라이프사이클 큐 관리 실행까지 이거 일단 걍 씬에서 갖는거로 하자 -> 액티브계열 함수 호출등록해줘야돼
 
 
 //
@@ -30,6 +41,8 @@ using namespace std;
 // 씬 / 하이라키 구조 (사실 이 아래 씬으로 들어갈게 꽤 많은)
 // 더 많은 오브젝트 / 컴포넌트 속성 (최소한 액티브, 이름, find동작)
 // 코루틴 사이클
+// 
+// 스마트포인터 적용하기..? (차차)
 //
 
 
@@ -53,17 +66,11 @@ namespace
     HBITMAP hDefaultBitmap = nullptr;
 
 
-    vector<Scene*> pSceneList;
+    // 내부로직에서 접근가능하게 빼기
+    static DDANZIT_Core gameCore;
 
 
-    // TODO: 벡터든 큐든 뭐.. 바꾸기.. 이전에 씬 / 하이라키로 넣기
-
-    GameObjectBase** ppGameObjects = nullptr;
-    int gameObjectsIndex = 0;
-
-    IDrawable** ppDrawableLayers[MAX_LAYER_NUM];
-
-
+    // TODO: 이것도 리스트로 바꿔?
     BitmapInfo* ppBitmapResources[MAX_RESOURCE_NUM];
     int bmiIndex = 0;
 
@@ -72,20 +79,23 @@ namespace
 
 
     // Pipeline
-    void _Update();
-    void _Render();
+    // 걍 때려박음 (접근 이슈)
+    //void DDANZIT_Update();
+    //void DDANZIT_Render();
 
 
     // Lifecycles
-    void Awake();
-    //void OnEnable();
-    void Start();
+    // 코어로 이사감
+    //void _Awake();
+    //void _OnEnable();
+    //void _Start();
 
-    void Update();
-    void FixedUpdate();
+    //void _Update();
+    //void _FixedUpdate();
+    //void _LateUpdate();
 
-    //void OnDisable();
-    void OnDestroy();
+    //void _OnDisable();
+    //void _OnDestroy();
 
 
     // Input Events ...추가 예정
@@ -128,23 +138,9 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     hDefaultBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
 
 
+
     // 게임 초기화
-    ppGameObjects = new GameObjectBase * [MAX_GAME_OBJECT_NUM];
 
-    for (int i = 0; i < MAX_GAME_OBJECT_NUM; ++i)
-    {
-        ppGameObjects[i] = nullptr;
-    }
-
-    gameObjectsIndex = 0;
-
-    for (int i = 0; i < MAX_LAYER_NUM; i++)
-    {
-        ppDrawableLayers[i] = new IDrawable * [MAX_GAME_OBJECT_NUM];
-
-        for (int j = 0; j < MAX_GAME_OBJECT_NUM; j++)
-            ppDrawableLayers[i][j] = nullptr;
-    }
 
 
     return true;
@@ -194,8 +190,151 @@ void DDANZIT_Run() {
         }
         else
         {
-            _Update();
-            _Render();
+            // 프레임 시작!
+            // 유니티 라이프사이클 순서를 따름
+
+            gameCore._Awake();
+
+            gameCore._OnEnable();
+
+            gameCore._Start();
+
+
+            /* DDANZIT_Update() */
+            {
+                // TODO: Time 클래스에 접근해서 틱
+                pGameTimer->Tick();
+
+
+                while (fFrameCount >= 200.0f)
+                {
+                    gameCore._FixedUpdate();
+
+                    // gameCore._OnTrigger...();
+                    // gameCore._OnCollision...();
+
+                    // gameCore._WaitForFixedUpdate();
+
+                    fFrameCount -= 200.0f;
+                }
+
+
+                // gameCore._OnMouse...();
+
+
+                gameCore._Update();
+
+                // gameCore._WaitForSeconds();
+                // gameCore._StartCoroutine();
+
+                gameCore._LateUpdate();
+
+
+                fDeltaTime = pGameTimer->DeltaTimeMS();
+                fFrameCount += fDeltaTime;
+            }
+
+
+            /* DDANZIT_Render() */
+            {
+                HBRUSH hGrayBrush = CreateSolidBrush(RGB(216, 216, 216));
+                HBRUSH hOldBrush = (HBRUSH)SelectObject(hBackDC, hGrayBrush);
+
+                ::PatBlt(hBackDC, 0, 0, g_width, g_height, PATCOPY);
+
+                SelectObject(hBackDC, hOldBrush);
+                DeleteObject(hGrayBrush);
+
+
+                // 0번 레이어가 가장 위
+                for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
+                {
+                    for (int j = 0; j < gameObjectsIndex; ++j)
+                    {
+                        if (ppDrawableLayers[i][j])
+                            ppDrawableLayers[i][j]->Draw(hBackDC);
+                    }
+                }
+
+
+                BitBlt(hFrontDC, 0, 0, g_width, g_height, hBackDC, 0, 0, SRCCOPY);
+            }
+
+
+            // gameCore._WaitForEndOfFrame();
+
+
+            gameCore._OnDisable();
+
+            gameCore._OnDestroy();
+
+
+            /* DestroyScheduled */
+            {
+                while (!gameCore.destroyScheduledQueue.empty())
+                {
+                    GameObject* gameObject = gameCore.destroyScheduledQueue.front();
+                    Scene* targetScene = gameObject->_scene;
+
+
+                    // 라이프사이클 함수들 리스트에서 빼주기
+                    for (Component* comp : gameObject->pComponentList)
+                    {
+                        //if (Lifecycle* lc = dynamic_cast<Lifecycle*>(comp))   은 보장이 되니까 스킵
+                        Lifecycle* lc = dynamic_cast<Lifecycle*>(comp);
+                        
+                        if (lc->activeUpdate)
+                            targetScene->updateExecList.erase(remove(
+                                targetScene->updateExecList.begin(),
+                                targetScene->updateExecList.end(), lc),
+                                targetScene->updateExecList.end());
+
+                        if (lc->activeFixedUpdate)
+                            targetScene->fixedUpdateExecList.erase(remove(
+                                targetScene->fixedUpdateExecList.begin(),
+                                targetScene->fixedUpdateExecList.end(), lc),
+                                targetScene->fixedUpdateExecList.end());
+
+                        if (lc->activeLateUpdate)
+                            targetScene->lateUpdateExecList.erase(remove(
+                                targetScene->lateUpdateExecList.begin(),
+                                targetScene->lateUpdateExecList.end(), lc),
+                                targetScene->lateUpdateExecList.end());
+                    }
+
+
+                    // 씬 / 하이라키(루트)에서 빼버리기
+                    // ..하이라키를 아직 안만들었네; 상관은 없지만서도
+                    if (gameObject->_transform->_parent == nullptr)
+                    {
+                        targetScene->pRootGameObjectList.erase(remove(
+                            targetScene->pRootGameObjectList.begin(),
+                            targetScene->pRootGameObjectList.end(), gameObject),
+                            targetScene->pRootGameObjectList.end());
+                    }
+                    else
+                    {
+                        gameObject->_transform->_parent->RemoveChild(gameObject->_transform);	// 별로 좋은 코드는 아니군
+
+                        gameObject->_transform->_parent = nullptr;
+                    }
+
+
+                    // TODO_LATER: (게임아닌)오브젝트를 받는다면... 컴포넌트인 경우의 처리(분기)
+
+
+                    // 삭제!
+                    delete gameCore.destroyScheduledQueue.front();
+                    gameCore.destroyScheduledQueue.pop();
+                }
+
+
+                //if (Application.isQuit)
+                //    break;
+
+
+                // 다음 프레임...
+            }
         }
     }
 }
@@ -305,99 +444,8 @@ namespace
     }
 
 
-    void _Update()
-    {
-        pGameTimer->Tick();
-
-        Update();
-
-        fDeltaTime = pGameTimer->DeltaTimeMS();
-        fFrameCount += fDeltaTime;
-
-        while (fFrameCount >= 200.0f)
-        {
-            FixedUpdate();
-            fFrameCount -= 200.0f;
-        }
-    }
-
-    // TODO: 배경색 스카이박스 설정 가능하게 (내부함수로)
-    void _Render()
-    {
-        HBRUSH hGrayBrush = CreateSolidBrush(RGB(216, 216, 216));
-        HBRUSH hOldBrush = (HBRUSH)SelectObject(hBackDC, hGrayBrush);
-
-        ::PatBlt(hBackDC, 0, 0, g_width, g_height, PATCOPY);
-
-        SelectObject(hBackDC, hOldBrush);
-        DeleteObject(hGrayBrush);
-
-
-        // 0번 레이어가 가장 위
-        for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
-        {
-            for (int j = 0; j < gameObjectsIndex; ++j)
-            {
-                if (ppDrawableLayers[i][j])
-                    ppDrawableLayers[i][j]->Draw(hBackDC);
-            }
-        }
-
-
-        BitBlt(hFrontDC, 0, 0, g_width, g_height, hBackDC, 0, 0, SRCCOPY);
-    }
-
-
-    // TODO: 자료구조로 반영, 별도의 Awake / Start 큐에 등록 및 호출..
-    void Awake() 
-    {
-        for (int i = 0; i < gameObjectsIndex; ++i)
-        {
-            if (ppGameObjects[i])
-            {
-                ppGameObjects[i]->Awake();
-            }
-        }
-    }
-
-
-    void Start()
-    {
-        for (int i = 0; i < gameObjectsIndex; ++i)
-        {
-            if (ppGameObjects[i])
-            {
-                ppGameObjects[i]->Start();
-            }
-        }
-    }
-
-
-    void Update()
-    {
-        for (int i = 0; i < gameObjectsIndex; ++i)
-        {
-            if (ppGameObjects[i])
-            {
-                ppGameObjects[i]->Update(fDeltaTime);
-            }
-        }
-    }
-
-
-    void FixedUpdate()
-    {
-        for (int i = 0; i < gameObjectsIndex; ++i)
-        {
-            if (ppGameObjects[i])
-            {
-                ppGameObjects[i]->FixedUpdate();
-            }
-        }
-    }
-
-
     // TODO: 이벤트 등록된 함수 호출
+    // 아냐 이것도 큐로해야되;
     void _OnMouseMove(int x, int y)
     {
     }

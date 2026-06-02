@@ -48,7 +48,7 @@ void Transform::AddChild(Transform* child)
 
 void Transform::RemoveChild(Transform* child)
 {
-	pChildList.erase(std::remove(pChildList.begin(), pChildList.end(), child), pChildList.end());
+	pChildList.erase(remove(pChildList.begin(), pChildList.end(), child), pChildList.end());
 }
 
 #pragma endregion
