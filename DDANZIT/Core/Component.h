@@ -1,14 +1,22 @@
 #pragma once
 
+#include <concepts>
+#include <string>
+#include <vector>
+
+#include "DefineOption.h"
 
 class Scene;
 class GameObject;
+class Transform;
 class MonoBehavior;
+
 
 class Component
 {
 public:
 	friend class GameObject;
+	friend class Transform;
 	friend class MonoBehavior;
 
 #pragma region Constructor
@@ -17,6 +25,7 @@ protected:
 	Component() = delete;
 	Component(const Component&) = delete;
 	Component(GameObject* pGameObject);
+	Component(GameObject* pGameObject, bool active);
 
 public:
 	virtual ~Component() = default;
@@ -34,17 +43,27 @@ public:
 	GameObject* const gameObject();				// 포인터의 경우.. 주소만 잠그고 내부는 알아서
 
 
-protected:
-	bool _active;
-	//bool& active() { return _active; }
 public:
-	const bool& active() const { return _active; }
+	const std::string& name() const { return _gameObject->_name; }
+
+
+public:
+	const Tag& tag() const { return _gameObject->_tag; }
+
+
+public:
+	Transform* const transform() { return _gameObject->_transform; }
 
 
 	// 내부용
 private:
+	bool _active;
 	// 내 오브젝트가 어떤지, 둘 중 하나라도 false면 꺼진거임 상태 저장용이다
-	bool parentActive = true;
+	bool parentActive;
+
+	// Destroy 마킹
+	// TODO_LATER: 컴포넌트 파괴 대응.. 인데 이거 오브젝트 상속받는게 전제니까 플래그가 거기로 올라가겠네?
+	bool isKilled = false;
 
 #pragma endregion
 
@@ -75,6 +94,9 @@ public:
 
 		for (Component* comp : _gameObject->pComponentList)
 		{
+			if (comp->isKilled)
+				continue;
+
 			if (T* targetComponent = dynamic_cast<T*>(comp))
 				componentList.push_back(targetComponent);
 		}
@@ -85,6 +107,9 @@ public:
 	{
 		for (Component* comp : _gameObject->pComponentList)
 		{
+			if (comp->isKilled)
+				continue;
+
 			if (T* targetComponent = dynamic_cast<T*>(comp))
 				return targetComponent;
 		}
@@ -99,6 +124,9 @@ public:
 		{
 			if (T* targetComponent = dynamic_cast<T*>(comp))
 			{
+				if (comp->isKilled)
+					continue;
+
 				component = targetComponent;
 				return true;
 			}

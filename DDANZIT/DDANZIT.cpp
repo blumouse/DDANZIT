@@ -1,49 +1,63 @@
 ﻿#include "DDANZIT.h"
+
 #include "DefineOption.h"
 
-#include "GameTimer.h"
-
 #include "DDANZIT_Core.h"
+#include "IDrawable.h"
+#include "SceneManager.h"
 
 #include "Scene.h"
-
-#include "IDrawable.h"
 #include "GameObject.h"
 
-#include "Lifecycle.h"
-#include "Transform.h"
-
+#include "GameTimer.h"
 #include "INC_Windows.h"
 #include "RenderHelp.h"
+#include "Utillity.h"
 
 #include <vector>
 #include <queue>
 
 using namespace std;
 
+using BitmapInfo = renderHelp::BitmapInfo;
 
-// 지금 하고있는것...
-// 하이라키 타입 만들기 씬에서 관리
-// 라이프사이클 큐 관리 실행까지 이거 일단 걍 씬에서 갖는거로 하자 -> 액티브계열 함수 호출등록해줘야돼
+
+// 지금 하고있는것... 너무 많은걸 하고 있는 느낌이..!! 중요한거부터 해! 금방하고 d2d해야돼.. <- 사실 gdi로 돌아가면 된다
+// 
+// 크앗 액티브 타이밍 이슈 다시해야돼 <- 된건가...?
+// 파괴된 오브젝트 그 프레임동안 킬체크 접근불가하게 막아야함 <- 너무 많아.. 계획을 세워서 하자 아님걍 래핑;
+// 그냥 함수마다 본인이 죽었으면 경고띄우면 되나? 일단 킵
+// 
+// 씬 매니저 만들기! <- 대강 되간다 로드 / 디스크립터는 너무갔어 일단 킵;
+// 
+// 하이라키 타입 만들기 씬에서 관리 <- 얼추 했는데 잘 되는진 모르겠어
+// 
+// 이거 add 씬 / 오브젝트 도 있어야겠는데..? 제네릭으로 받아야돼? <- 씬은 했다 이거하기
+// 오브젝트 Add에서 복사생성자 인스턴트까지
+//
+// 간이로 디버그 레이어 일찍 만드는게 좋을지도 나도당장 디버그가 필요해..
+// 다음은 바로 렌더러 구현 / 테스트하자..
+// 아씨 트렌스폼 부모기준으로도 해야되는데..? 근데 이건 상위에서 결산할때 그렇게 하면 되기도 하고
+// 각도 - 벡터변환도 있어
+// 걍 빠르게 오브젝트 상속 주는게 나을지도
 
 
 //
 // TODO 소기의 목표
 // 
-// 일단 이식하기! 제네릭 자료구조 적극사용
-// 이름들 똑같이 바꾸기
-// 전역으로 바꿀것들 바꾸기
-// 추상화/옵션 지점들 - 렌더러, 디버거, 2d/3d - 등 고려하기
+// 추가할거.. 순서
+// 하이라키 구조
+// 씬 매니저
+// 더 많은 오브젝트 / 컴포넌트 속성
+// 코루틴 사이클
+// 인풋시스템
+// 애플리케이션
+// 
+// 
+// 필드/메서드명 다시 정리하기...
 // 원본코드에(유틸) 있던것들 필요한거 갈무리 정리 쳐내기
 // 오류 정보들 필요한거 던져주기
-// 
-// 추가할거..
-// 씬 / 하이라키 구조 (사실 이 아래 씬으로 들어갈게 꽤 많은)
-// 더 많은 오브젝트 / 컴포넌트 속성 (최소한 액티브, 이름, find동작)
-// 코루틴 사이클
-// 
-// 스마트포인터 적용하기..? (차차)
-//
+
 
 
 // 여기에 내부함수를 두면 된다
@@ -138,9 +152,8 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     hDefaultBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
 
 
-
-    // 게임 초기화
-
+    SceneManager::mainScene = nullptr;
+    SceneManager::dontDestroyOnLoad = nullptr;
 
 
     return true;
@@ -154,9 +167,8 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     return DDANZIT_Initialize(windowName, width, height);
 }
 
-
-void DDANZIT_Run() {
-
+void DDANZIT_Run() 
+{
     MSG msg = { 0 };
     while (msg.message != WM_QUIT)
     {
@@ -193,11 +205,17 @@ void DDANZIT_Run() {
             // 프레임 시작!
             // 유니티 라이프사이클 순서를 따름
 
+
             gameCore._Awake();
 
+            // 생성 시에만 큐에서 호출
             gameCore._OnEnable();
 
             gameCore._Start();
+
+
+            // 라이프사이클 / 오브젝트 정보 갱신
+            gameCore.RegisterUpdateScheduled();
 
 
             /* DDANZIT_Update() */
@@ -264,82 +282,30 @@ void DDANZIT_Run() {
             // gameCore._WaitForEndOfFrame();
 
 
+            // 파괴 시에만 큐에서 호출
             gameCore._OnDisable();
 
             gameCore._OnDestroy();
 
 
-            /* DestroyScheduled */
-            {
-                while (!gameCore.destroyScheduledQueue.empty())
-                {
-                    GameObject* gameObject = gameCore.destroyScheduledQueue.front();
-                    Scene* targetScene = gameObject->_scene;
+            // 라이프사이클 / 오브젝트 정보 갱신
+            gameCore.QuitUpdateScheduled();
+
+            gameCore.DestroyScheduled();
+            
 
 
-                    // 라이프사이클 함수들 리스트에서 빼주기
-                    for (Component* comp : gameObject->pComponentList)
-                    {
-                        //if (Lifecycle* lc = dynamic_cast<Lifecycle*>(comp))   은 보장이 되니까 스킵
-                        Lifecycle* lc = dynamic_cast<Lifecycle*>(comp);
-                        
-                        if (lc->activeUpdate)
-                            targetScene->updateExecList.erase(remove(
-                                targetScene->updateExecList.begin(),
-                                targetScene->updateExecList.end(), lc),
-                                targetScene->updateExecList.end());
-
-                        if (lc->activeFixedUpdate)
-                            targetScene->fixedUpdateExecList.erase(remove(
-                                targetScene->fixedUpdateExecList.begin(),
-                                targetScene->fixedUpdateExecList.end(), lc),
-                                targetScene->fixedUpdateExecList.end());
-
-                        if (lc->activeLateUpdate)
-                            targetScene->lateUpdateExecList.erase(remove(
-                                targetScene->lateUpdateExecList.begin(),
-                                targetScene->lateUpdateExecList.end(), lc),
-                                targetScene->lateUpdateExecList.end());
-                    }
+            //if (Application.isQuit)
+            //    break;
 
 
-                    // 씬 / 하이라키(루트)에서 빼버리기
-                    // ..하이라키를 아직 안만들었네; 상관은 없지만서도
-                    if (gameObject->_transform->_parent == nullptr)
-                    {
-                        targetScene->pRootGameObjectList.erase(remove(
-                            targetScene->pRootGameObjectList.begin(),
-                            targetScene->pRootGameObjectList.end(), gameObject),
-                            targetScene->pRootGameObjectList.end());
-                    }
-                    else
-                    {
-                        gameObject->_transform->_parent->RemoveChild(gameObject->_transform);	// 별로 좋은 코드는 아니군
-
-                        gameObject->_transform->_parent = nullptr;
-                    }
-
-
-                    // TODO_LATER: (게임아닌)오브젝트를 받는다면... 컴포넌트인 경우의 처리(분기)
-
-
-                    // 삭제!
-                    delete gameCore.destroyScheduledQueue.front();
-                    gameCore.destroyScheduledQueue.pop();
-                }
-
-
-                //if (Application.isQuit)
-                //    break;
-
-
-                // 다음 프레임...
-            }
+            // 다음 프레임...
+            
         }
     }
 }
 
-
+// TODO ...손도못댐
 void DDANZIT_Finalize() {
 
     delete pGameTimer;

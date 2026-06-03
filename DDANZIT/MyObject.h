@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "Script.h"
 
+// 사실 원래는 이렇게 상속받지 않지만;
 class MyObject : public GameObject
 {
 public:

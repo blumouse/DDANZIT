@@ -129,17 +129,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CodeEdit.cpp" />
     <ClCompile Include="Core\Component.cpp" />
     <ClCompile Include="Core\DDANZIT_Core.cpp" />
     <ClCompile Include="Core\IDrawable.cpp" />
-    <ClCompile Include="Core\MyGameObject.cpp" />
     <ClCompile Include="Core\NzWndBase.cpp" />
     <ClCompile Include="Core\Transform.cpp" />
     <ClCompile Include="DDANZIT.cpp" />
+    <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="GameObjectDesciptor.cpp" />
+    <ClCompile Include="Hierarchy.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MngObject.cpp" />
     <ClCompile Include="MonoBehavior.cpp" />
-    <ClCompile Include="MyObject.cpp" />
+    <ClCompile Include="MyObject.h" />
     <ClCompile Include="NewObject.cpp" />
     <ClCompile Include="NewVisual.cpp" />
     <ClCompile Include="ObjectData.cpp" />
@@ -148,20 +151,24 @@
     <ClCompile Include="ObjectVisual.cpp" />
     <ClCompile Include="Lifecycle.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Script.h" />
     <ClCompile Include="Util\GameTimer.cpp" />
     <ClCompile Include="Util\RenderHelp.cpp" />
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CodeEdit.h" />
     <ClInclude Include="Core\Component.h" />
     <ClInclude Include="Core\DDANZIT_Core.h" />
     <ClInclude Include="Core\IDrawable.h" />
-    <ClInclude Include="Core\MyGameObject.h" />
     <ClInclude Include="Core\NzWndBase.h" />
     <ClInclude Include="Core\Transform.h" />
     <ClInclude Include="DDANZIT.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="DefineOption.h" />
+    <ClInclude Include="GameObjectDesciptor.h" />
+    <ClInclude Include="Hierarchy.h" />
     <ClInclude Include="MonoBehavior.h" />
     <ClInclude Include="ObjectData.h" />
     <ClInclude Include="ObjectLogic.h" />
@@ -169,6 +176,8 @@
     <ClInclude Include="ObjectVisual.h" />
     <ClInclude Include="Lifecycle.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneManagement.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Util\GameTimer.h" />
     <ClInclude Include="Util\INC_Windows.h" />
     <ClInclude Include="Util\RenderHelp.h" />

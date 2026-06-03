@@ -37,24 +37,21 @@
     <Filter Include="소스 파일\사용해보기\Origin">
       <UniqueIdentifier>{738550ec-451c-4c2f-b7f1-aa779c3d3bd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\DDANZIT\Origin">
+      <UniqueIdentifier>{a316dcb5-82bc-4462-82a0-1807ea0f76b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\DDANZIT\Origin">
+      <UniqueIdentifier>{5c71a7a9-214c-47ef-ac28-ece557ab84d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Service">
+      <UniqueIdentifier>{12a0622b-81a4-4d12-b049-c1202d64a258}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Component.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\IDrawable.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\MyGameObject.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\NzWndBase.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Transform.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
     <ClCompile Include="Util\GameTimer.cpp">
@@ -66,19 +63,7 @@
     <ClCompile Include="Util\Utillity.cpp">
       <Filter>소스 파일\Util</Filter>
     </ClCompile>
-    <ClCompile Include="DDANZIT.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectData.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectLogic.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectVisual.cpp">
       <Filter>소스 파일\DDANZIT</Filter>
     </ClCompile>
     <ClCompile Include="Lifecycle.cpp">
@@ -102,27 +87,51 @@
     <ClCompile Include="Script.h">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
-    <ClCompile Include="MyObject.cpp">
+    <ClCompile Include="MyObject.h">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
+    <ClCompile Include="Hierarchy.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectData.cpp">
+      <Filter>소스 파일\DDANZIT\Origin</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectLogic.cpp">
+      <Filter>소스 파일\DDANZIT\Origin</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectVisual.cpp">
+      <Filter>소스 파일\DDANZIT\Origin</Filter>
+    </ClCompile>
+    <ClCompile Include="DDANZIT.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
     <ClCompile Include="Core\DDANZIT_Core.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Component.cpp">
       <Filter>소스 파일\DDANZIT</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\NzWndBase.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Transform.cpp">
+      <Filter>소스 파일\DDANZIT</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>소스 파일\DDANZIT</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectDesciptor.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeEdit.cpp">
+      <Filter>소스 파일\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Component.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\IDrawable.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\MyGameObject.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\NzWndBase.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Transform.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
     <ClInclude Include="Util\Utillity.h">
@@ -137,26 +146,11 @@
     <ClInclude Include="Util\GameTimer.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
-    <ClInclude Include="DDANZIT.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectData.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectLogic.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectVisual.h">
       <Filter>헤더 파일\DDANZIT</Filter>
     </ClInclude>
     <ClInclude Include="Lifecycle.h">
       <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="DefineOption.h">
-      <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MonoBehavior.h">
       <Filter>헤더 파일\DDANZIT</Filter>
@@ -164,8 +158,50 @@
     <ClInclude Include="Scene.h">
       <Filter>헤더 파일\DDANZIT</Filter>
     </ClInclude>
-    <ClInclude Include="Core\DDANZIT_Core.h">
+    <ClInclude Include="Hierarchy.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectData.h">
+      <Filter>헤더 파일\DDANZIT\Origin</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectLogic.h">
+      <Filter>헤더 파일\DDANZIT\Origin</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectVisual.h">
+      <Filter>헤더 파일\DDANZIT\Origin</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\NzWndBase.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DefineOption.h">
       <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="DDANZIT.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DDANZIT_Core.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Component.h">
+      <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Transform.h">
+      <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>헤더 파일\DDANZIT</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManagement.h">
+      <Filter>헤더 파일\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectDesciptor.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeEdit.h">
+      <Filter>헤더 파일\Service</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

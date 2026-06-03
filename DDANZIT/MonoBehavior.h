@@ -11,6 +11,8 @@ class GameObject;
 class MonoBehavior : public Component, public Lifecycle
 {
 public:
+	friend class DDANZIT_Core;
+	friend class Scene;
 	friend class GameObject;
 
 #pragma region Constructor
@@ -27,10 +29,19 @@ public:
 
 
 
+#pragma region Properties
+
+private:
+	bool isInUpdateList = false;
+
+#pragma endregion
+
+
+
 #pragma region Methods
 
 public:
-	// 매우매우 고민하다 상속주기..
+	const bool& isActiveAndEnabled() const { return _active && parentActive; }
 	void SetActive(bool newActive) override;
 
 

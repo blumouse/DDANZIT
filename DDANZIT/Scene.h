@@ -1,23 +1,25 @@
 #pragma once
 
+#include <concepts>
+#include <string>
 #include <vector>
 #include <queue>
 
-class DDANZIT_Core;
+#include "Hierarchy.h"
+
 class GameObject;
 class IDrawable;
 class Lifecycle;
-class MonoBehavior;
 
 
-// 이럴거면 이걸 씬으로 하지말고 따로 빼내는게..?
-// Scene에 몰래 끼워들어가는 뭔가 느낌으로
 class Scene
 {
 public:
     friend class DDANZIT_Core;
+    friend class SceneManager;
     friend class GameObject;
     friend class MonoBehavior;
+
     friend class IDrawable;     // TODO: ? 이건 전처리기로 걸러야겠군.. 아니 뭐 걍 다 써놔도 되긴하겠지만
 
 
@@ -25,56 +27,98 @@ public:
     friend void DDANZIT_Run();
     friend void DDANZIT_Finalize();
 
-#pragma region Hierarchy
+#pragma region Constructor
+
+    Scene() = delete;
+    Scene(std::string name);
+    Scene(const Scene&) = delete;
+
+    ~Scene() = default;
+
+#pragma endregion
+
+
+
+#pragma region Properties
 
 protected:
-    std::vector<GameObject*> pRootGameObjectList;
+    std::string _name;
+    std::string& name() { return _name; }
+public:
+    const std::string& name() const { return _name; }
+
+
+public:
+    bool isSubScene() const;
+
+//public:
+//    bool isLoaded() const;
+
+//public:
+//    const wchar_t* path() const;
+
+private:
+    bool isLoaded;
+
+#pragma endregion
+
+
+
+#pragma region Hierarchy
+
 public:
     std::vector<GameObject*> GetRootGameObjects() const;
     const int& rootCount() const;
 
-    //std::vector<Transform*> hierarchy;
-    // TODO: 하이라키 타입정의해서 오퍼레이터 +=로 받기 (인스턴트랑 동일한 동작)
-    // scene.hierarchy += gameObject; 식
+
+    // 유사 하이라키
+public:
+    Hierarchy hierarchy;
+
+    // 내부용 함수들 좀 만들어야겠다
+private:
+    void AddToHierarchy(GameObject* go, Transform* parent);
+    void RemoveFromHierarchy(GameObject* go);
 
 #pragma endregion
 
 
 
-#pragma region Lifecycle
+#pragma region GameObjectManagement
 
-    // 이걸 통째로 가져야되나 함수별로 분리해야되나;
-    // 한번만 실행이면 큐(삭제되니깐), 계속실행이면 벡터
-private:
-    std::queue<Lifecycle*> awakeExecQueue;
-    std::queue<Lifecycle*> onEnableExecQueue;
-    std::queue<Lifecycle*> startExecQueue;
-
-    std::vector<Lifecycle*> fixedUpdateExecList;
-    std::vector<Lifecycle*> updateExecList;
-    std::vector<Lifecycle*> lateUpdateExecList;
-
-    std::queue<Lifecycle*> onDisableExecQueue;
-    std::queue<Lifecycle*> onDestroyExecQueue;
-
-#pragma endregion
+public:
+    // TODO: 굳이 따지면 CreatePrimitive에 해당한다
+    // 하이라키에 오브젝트 하나 만들어 올린다
+    // 뭔가 더 해야될거 같은데..?
+    GameObject* AddGameObject()
+    {
+        if (hierarchy.pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
+        {
+            // DEBUG: 너무많아
+            return;
+        }
 
 
+        GameObject* gameObject = new GameObject(this);
 
-#pragma region RenderManagement
+        hierarchy += gameObject;
+    }
 
-private:
-    // TODO: 레이어(depth) 적용해서 만들기
-    std::queue<IDrawable*> drawableRenderQueue;
+    // 사용감을 높이기 위한...
+    template <std::derived_from<GameObject> T>
+    GameObject* AddGameObject() 
+    {
+        if (hierarchy.pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
+        {
+            // DEBUG: 디버그 메세지
+            return;
+        }
 
-    // 이걸 하이라키 등록(오퍼레이터)으로 대체하겠지
-    void RegisterGameObject(GameObject* gameObject);
-    void QuitGameObject(GameObject* gameObject);
 
-    void RegisterDrawable(IDrawable* drawable);
-    void RegisterDrawable(IDrawable* drawable, int layer);
-    void QuitDrawable(IDrawable* drawable);
-    void QuitDrawable(IDrawable* drawable, int layer);
+        T* gameObject = new T(this);
+
+        hierarchy += gameObject;
+    }
 
 #pragma endregion
 

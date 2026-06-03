@@ -1,20 +1,8 @@
 #pragma once
 
 
-class GameTimer;
-class GameObjectBase;
-class IDrawable;
-class Transform;
-
-namespace renderHelp
-{
-    class BitmapInfo;
-}
-
-using BitmapInfo = renderHelp::BitmapInfo;
-
-
 // 여기엔 접근 가능한 것들 선언
+
 
 
 bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);

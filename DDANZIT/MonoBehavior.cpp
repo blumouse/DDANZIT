@@ -1,5 +1,6 @@
 #include "MonoBehavior.h"
 
+#include "DDANZIT_Core.h"
 #include "GameObject.h"
 #include "Scene.h"
 
@@ -19,39 +20,75 @@ MonoBehavior::MonoBehavior(GameObject* pGameObject) : Component(pGameObject)
 
 void MonoBehavior::SetActive(bool newActive)
 {
+	// 이미 그상태, 상관없이 토글은 해주고 호출은 안함
+	if (parentActive == newActive)
+	{
+		_active = newActive;
+		return;
+	}
+
 	if (_active == newActive)
 		return;
 
+	_active = newActive;
+
+	// ㅇㄴ 생성/파괴시에만 순서를 따르고, 평소 온오프에서는 즉시 실행 및 상태변경
+
+
 	if (newActive /*== true*/)
 	{
-		// OnEnable 리스트에 추가
-		_gameObject->_scene->onEnableExecQueue.push(this);
+		if (activeOnEnable)
+		{
+			OnEnable();
+
+			// 업데이트는 다음 프레임부터 ..뭐 시점이 Start 이전이면 아닐수도 있고
+			if (!isInUpdateList)
+				DDANZIT_Core::RegisterUpdateExecLists(this);
+		}
 	}
 	else
 	{
-		// 유사
-		_gameObject->_scene->onDisableExecQueue.push(this);
-	}
+		if (activeOnDisable)
+		{
+			OnDisable();
 
-	_active = newActive;
+			// 이 경우는 또 다름! 즉시 중지 (삭제말고 플래그 체크로, 여기선 안함)
+		}
+	}
 }
+
 
 void MonoBehavior::SetParentActive(bool newActive)
 {
 	if (_active == newActive)
+	{
+		parentActive = newActive;
 		return;
+	}
+
+	if (parentActive == newActive)
+		return;
+
+	parentActive = newActive;
+
 
 	if (newActive /*== true*/)
 	{
-		_gameObject->_scene->onEnableExecQueue.push(this);
+		if (activeOnEnable)
+		{
+			OnEnable();
+
+			if (!isInUpdateList)
+				DDANZIT_Core::RegisterUpdateExecLists(this);
+		}
 	}
 	else
 	{
-		// 유사
-		_gameObject->_scene->onDisableExecQueue.push(this);
+		if (activeOnDisable)
+		{
+			OnDisable();
+		}
 	}
-
-	_active = newActive;
 }
 
 #pragma endregion

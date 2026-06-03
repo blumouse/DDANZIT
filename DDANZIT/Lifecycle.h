@@ -1,15 +1,15 @@
 #pragma once
 
-class DDANZIT_Core;
-class GameObject;
-
 
 // 컴포넌트에서 사용하는 라이프사이클
+// 그냥 모노비헤이비어로 상속시켜서 쓰는게 맞겠다 접근을 모두 거기서
 class Lifecycle
 {
 public:
-	friend class GameObject;
 	friend class DDANZIT_Core;
+	friend class Scene;
+	friend class GameObject;
+	friend class MonoBehavior;
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
 	friend void DDANZIT_Run();

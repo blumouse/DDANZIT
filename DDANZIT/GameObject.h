@@ -1,15 +1,18 @@
 #pragma once
 
+#include <concepts>
 #include <string>
 #include <vector>
 #include <queue>
 
 #include "DefineOption.h"
-#include "Scene.h"
 
-class Component;
+#include "DDANZIT_Core.h"
+#include "Scene.h"
+#include "Component.h"
+#include "MonoBehavior.h"
+
 class Lifecycle;
-class MonoBehavior;
 
 namespace learning 
 {
@@ -23,21 +26,24 @@ using Vector2 = learning::Vector2f;
 class GameObject
 {
 public:
-	//friend class Scene;
+	friend class DDANZIT_Core;
+	friend class SceneManager;
+	friend class Scene;
 	friend class Component;
 	friend class Transform;
 	friend class MonoBehavior;
 
-	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
-	friend void DDANZIT_Run();
-	friend void DDANZIT_Finalize();
+	//friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
+	//friend void DDANZIT_Run();
+	//friend void DDANZIT_Finalize();
 
 #pragma region Constructor
 
 protected:
 	GameObject();
 	GameObject(Scene* scene);
-	GameObject(const GameObject&) = default;		// 헷갈린당 가리고 friend가 맞나..?
+	GameObject(Scene* scene, bool parentActive);
+	GameObject(const GameObject&);		// TODO: 인스턴트를 위한 재정의 근데 이것도 상위에서 처리될라나?
 
 public:
 	virtual ~GameObject();
@@ -47,9 +53,6 @@ public:
 
 	// 유사 프로퍼티 (정말)
 #pragma region Properties
-
-private:
-	long index;		// TODO: 이거 할당 ....?
 
 protected:
 	Scene* _scene;
@@ -89,9 +92,10 @@ public:
 	// 내부용
 private:
 	// 나는 아니고~ 부모가 활/비활이래
-	bool parentActive = true;
+	bool parentActive;
 
-	// Destroy 마킹 (필요 없을수도)
+	// Destroy 마킹
+	// 이건 참조불가로 만드는 목적, 실제 파괴는 프레임 마지막에 일어나니
 	bool isKilled = false;
 
 #pragma endregion
@@ -107,6 +111,9 @@ public:
 	// 내부용
 private:
 	void SetParentActive(bool newActive);
+
+	void SetSceneAndDetach(Scene* scene);
+	void SetSceneRecursive(Scene* scene);
 
 #pragma endregion
 
@@ -130,6 +137,9 @@ public:
 
 		for (Component* comp : pComponentList)
 		{
+			if (comp->isKilled)
+				continue;
+
 			if (T* targetComponent = dynamic_cast<T*>(comp))
 				componentList.push_back(targetComponent);
 		}
@@ -140,10 +150,14 @@ public:
 	{
 		for (Component* comp : pComponentList)
 		{
+			if (comp->isKilled)
+				continue;
+
 			if (T* targetComponent = dynamic_cast<T*>(comp))
 				return targetComponent;
 		}
 
+		// TODO_LATER: 그런 컴포넌트 없음 메세지
 		return nullptr;
 	}
 
@@ -152,6 +166,9 @@ public:
 	{
 		for (Component* comp : pComponentList)
 		{
+			if (comp->isKilled)
+				continue;
+
 			if (T* targetComponent = dynamic_cast<T*>(comp))
 			{
 				component = targetComponent;
@@ -181,27 +198,22 @@ protected:
 
 		pComponentList.push_back(component);
 
-
-		if (Lifecycle* lifecycle = dynamic_cast<Lifecycle*>(component))
+		// TODO: 생각해보니까 이것도... 인스턴트가 프레임 내에서 일어나니까..? 아닌가 시작은 이미됐으니
+		if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(component))
 		{
-			if (lifecycle->activeAwake)
-				_scene->awakeExecQueue.push(lifecycle);
+			if (b->activeAwake)
+				DDANZIT_Core::awakeExecQueue.push(b);
 
-			if (lifecycle->activeStart)
-				_scene->startExecQueue.push(lifecycle);
+			if (b->activeOnEnable && b->isActiveAndEnabled())
+				DDANZIT_Core::onEnableExecQueue.push(b);
+
+			if (b->activeStart)
+				DDANZIT_Core::startExecQueue.push(b);
 
 
-			if (lifecycle->activeFixedUpdate)
-				_scene->fixedUpdateExecList.push_back(lifecycle);
-
-			if (lifecycle->activeUpdate)
-				_scene->updateExecList.push_back(lifecycle);
-
-			if (lifecycle->activeLateUpdate)
-				_scene->lateUpdateExecList.push_back(lifecycle);
-
-			// TODO?: 다른 On 함수들은 해당 시점에 검사 및 추가
-			// 남은거: OnEnable / OnDisable
+			// 활성화 여부에 따라.. 안넣을수도있음
+			if (b->isActiveAndEnabled())
+				DDANZIT_Core::RegisterUpdateExecLists(b);
 		}
 	}
 
@@ -242,6 +254,9 @@ protected:
 
 	static GameObject* Find(std::string name);
 	static GameObject* FindWithTag(Tag tag);
+
+
+	static void DontDestroyOnLoad(GameObject* gameObject);
 
 
 private:

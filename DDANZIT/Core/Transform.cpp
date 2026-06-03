@@ -1,4 +1,7 @@
 #include "Transform.h"
+
+#include "DefineOption.h"
+
 #include "GameObject.h"
 
 using namespace std;
@@ -16,6 +19,24 @@ Transform::Transform(GameObject* pGameObject) :
 
 
 
+#pragma region Methods
+
+void Transform::SetActive(bool newActive)
+{
+	// 경고
+
+}
+
+
+void Transform::SetParentActive(bool newActive)
+{
+	// 딱히 의미없음
+}
+
+#pragma endregion
+
+
+
 #pragma region HierarchyTree
 
 void Transform::SetParent(Transform* parent)
@@ -23,11 +44,26 @@ void Transform::SetParent(Transform* parent)
 	if (_parent == parent)
 		return;
 
-	if (_parent != nullptr)
+	if (parent == HIERARCY_ROOT)
+	{
+		_gameObject->_scene->hierarchy.pRootGameObjectList.push_back(_gameObject);
+
+		_parent = parent;
+		return;
+	}
+	// (parent != HIERARCY_ROOT)
+
+	if (_gameObject->_scene != parent->_gameObject->_scene)
+	{
+		// DEBUG: 다른 씬의 오브젝트임
+		return;
+	}
+
+	if (_parent != HIERARCY_ROOT)
 		_parent->RemoveChild(this);
 
-	if (parent != nullptr)
-		parent->AddChild(this);
+	parent->AddChild(this);
+	
 
 	_parent = parent;
 }

@@ -3,8 +3,9 @@
 #include <vector>
 
 #include "DefineOption.h"
-#include "Utillity.h"
 #include "Component.h"
+
+#include "Utillity.h"
 
 
 // 고정 컴포넌트(유사)로 바꿔야한다
@@ -16,6 +17,7 @@ class GameObject;
 class Transform : public Component
 {
 public:
+	friend class DDANZIT_Core;
 	friend class GameObject;
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
@@ -28,6 +30,7 @@ private:
 	Transform() = delete;
 	Transform(const Transform&) = default;	// 이거 괜찮나?
 	Transform(GameObject* gameObject);
+	Transform(GameObject* pGameObject, bool active) = delete;
 
 public:
 	virtual ~Transform() = default;
@@ -39,7 +42,7 @@ public:
 #pragma region Properties
 
 	// TODO: 부모 오브젝트 기준으로 움직이게 하기
-#ifdef USE_MODE_2D
+#ifdef PROPS_MODE_2D
 	
 private:
 	Vector2 _position;
@@ -78,8 +81,7 @@ public:
 	unsigned int& depth() { return _depth; }
 	const int& depth() const { return _depth; }
 
-
-#endif // USE_MODE_2D
+#endif // PROPS_MODE_2D
 
 
 #pragma endregion
@@ -117,6 +119,13 @@ private:
 
 #pragma region Methods
 
+public:
+	void SetActive(bool newActive) override;
+
+
+	// 내부용
+private:
+	void SetParentActive(bool newActive) override;
 
 #pragma endregion
 

@@ -5,41 +5,44 @@
 
 class Scene;
 class GameObject;
+class Lifecycle;
+class MonoBehavior;
 
 namespace renderHelp
 {
 	class BitmapInfo;
 }
 
-// 엔진 내부 공개를 위한 클래스
-// 정적으로 만드는게 낫나? 뭔가 좀 더러운 너낌스..
+
+// 엔진 내부 공개를 위한 클래스..였는데
+// 굳이 없어도 될것 같지만 보기좋으니 놔두자
 class DDANZIT_Core 
 {
 	using BitmapInfo = renderHelp::BitmapInfo;
 
 public:
-	friend class Scene;
 	friend class GameObject;
+	friend class MonoBehavior;
+
+	friend class IDrawable;
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
 	friend void DDANZIT_Run();
 	friend void DDANZIT_Finalize();
+	
+#pragma region Properties
 
-#pragma region Constructor
+private:
+
+	// TODO_LATER: Object로 바꾸기?
+	std::queue<GameObject*> destroyScheduledQueue;
 
 #pragma endregion
 
 
 
-#pragma region Properties
+#pragma region Methods
 
-private:
-	static Scene* mainScene;		// TODO: 이거 할당
-	static std::vector<Scene*> pSceneList;
-	static std::vector<Scene*> pLoadedSceneList;
-
-	// TODO_LATER: Object로 바꾸기?
-	static std::queue<GameObject*> destroyScheduledQueue;
 
 #pragma endregion
 
@@ -58,6 +61,52 @@ private:
 
 	void _OnDisable();
 	void _OnDestroy();
+
+	// 컴포넌트 속성도 접근 가능하게, 모노비헤이비어로 받기
+private:
+	static std::queue<MonoBehavior*> awakeExecQueue;
+	static std::queue<MonoBehavior*> onEnableExecQueue;
+	static std::queue<MonoBehavior*> startExecQueue;
+
+	static std::vector<MonoBehavior*> fixedUpdateExecList;
+	static std::vector<MonoBehavior*> updateExecList;
+	static std::vector<MonoBehavior*> lateUpdateExecList;
+
+	static std::queue<MonoBehavior*> onDisableExecQueue;
+	static std::queue<MonoBehavior*> onDestroyExecQueue;
+
+
+	// 업데이트 훼손 방지용
+
+	static std::queue<MonoBehavior*> registerUpdateScheduledQueue;
+	static std::queue<MonoBehavior*> quitUpdateScheduledQueue;
+
+	// 이건 위에서 호출
+
+	void RegisterUpdateScheduled();
+	void QuitUpdateScheduled();
+
+	void DestroyScheduled();
+
+	// 이건 아래에서 호출
+
+	static void RegisterUpdateExecLists(MonoBehavior* behavior);
+	static void QuitUpdateExecLists(MonoBehavior* behavior);
+
+#pragma endregion
+
+
+
+#pragma region Render
+
+private:
+	// TODO: 레이어(depth) 적용해서 만들기
+	std::vector<IDrawable*> drawableRenderList;
+
+	void RegisterDrawable(IDrawable* drawable);
+	void RegisterDrawable(IDrawable* drawable, int layer);
+	void QuitDrawable(IDrawable* drawable);
+	void QuitDrawable(IDrawable* drawable, int layer);
 
 #pragma endregion
 
