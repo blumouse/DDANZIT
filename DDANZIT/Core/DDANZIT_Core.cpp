@@ -20,38 +20,11 @@ void DDANZIT_Core::DestroyScheduled()
         Scene* targetScene = gameObject->_scene;
 
 
-        // 라이프사이클 함수들 리스트에서 빼주기
-        // 이거 위에 저거로 위임하는게 낫겠다 디스트로이에서 넣어주고
-        //for (Component* comp : gameObject->pComponentList)
-        //{
-        //    if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(comp))
-        //    {
-        //        if (b->activeFixedUpdate)
-        //            targetScene->fixedUpdateExecList.erase(remove(
-        //                targetScene->fixedUpdateExecList.begin(),
-        //                targetScene->fixedUpdateExecList.end(), b),
-        //                targetScene->fixedUpdateExecList.end());
-
-        //        if (b->activeUpdate)
-        //            targetScene->updateExecList.erase(remove(
-        //                targetScene->updateExecList.begin(),
-        //                targetScene->updateExecList.end(), b),
-        //                targetScene->updateExecList.end());
-
-        //        if (b->activeLateUpdate)
-        //            targetScene->lateUpdateExecList.erase(remove(
-        //                targetScene->lateUpdateExecList.begin(),
-        //                targetScene->lateUpdateExecList.end(), b),
-        //                targetScene->lateUpdateExecList.end());
-        //    }
-        //}
-
-
         // 씬 / 하이라키(루트)에서 빼버리기
-        // ..하이라키를 아직 안만들었네; 상관은 없지만서도
+        // TODO: 이거 셋파랜트로 되나? 킬체크를 우회해야되니까 잘 모르겟다
         if (gameObject->_transform->_parent == nullptr)
         {
-            targetScene->RemoveFromHierarchy(gameObject);
+            targetScene->RemoveFromHierarchy(gameObject);   // 아니 걍 이거 하나로 통일되지 않나? 내부적으로 셋파랜트가 있어 이거
         }
         else
         {

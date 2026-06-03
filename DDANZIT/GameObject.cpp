@@ -264,6 +264,7 @@ void GameObject::Destroy(GameObject* gameObject)
 		return;
 	}
 
+
 	gameObject->isKilled = true;
 
 	for (Component* comp : gameObject->pComponentList)

@@ -11,6 +11,7 @@ class GameObject;
 // TODO_LATER: 직렬화를 만들기...?
 // 저 += 가 원래는 디스크립터를 추가하는 동작이어야 맞는거같은데..
 // 게임 실행중이면 그때나 게임에도 동적 추가해주는거고 말야 암튼 할거면 함수를 따로 빼야함
+// 그럼 지금 필요한 동작이 (적어도) 세개네? 생성해서 넣어주기 / 그냥 등록하기 / 설명서만 넣기
 class Hierarchy
 {
 public:
@@ -24,7 +25,7 @@ public:
 
 private:
 	std::vector<GameObject*> pRootGameObjectList;
-	std::vector<GameObject*> pGameObjectList;
+	std::vector<GameObject*> pGameObjectList;		// <- 이거는 리스트로 바꾸는게?
 
 public:
 	Hierarchy& operator+=(GameObject* go);
