@@ -28,7 +28,10 @@ class GameObject
 public:
 	friend class DDANZIT_Core;
 	friend class SceneManager;
+
 	friend class Scene;
+	friend class Hierarchy;
+
 	friend class Component;
 	friend class Transform;
 	friend class MonoBehavior;
@@ -43,10 +46,19 @@ protected:
 	GameObject();
 	GameObject(Scene* scene);
 	GameObject(Scene* scene, bool parentActive);
-	GameObject(const GameObject&);		// TODO: 인스턴트를 위한 재정의 근데 이것도 상위에서 처리될라나?
+	GameObject(const GameObject& other);
 
 public:
 	virtual ~GameObject();
+
+#pragma endregion
+
+
+
+#pragma region Clone
+
+private:
+	virtual GameObject* Clone() const;		// TODO: 유저가 구현...?
 
 #pragma endregion
 
@@ -94,6 +106,12 @@ private:
 	// 나는 아니고~ 부모가 활/비활이래
 	bool parentActive;
 
+	// pGameObjectList에 들어있는가
+	Hierarchy* ownerHierarchy = nullptr;
+
+	// 생성 / 및 생성 시 라이프사이클 호출 끝났음 플래그
+	bool isInitialized = false;
+
 	// Destroy 마킹
 	// 이건 참조불가로 만드는 목적, 실제 파괴는 프레임 마지막에 일어나니
 	bool isKilled = false;
@@ -114,6 +132,9 @@ private:
 
 	void SetSceneAndDetach(Scene* scene);
 	void SetSceneRecursive(Scene* scene);
+
+	// 런타임 여부에 따라 동작이 다르다
+	void InitializeLifecycle(MonoBehavior* behavior);
 
 #pragma endregion
 
@@ -180,60 +201,31 @@ public:
 	}
 
 
-protected:
-	// 컴포넌트 등록 함수
-	// 오브젝트 생성자에서 호출해야함
-	// 스크립트 아닌 기본 컴포넌트도 이걸로 등록
+public:
+	// 컴포넌트 등록 함수 (MonoBehavior 스크립트 포함)
+	// 생성자에서 등록하세요
 	template <std::derived_from<Component> T>
 	T* AddComponent()
 	{
-		// TODO_LATER: 디버그 메세지
 		if (pComponentList.size() == MAX_COMPONENT_NUM)
 		{
+			// DEBUG: 디버그 메세지
 			return;
 		}
-
 		
 		T* component = new T(this);
 
 		pComponentList.push_back(component);
 
-		// TODO: 생각해보니까 이것도... 인스턴트가 프레임 내에서 일어나니까..? 아닌가 시작은 이미됐으니
-		if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(component))
+
+		if (isInitialized)
 		{
-			if (b->activeAwake)
-				DDANZIT_Core::awakeExecQueue.push(b);
-
-			if (b->activeOnEnable && b->isActiveAndEnabled())
-				DDANZIT_Core::onEnableExecQueue.push(b);
-
-			if (b->activeStart)
-				DDANZIT_Core::startExecQueue.push(b);
-
-
-			// 활성화 여부에 따라.. 안넣을수도있음
-			if (b->isActiveAndEnabled())
-				DDANZIT_Core::RegisterUpdateExecLists(b);
+			if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(component))
+			{
+				InitializeLifecycle(b);
+			}
 		}
 	}
-
-#pragma endregion
-
-
-
-#pragma region Lifecycle
-
-//public:
-//	virtual void Awake();
-//	virtual void OnEnable();
-//	virtual void Start();
-//
-//	virtual void Update();
-//	virtual void FixedUpdate();
-//	virtual void LateUpdate();
-//
-//	virtual void OnDisable();
-//	virtual void OnDestroy();
 
 #pragma endregion
 
@@ -242,7 +234,7 @@ protected:
 #pragma region StaticMethods
 
 	// TODO_LATER: 이것들 원래는 Object의 메서드임
-
+public:
 	static GameObject* Instantiate(GameObject* gameObject);
 	static GameObject* Instantiate(GameObject* gameObject, Transform* parent);
 	static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float angle);
@@ -257,17 +249,6 @@ protected:
 
 
 	static void DontDestroyOnLoad(GameObject* gameObject);
-
-
-private:
-	// ?
-	static void RegisterObj(GameObject* pGameObject);
-	static void QuitObj(GameObject* pGameObject);
-
-
-	// 이런것들은 접근 못하게 하는군...
-	//static std::vector<GameObject*> GetObjList();
-	//static GameObject* Find(long index);
 
 #pragma endregion
 

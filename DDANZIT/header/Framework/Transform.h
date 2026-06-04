@@ -7,12 +7,10 @@
 
 #include "Utillity.h"
 
-
-// 고정 컴포넌트(유사)로 바꿔야한다
-
 using Vector2 = learning::Vector2f;
 
 class GameObject;
+
 
 class Transform : public Component
 {
@@ -28,7 +26,7 @@ public:
 
 private:
 	Transform() = delete;
-	Transform(const Transform&) = default;	// 이거 괜찮나?
+	Transform(const Transform& other);		// 직접 구현해야겠다; 자식까지 전부 복제는 그냥 내가 안할래
 	Transform(GameObject* gameObject);
 	Transform(GameObject* pGameObject, bool active) = delete;
 
@@ -39,7 +37,22 @@ public:
 
 
 
+#pragma region Clone
+
+	// 트랜스폼은 고정이라 전용으로 하면 될거같은데? 가려버려
+private:
+	Transform* Clone() const;
+
+#pragma endregion
+
+
+
 #pragma region Properties
+
+	// TODO: 이거 따로 빼기 라이브러리같은거?
+
+	static constexpr float DEG2RAD = 3.14159265f / 180.0f;
+	static constexpr float RAD2DEG = 180.0f / 3.14159265f;
 
 	// TODO: 부모 오브젝트 기준으로 움직이게 하기
 #ifdef PROPS_MODE_2D
@@ -57,27 +70,25 @@ public:
 	Vector2& scale() { return _scale; }
 	const Vector2& scale() const { return _scale; }
 
-	// TODO: rotation <-> angle 상호 변환해야함 Set 함수를 써야겠네
-	// 아니면.. 오퍼레이터 정의해도됨 헉!
+
 private:
-	Vector2 _rotation;
+	Vector2 _direction;
 public:
-	Vector2& rotation() { return _rotation; }
-	const Vector2& rotation() const { return _rotation; }
+	// 유니티엔 없는 방향벡터
+	Vector2& direction() { return _direction; }
+	const Vector2& direction() const { return _direction; }
 
 
-private:
-	float _angle;
 public:
 	// 보기좋은 degree
-	float& angle() { return _angle; }
-	const float& angle() const { return _angle; }
+	void SetAngle(float degree);
+	float angle() const;
 
 
 private:
 	unsigned int _depth;
 public:
-	// 인덱스 방식이기 때문에 음수는 없을 예정
+	// 인덱스 방식이기 때문에 음수는 없을 예정 작을수록 위쪽
 	unsigned int& depth() { return _depth; }
 	const int& depth() const { return _depth; }
 

@@ -10,9 +10,53 @@ using namespace std;
 #pragma region Constructor
 
 Transform::Transform(GameObject* pGameObject) : 
-	Component(pGameObject), _parent(nullptr), _position(Vector2(0, 0)), _rotation(Vector2(1, 0)), _angle(0), _scale(Vector2(1, 1)), _depth(0)
+	Component(pGameObject), _parent(HIERARCY_ROOT), _position(Vector2(0, 0)), _direction(Vector2(1.0f, 0)), _scale(Vector2(1.0f, 1.0f)), _depth(0)
 {
 	//RegisterTransform(this);
+}
+
+Transform::Transform(const Transform& other) :
+	Component(other)
+{
+	_position = other._position;
+	_direction = other._direction;
+	_scale = other._scale;
+	_depth = other._depth;
+	_parent = HIERARCY_ROOT;
+
+	// pChildList는 안건드림 자식 빈상태 그대로
+}
+
+#pragma endregion
+
+
+
+#pragma region Properties
+
+void Transform::SetAngle(float degree)
+{ 
+	float radians = degree * DEG2RAD;
+
+	_direction.x = cos(radians);
+	_direction.y = sin(radians);
+}
+
+float Transform::angle() const 
+{ 
+	float radians = atan2(_direction.y, _direction.x);
+
+	return radians * RAD2DEG;
+}
+
+#pragma endregion
+
+
+
+#pragma region Clone
+
+Transform* Transform::Clone() const
+{
+	return new Transform(*this);
 }
 
 #pragma endregion

@@ -30,5 +30,9 @@ void Mycode() {
 
 	scene1->AddGameObject<MyObject>();
 
+	GameObject* go = scene1->hierarchy.RegisterGameObject<MyObject>();
+
+
+
 	hierarchy()->GetObjectList();
 }

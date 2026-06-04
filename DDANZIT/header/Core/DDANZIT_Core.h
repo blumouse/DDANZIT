@@ -14,8 +14,7 @@ namespace renderHelp
 }
 
 
-// 엔진 내부 공개를 위한 클래스..였는데
-// 굳이 없어도 될것 같지만 보기좋으니 놔두자
+// 엔진 내부 공개를 위한 클래스..였는데 음 몰라
 class DDANZIT_Core 
 {
 	using BitmapInfo = renderHelp::BitmapInfo;

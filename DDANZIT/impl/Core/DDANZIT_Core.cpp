@@ -21,20 +21,10 @@ void DDANZIT_Core::DestroyScheduled()
 
 
         // 씬 / 하이라키(루트)에서 빼버리기
-        // TODO: 이거 셋파랜트로 되나? 킬체크를 우회해야되니까 잘 모르겟다
-        if (gameObject->_transform->_parent == nullptr)
-        {
-            targetScene->RemoveFromHierarchy(gameObject);   // 아니 걍 이거 하나로 통일되지 않나? 내부적으로 셋파랜트가 있어 이거
-        }
-        else
-        {
-            gameObject->_transform->_parent->RemoveChild(gameObject->_transform);	// 별로 좋은 코드는 아니군
-
-            gameObject->_transform->_parent = nullptr;
-        }
+        targetScene->RemoveFromHierarchy(gameObject);
 
 
-        // TODO_LATER: (게임아닌)오브젝트를 받는다면... 컴포넌트인 경우의 처리(분기)
+        // TODO_LATER: 큐가 (게임아닌)오브젝트를 받는다면... 컴포넌트인 경우의 처리(분기)
 
 
         // 삭제!

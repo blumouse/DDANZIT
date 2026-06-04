@@ -8,8 +8,15 @@ public:
 	MyObject(Scene* scene) 
 	{
 		AddComponent<Script>();
+	}
 
-		// 씬/하이라키 에 추가
+	// 런타임, 인스턴트는 아래 복사생성자로 만들어짐
+	// 인스턴트하려면 복사생성자랑 클론도 만드세요
+	MyObject(const MyObject& other) = default;
+
+	GameObject* Clone() const override 
+	{
+		return new MyObject(*this);
 	}
 
 	~MyObject() = default;

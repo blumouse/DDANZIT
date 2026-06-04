@@ -7,9 +7,25 @@
 
 #pragma region Constructor
 
-MonoBehavior::MonoBehavior(GameObject* pGameObject) : Component(pGameObject)
+MonoBehavior::MonoBehavior(GameObject* pGameObject) : Component(pGameObject), isInUpdateList(false)
 {
 
+}
+
+MonoBehavior::MonoBehavior(const MonoBehavior& other) : Component(other), isInUpdateList(false)
+{
+
+}
+
+#pragma endregion
+
+
+
+#pragma region Clone
+
+Component* MonoBehavior::Clone() const
+{
+	return new MonoBehavior(*this);
 }
 
 #pragma endregion

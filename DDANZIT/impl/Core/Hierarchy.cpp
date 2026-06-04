@@ -1,59 +1,106 @@
 #include "Hierarchy.h"
 
-#include "DefineOption.h"
 #include "Debug.h"
 
 #include "SceneManager.h"
-#include "GameObject.h"
-#include "Transform.h"
+#include "Scene.h"
 
 using namespace std;
 
 
+#pragma region Constructor
+
+Hierarchy::Hierarchy(Scene* scene) : scene(scene)
+{
+
+}
+
+#pragma endregion
+
+
+
 Hierarchy& Hierarchy::operator+=(GameObject* go) 
 {
-	RegisterGameObject(go);
+	if (go == nullptr) 
+	{
+		// DEBUG: nullptr
+		return *this;
+	}
+
+	if (go->ownerHierarchy == this)
+	{
+		// DEBUG: 리스트 안에 이미 주소가 있으면 안돼
+		return *this;
+	}
+
+
+	pGameObjectList.push_back(go);
+	go->ownerHierarchy = this;
+
+	if (go->transform()->parent() == HIERARCY_ROOT)
+		pRootGameObjectList.push_back(go);
+
 
 	return *this;
 }
 
 Hierarchy& Hierarchy::operator-=(GameObject* go) 
 {
-	QuitGameObject(go);
+	if (go == nullptr)
+	{
+		// DEBUG: nullptr
+		return *this;
+	}
+
+	if (go->ownerHierarchy != this)
+	{
+		// DEBUG: 리스트 안에 주소가 없으면 안돼
+		return *this;
+	}
+
+
+	pGameObjectList.erase(remove(
+		pGameObjectList.begin(),
+		pGameObjectList.end(), go),
+		pGameObjectList.end());
+
+	go->ownerHierarchy = nullptr;
+
+	if (go->transform()->parent() == HIERARCY_ROOT)
+		pRootGameObjectList.erase(remove(
+			pRootGameObjectList.begin(),
+			pRootGameObjectList.end(), go),
+			pRootGameObjectList.end());
+
 
 	return *this;
 }
 
 
-void Hierarchy::RegisterGameObject(GameObject* go)
+GameObject* Hierarchy::RegisterGameObject()
 {
-	if (go != nullptr)
+	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
 	{
-		pGameObjectList.push_back(go);
-
-		if (go->transform()->parent() == HIERARCY_ROOT)
-			pRootGameObjectList.push_back(go);
+		// DEBUG: 디버그 메세지
+		return;
 	}
+
+	GameObject* go = new GameObject(scene);
+
+
+	pGameObjectList.push_back(go);
+	go->ownerHierarchy = this;
+
+	if (go->transform()->parent() == HIERARCY_ROOT)
+		pRootGameObjectList.push_back(go);
+
+	return go;
 }
 
-void Hierarchy::QuitGameObject(GameObject* go)
-{
-	if (go != nullptr) 
-	{
-		pGameObjectList.erase(remove(
-			pGameObjectList.begin(),
-			pGameObjectList.end(), go),
-			pGameObjectList.end()
-		);
-
-		if (go->transform()->parent() == HIERARCY_ROOT)
-			pRootGameObjectList.erase(remove(
-				pRootGameObjectList.begin(),
-				pRootGameObjectList.end(), go),
-				pRootGameObjectList.end()
-			);
-	}
-}
+//void Hierarchy::QuitGameObject(GameObject* go)
+//{
+//
+//}
 
 
 vector<GameObject*> Hierarchy::GetObjectList()
@@ -61,13 +108,24 @@ vector<GameObject*> Hierarchy::GetObjectList()
 	return pGameObjectList;
 }
 
-GameObject* Hierarchy::GetObjectByIndex(int index)
+GameObject* Hierarchy::GetObjectByTag(Tag tag)
 {
-	if (index < 0 || index >= pGameObjectList.size())
+	for (GameObject* go : pGameObjectList)
 	{
-		// DEBUG: out of range
-		return nullptr;
+		if (go->_tag == tag)
+			return go;
 	}
 
-	return pGameObjectList[index];
+	return nullptr;
+}
+
+GameObject* Hierarchy::GetObjectByName(string name)
+{
+	for (GameObject* go : pGameObjectList)
+	{
+		if (go->_name == name)
+			return go;
+	}
+
+	return nullptr;
 }

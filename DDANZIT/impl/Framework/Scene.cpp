@@ -13,7 +13,7 @@ using namespace std;
 
 #pragma region Constructor
 
-Scene::Scene(std::string name) : _name(name), isLoaded(false)
+Scene::Scene(std::string name) : _name(name), isLoaded(false), hierarchy(this)
 {
 
 }
@@ -54,15 +54,31 @@ void Scene::AddToHierarchy(GameObject* go, Transform* parent)
     if (parent != HIERARCY_ROOT)
         go->_transform->SetParent(parent);
 
-    hierarchy.RegisterGameObject(go);
+    hierarchy += go;
 
 }
 
 void Scene::RemoveFromHierarchy(GameObject* go) 
 {
-    // 루트지정 해놓은다음 하이라키에선 지워버려서 고아로 만듬
+    // 루트지정 해놓은다음 하이라키에선 지워버려서 고아로 만듬 내부용이라 제한없이 작동 (아마)
     go->_transform->SetParent(HIERARCY_ROOT);
-    hierarchy.QuitGameObject(go);
+    hierarchy -= go;
+}
+
+#pragma endregion
+
+
+#pragma region GameObjectManagement
+
+GameObject* Scene::AddGameObject()
+{
+    if (hierarchy.pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
+    {
+        // DEBUG: 너무많아
+        return;
+    }
+
+    return hierarchy.RegisterGameObject();
 }
 
 #pragma endregion

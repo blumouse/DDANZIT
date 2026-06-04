@@ -90,21 +90,9 @@ public:
     // TODO: 굳이 따지면 CreatePrimitive에 해당한다
     // 하이라키에 오브젝트 하나 만들어 올린다
     // 뭔가 더 해야될거 같은데..?
-    GameObject* AddGameObject()
-    {
-        if (hierarchy.pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
-        {
-            // DEBUG: 너무많아
-            return;
-        }
+    GameObject* AddGameObject();
 
-
-        GameObject* gameObject = new GameObject(this);
-
-        hierarchy += gameObject;
-    }
-
-    // 사용감을 높이기 위한...
+    // 사용감을 높이기 위한... 굳이 따지면 Instantiate와 유사하다
     template <std::derived_from<GameObject> T>
     GameObject* AddGameObject() 
     {
@@ -114,10 +102,7 @@ public:
             return;
         }
 
-
-        T* gameObject = new T(this);
-
-        hierarchy += gameObject;
+        return hierarchy.RegisterGameObject<T>();
     }
 
 #pragma endregion

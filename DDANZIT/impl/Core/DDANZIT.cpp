@@ -3,8 +3,10 @@
 #include "DefineOption.h"
 
 #include "DDANZIT_Core.h"
-#include "IDrawable.h"
+#include "Application.h"
 #include "SceneManager.h"
+
+#include "IDrawable.h"
 
 #include "Scene.h"
 #include "GameObject.h"
@@ -32,15 +34,15 @@ using BitmapInfo = renderHelp::BitmapInfo;
 // 
 // 하이라키 타입 만들기 씬에서 관리 <- 얼추 했는데 잘 되는진 모르겠어
 // 
-// 이거 add 씬 / 오브젝트 도 있어야겠는데..? 제네릭으로 받아야돼? <- 씬은 했다 이거하기 !!
+// 이거 add 씬 / 오브젝트 도 있어야겠는데..? 제네릭으로 받아야돼? <- 인스턴트 남음 ......이거 생각보다 복사 겁나 어렵다!!!
 // 오브젝트 Add에서 복사생성자 인스턴트까지
 //
 // 간이로 디버그 레이어 일찍 만드는게 좋을지도 나도당장 디버그가 필요해.. <- 끝
 // 
 // 다음은 바로 렌더러 구현 / 테스트하자..
 // 아씨 트렌스폼 부모기준으로도 해야되는데..? 근데 이건 상위에서 결산할때 그렇게 하면 되기도 하고
-// 각도 - 벡터변환도 있어
-// 걍 빠르게 오브젝트 상속 주는게 나을지도
+// 각도 - 벡터변환도 있어 <- 끝
+// 걍 빠르게 오브젝트 상속 주는게 나을지도 <- 안해
 
 
 //
@@ -83,7 +85,7 @@ namespace
 
 
     // 내부로직에서 접근가능하게 빼기
-    static DDANZIT_Core gameCore;
+    DDANZIT_Core gameCore;
 
 
     // TODO: 이것도 리스트로 바꿔?
@@ -154,6 +156,10 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     hDefaultBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
 
 
+    Application::_isPlaying = false;
+    Application::_isQuit = false;
+
+
     SceneManager::mainScene = nullptr;
     SceneManager::dontDestroyOnLoad = nullptr;
 
@@ -171,6 +177,9 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
 void DDANZIT_Run() 
 {
+    Application::_isPlaying = true;
+
+
     MSG msg = { 0 };
     while (msg.message != WM_QUIT)
     {
@@ -297,14 +306,17 @@ void DDANZIT_Run()
             
 
 
-            //if (Application.isQuit)
-            //    break;
+            if (Application::_isQuit)
+                break;
 
 
             // 다음 프레임...
             
         }
     }
+
+
+    Application::_isPlaying = false;
 }
 
 // TODO ...손도못댐

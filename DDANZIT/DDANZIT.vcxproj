@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
     <ClCompile Include="impl\Core\Debug.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="header\Core\DDANZIT.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\Debug.h" />

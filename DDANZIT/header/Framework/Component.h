@@ -18,17 +18,27 @@ public:
 	friend class GameObject;
 	friend class Transform;
 	friend class MonoBehavior;
+	// 이걸 상속 주는대로 다뚫어야 된다고?? 그래야 안보이긴 함;
 
 #pragma region Constructor
 
 protected:
 	Component() = delete;
-	Component(const Component&) = delete;
+	Component(const Component& other) = default;
 	Component(GameObject* pGameObject);
 	Component(GameObject* pGameObject, bool active);
 
 public:
 	virtual ~Component() = default;
+
+#pragma endregion
+
+
+
+#pragma region Clone
+
+private:
+	virtual Component* Clone() const = 0;	// TODO: 컴포넌트들 / 모노비헤비어에서 구현
 
 #pragma endregion
 
