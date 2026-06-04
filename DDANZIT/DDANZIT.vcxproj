@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Draw2D.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
     <ClCompile Include="impl\Core\Debug.cpp" />
@@ -154,12 +155,14 @@
     <ClCompile Include="ObjectVisual.cpp" />
     <ClCompile Include="Script.h" />
     <ClCompile Include="Service\CodeEdit.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="Util\GameTimer.cpp" />
     <ClCompile Include="Util\RenderHelp.cpp" />
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Draw2D.h" />
     <ClInclude Include="header\Core\DDANZIT.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\Debug.h" />
@@ -180,6 +183,7 @@
     <ClInclude Include="Service\CodeEdit.h" />
     <ClInclude Include="Service\DefineOption.h" />
     <ClInclude Include="Service\SceneManagement.h" />
+    <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Util\GameTimer.h" />
     <ClInclude Include="Util\INC_Windows.h" />
     <ClInclude Include="Util\RenderHelp.h" />

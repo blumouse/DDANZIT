@@ -1,7 +1,5 @@
 #include "Component.h"
 
-#include "GameObject.h"
-
 
 #pragma region Constructor
 

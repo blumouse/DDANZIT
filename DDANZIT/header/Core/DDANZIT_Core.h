@@ -3,6 +3,8 @@
 #include <vector>
 #include <queue>
 
+#include "DefineOption.h"
+
 class Scene;
 class GameObject;
 class Lifecycle;
@@ -100,12 +102,14 @@ private:
 
 private:
 	// TODO: 레이어(depth) 적용해서 만들기
-	std::vector<IDrawable*> drawableRenderList;
+	// 뭐 최적화 캐시히트 그런건 나중에 고려하자..
+	std::vector<IDrawable*> drawableRenderLists[MAX_LAYER_NUM];
 
-	void RegisterDrawable(IDrawable* drawable);
-	void RegisterDrawable(IDrawable* drawable, int layer);
-	void QuitDrawable(IDrawable* drawable);
-	void QuitDrawable(IDrawable* drawable, int layer);
+	static void RegisterDrawable(IDrawable* drawable);
+	static void RegisterDrawable(IDrawable* drawable, int layer);
+
+	static void QuitDrawable(IDrawable* drawable);
+	static void QuitDrawable(IDrawable* drawable, int layer);
 
 #pragma endregion
 

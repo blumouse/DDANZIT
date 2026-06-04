@@ -48,6 +48,17 @@ float Transform::angle() const
 	return radians * RAD2DEG;
 }
 
+void Transform::SetDepth(int depth) 
+{
+	if (depth < 0 || depth >= MAX_LAYER_NUM)
+	{
+		// DEBUG: 레이어 범위 밖
+		return;
+	}
+
+	_depth = depth;
+}
+
 #pragma endregion
 
 

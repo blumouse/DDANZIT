@@ -20,6 +20,6 @@ private:
 public:
 	static void Quit() { _isQuit = true; }
 
-	// TODO: Quit / Pause 등.. 추가
+	// TODO: 다른거 또 뭐잇지
 };
 

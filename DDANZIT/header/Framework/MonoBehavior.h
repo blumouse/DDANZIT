@@ -31,7 +31,6 @@ public:
 
 #pragma region Clone
 
-	// 트랜스폼은 고정이라 전용으로 하면 될거같은데? 가려버려
 private:
 	Component* Clone() const override;
 
@@ -51,7 +50,6 @@ private:
 #pragma region Methods
 
 public:
-	const bool& isActiveAndEnabled() const { return _active && parentActive; }
 	void SetActive(bool newActive) override;
 
 

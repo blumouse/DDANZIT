@@ -87,12 +87,12 @@ private:
 #pragma region GameObjectManagement
 
 public:
-    // TODO: 굳이 따지면 CreatePrimitive에 해당한다
-    // 하이라키에 오브젝트 하나 만들어 올린다
-    // 뭔가 더 해야될거 같은데..?
+    // 굳이 따지면 CreatePrimitive에 해당한다
+    // 이거 있어야 하나..? 정말 빈 오브젝트 하나
     GameObject* AddGameObject();
 
     // 사용감을 높이기 위한... 굳이 따지면 Instantiate와 유사하다
+    // 뭔가 더 해야될거 같은데..?
     template <std::derived_from<GameObject> T>
     GameObject* AddGameObject() 
     {

@@ -34,14 +34,17 @@ using BitmapInfo = renderHelp::BitmapInfo;
 // 
 // 하이라키 타입 만들기 씬에서 관리 <- 얼추 했는데 잘 되는진 모르겠어
 // 
-// 이거 add 씬 / 오브젝트 도 있어야겠는데..? 제네릭으로 받아야돼? <- 인스턴트 남음 ......이거 생각보다 복사 겁나 어렵다!!!
-// 오브젝트 Add에서 복사생성자 인스턴트까지
+// 이거 add 씬 / 오브젝트 도 있어야겠는데..? 제네릭으로 받아야돼?
+// 오브젝트 Add에서 복사생성자 인스턴트까지 <- 와 일단락! 남은건 테스트
 //
 // 간이로 디버그 레이어 일찍 만드는게 좋을지도 나도당장 디버그가 필요해.. <- 끝
 // 
 // 다음은 바로 렌더러 구현 / 테스트하자..
+// 
 // 아씨 트렌스폼 부모기준으로도 해야되는데..? 근데 이건 상위에서 결산할때 그렇게 하면 되기도 하고
+// 
 // 각도 - 벡터변환도 있어 <- 끝
+// 
 // 걍 빠르게 오브젝트 상속 주는게 나을지도 <- 안해
 
 
@@ -49,8 +52,8 @@ using BitmapInfo = renderHelp::BitmapInfo;
 // TODO 소기의 목표
 // 
 // 추가할거.. 순서
-// 하이라키 구조
-// 씬 매니저
+// 하이라키 구조  끗
+// 씬 매니저    끗?
 // 더 많은 오브젝트 / 컴포넌트 속성
 // 코루틴 사이클
 // 인풋시스템
@@ -82,6 +85,19 @@ namespace
     HDC hBackDC = nullptr;
     HBITMAP hBackBitmap = nullptr;
     HBITMAP hDefaultBitmap = nullptr;
+
+
+    // 그래픽 엔진!
+#ifdef RENDER_MODE_WINGDI
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+
+#endif // RENDER_MODE_DIRECT2D
+
 
 
     // 내부로직에서 접근가능하게 빼기
@@ -155,10 +171,13 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
     hDefaultBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
 
+    // 이쯤에서 그래픽 엔진 초기화
+
+
+
 
     Application::_isPlaying = false;
     Application::_isQuit = false;
-
 
     SceneManager::mainScene = nullptr;
     SceneManager::dontDestroyOnLoad = nullptr;
@@ -278,11 +297,8 @@ void DDANZIT_Run()
                 // 0번 레이어가 가장 위
                 for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
                 {
-                    for (int j = 0; j < gameObjectsIndex; ++j)
-                    {
-                        if (ppDrawableLayers[i][j])
-                            ppDrawableLayers[i][j]->Draw(hBackDC);
-                    }
+                    for (IDrawable* drawable : gameCore.drawableRenderLists[i])
+                        drawable->Draw(hBackDC);
                 }
 
 
@@ -325,29 +341,11 @@ void DDANZIT_Finalize() {
     delete pGameTimer;
     pGameTimer = nullptr;
 
-    for (int i = 0; i < MAX_LAYER_NUM; i++)
-    {
-        if (ppDrawableLayers[i])
-        {
-            delete ppDrawableLayers[i];
-            ppDrawableLayers[i] = nullptr;
-        }
-    }
+    SceneManager::mainScene = nullptr;
 
-    if (ppGameObjects)
+    for (Scene* scene : SceneManager::pLoadedSceneList)
     {
-        for (int i = 0; i < gameObjectsIndex; ++i)
-        {
-            if (ppGameObjects[i])
-            {
-                ppGameObjects[i]->OnDestroy();
-
-                delete ppGameObjects[i];
-                ppGameObjects[i] = nullptr;
-            }
-        }
-        delete ppGameObjects;
-        ppGameObjects = nullptr;
+        SceneManager::UnloadScene(scene);
     }
 
     DestroyWnd();
@@ -363,44 +361,6 @@ BitmapInfo* LoadResource(const wchar_t* filePath)
 
     return ppBitmapResources[bmiIndex];
 }
-
-
-//GameObjectBase* GetObjectWithPos(int mouseX, int mouseY)
-//{
-//    GameObjectBase* gameObject = nullptr;
-//
-//    for (int i = 0; i < gameObjectsIndex; i++)
-//    {
-//        if (ppTransforms[i] && ppTransforms[i]->IsIntersectPoint(mouseX, mouseY))
-//        {
-//            gameObject = dynamic_cast<GameObjectBase*>(ppTransforms[i]);
-//            break;
-//        }
-//    }
-//
-//    return gameObject;
-//}
-//
-//bool TryGetObjectWithPos(int mouseX, int mouseY, GameObjectBase*& pGameObject)
-//{
-//    GameObjectBase* gameObject = nullptr;
-//
-//    for (int i = 0; i < gameObjectsIndex; i++)
-//    {
-//        if (ppTransforms[i] && ppTransforms[i]->IsIntersectPoint(mouseX, mouseY))
-//        {
-//            // 어 그 주소 go 맞아.. 더 확실하게 보장시킬수 없나 transform에?
-//            if (gameObject = dynamic_cast<GameObjectBase*>(ppTransforms[i]))
-//            {
-//                pGameObject = gameObject;
-//                return true;
-//            }
-//        }
-//    }
-//
-//    return false;
-//}
-
 
 
 // 내부함수들..

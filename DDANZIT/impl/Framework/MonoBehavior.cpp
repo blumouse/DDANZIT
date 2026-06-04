@@ -50,7 +50,8 @@ void MonoBehavior::SetActive(bool newActive)
 
 	// ㅇㄴ 생성/파괴시에만 순서를 따르고, 평소 온오프에서는 즉시 실행 및 상태변경
 
-
+	// TODO: 이거 런타임 아니면 실행 안할듯?
+	// 런타임검사... 이런것들이 제법 지금 있을법한데
 	if (newActive /*== true*/)
 	{
 		if (activeOnEnable)

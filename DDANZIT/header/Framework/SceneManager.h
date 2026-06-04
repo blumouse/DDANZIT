@@ -6,7 +6,6 @@
 class Scene;
 class GameObject;
 
-// TODO: SceneManagement 헤더로 묶기
 
 enum class LoadSceneMode
 {
@@ -53,6 +52,7 @@ public:
 	static Scene* GetActiveScene();
 
 	static Scene* CreateScene(std::string name);
+	static Scene* CreateScene(std::string name, LoadSceneMode mode);	// 이것도 원래 없지만 편의를 위해 추가
 
 	static Scene* GetSceneAt(int index);
 	static Scene* GetSceneByName(std::string name);

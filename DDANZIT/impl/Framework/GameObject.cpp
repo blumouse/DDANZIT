@@ -124,9 +124,9 @@ GameObject* GameObject::Clone() const
 
 Transform* const GameObject::transform()
 {
-	if (isKilled)
+	if (isKilled)		// TODO?: 이거 킬체크 한번쯤 생각은 해야하는데;
 	{
-		// TODO_LATER: 디버그 메세지
+		// DEBUG: 죽엇어!
 		return nullptr;
 	}
 
@@ -312,7 +312,7 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent)
 	return clone;
 }
 
-GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, float angle)
+GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, Vector2 direction)
 {
 	if (gameObject == nullptr)
 	{
@@ -324,9 +324,29 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, fl
 		return nullptr;
 	}
 
+
+	GameObject* clone = gameObject->Clone();
+	clone->_transform->_parent = HIERARCY_ROOT;
+
+	clone->_transform->_position = position;
+	clone->_transform->_direction = direction;
+
+	SceneManager::mainScene->hierarchy += clone;
+
+	for (Component* comp : clone->pComponentList)
+	{
+		if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(comp))
+		{
+			clone->InitializeLifecycle(b);
+		}
+	}
+
+	clone->isInitialized = true;
+
+	return clone;
 }
 
-GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent, Vector2 position, float angle)
+GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, Vector2 direction, Transform* parent)
 {
 	if (gameObject == nullptr)
 	{
@@ -337,6 +357,28 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent, V
 	{
 		return nullptr;
 	}
+
+
+	GameObject* clone = gameObject->Clone();
+	clone->_transform->SetParent(parent);
+
+	// 월드 기준이라 할거 없음 오예
+	clone->_transform->_position = position;
+	clone->_transform->_direction = direction;
+
+	SceneManager::mainScene->hierarchy += clone;
+
+	for (Component* comp : clone->pComponentList)
+	{
+		if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(comp))
+		{
+			clone->InitializeLifecycle(b);
+		}
+	}
+
+	clone->isInitialized = true;
+
+	return clone;
 
 }
 
@@ -353,21 +395,25 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Scene* scene)
 	}
 
 	// 해당 씬 루트에 추가
-}
 
-GameObject* GameObject::Instantiate(GameObject* gameObject, Scene* scene, Vector2 position, float angle)
-{
-	if (gameObject == nullptr)
+
+	GameObject* clone = gameObject->Clone();
+	clone->_transform->_parent = HIERARCY_ROOT;
+	clone->_scene = scene;
+
+	scene->hierarchy += clone;
+
+	for (Component* comp : clone->pComponentList)
 	{
-		return nullptr;
+		if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(comp))
+		{
+			clone->InitializeLifecycle(b);
+		}
 	}
 
-	if (gameObject->isKilled)
-	{
-		return nullptr;
-	}
+	clone->isInitialized = true;
 
-
+	return clone;
 }
 
 
@@ -412,12 +458,24 @@ void GameObject::Destroy(GameObject* gameObject)
 
 GameObject* GameObject::Find(string name) 
 {
+	for (Scene* scene : SceneManager::pLoadedSceneList)
+	{
+		if (GameObject* go = scene->hierarchy.GetObjectByName(name))
+			return go;
+	}
 
+	return nullptr;
 }
 
 GameObject* GameObject::FindWithTag(Tag tag) 
 {
+	for (Scene* scene : SceneManager::pLoadedSceneList)
+	{
+		if (GameObject* go = scene->hierarchy.GetObjectByTag(tag))
+			return go;
+	}
 
+	return nullptr;
 }
 
 #pragma endregion

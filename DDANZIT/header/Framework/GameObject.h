@@ -32,6 +32,8 @@ public:
 	friend class Scene;
 	friend class Hierarchy;
 
+	friend class Draw2D;
+
 	friend class Component;
 	friend class Transform;
 	friend class MonoBehavior;
@@ -58,7 +60,7 @@ public:
 #pragma region Clone
 
 private:
-	virtual GameObject* Clone() const;		// TODO: 유저가 구현...?
+	virtual GameObject* Clone() const;
 
 #pragma endregion
 
@@ -178,7 +180,7 @@ public:
 				return targetComponent;
 		}
 
-		// TODO_LATER: 그런 컴포넌트 없음 메세지
+		// DEBUG: 그런 컴포넌트 없음 메세지
 		return nullptr;
 	}
 
@@ -237,10 +239,9 @@ public:
 public:
 	static GameObject* Instantiate(GameObject* gameObject);
 	static GameObject* Instantiate(GameObject* gameObject, Transform* parent);
-	static GameObject* Instantiate(GameObject* gameObject, Vector2 position, float angle);
-	static GameObject* Instantiate(GameObject* gameObject, Transform* parent, Vector2 position, float angle);
+	static GameObject* Instantiate(GameObject* gameObject, Vector2 position, Vector2 direction);
+	static GameObject* Instantiate(GameObject* gameObject, Vector2 position, Vector2 direction, Transform* parent);
 	static GameObject* Instantiate(GameObject* gameObject, Scene* scene);
-	static GameObject* Instantiate(GameObject* gameObject, Scene* scene, Vector2 position, float angle);
 
 	static void Destroy(GameObject* gameObject);
 

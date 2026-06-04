@@ -6,6 +6,8 @@
 
 #include "DefineOption.h"
 
+#include "GameObject.h"
+
 class Scene;
 class GameObject;
 class Transform;
@@ -38,7 +40,7 @@ public:
 #pragma region Clone
 
 private:
-	virtual Component* Clone() const = 0;	// TODO: 컴포넌트들 / 모노비헤비어에서 구현
+	virtual Component* Clone() const = 0;
 
 #pragma endregion
 
@@ -84,6 +86,7 @@ private:
 public:
 	// 매우매우 고민하다 상속주기..
 	virtual void SetActive(bool newActive);
+	const bool& isActiveAndEnabled() const { return _active && parentActive; }
 
 
 	// 내부용

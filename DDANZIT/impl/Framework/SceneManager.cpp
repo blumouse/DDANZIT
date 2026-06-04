@@ -37,6 +37,18 @@ Scene* SceneManager::CreateScene(string name)
 	return newScene;
 }
 
+Scene* SceneManager::CreateScene(string name, LoadSceneMode mode)
+{
+	Scene* newScene = new Scene(name);
+
+	pSceneInstanceList.push_back(newScene);
+
+	LoadScene(newScene, mode);
+
+	return newScene;
+}
+
+
 Scene* SceneManager::GetSceneAt(int index)
 {
 	if (index < 0 || index >= sceneCount())
@@ -71,15 +83,18 @@ Scene* SceneManager::GetSceneByName(string name)
 
 void SceneManager::LoadScene(Scene* scene)
 {
-	// TODO: 이 시점에 게임오브젝트들이 만들어진다
+	// TODO: 이 시점에 게임오브젝트들이 만들어진다 ...
 	// 원래는 파일로 있는거만 되는데 여건상 그냥 한다
 
-	if (mainScene)
-		UnloadScene(mainScene);
+	for (Scene* scene : pLoadedSceneList)
+		UnloadScene(scene);
+
+	mainScene = scene;
+
+	// 어쩌구저쩌구
 
 
 	scene->isLoaded = true;
-	mainScene = scene;
 }
 
 void SceneManager::LoadScene(Scene* scene, LoadSceneMode mode)

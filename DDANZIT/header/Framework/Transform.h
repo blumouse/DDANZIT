@@ -31,7 +31,7 @@ private:
 	Transform(GameObject* pGameObject, bool active) = delete;
 
 public:
-	virtual ~Transform() = default;
+	~Transform() = default;
 
 #pragma endregion
 
@@ -89,7 +89,7 @@ private:
 	unsigned int _depth;
 public:
 	// 인덱스 방식이기 때문에 음수는 없을 예정 작을수록 위쪽
-	unsigned int& depth() { return _depth; }
+	void SetDepth(int depth);
 	const int& depth() const { return _depth; }
 
 #endif // PROPS_MODE_2D

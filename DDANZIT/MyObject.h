@@ -1,11 +1,12 @@
 #include "GameObject.h"
 #include "Script.h"
+#include "Draw2D.h"
 
 // 사실 원래는 이렇게 상속받지 않지만;
-class MyObject : public GameObject
+class MyObject : public GameObject, public Draw2D
 {
 public:
-	MyObject(Scene* scene) 
+	MyObject(Scene* scene) : Draw2D(this)
 	{
 		AddComponent<Script>();
 	}
