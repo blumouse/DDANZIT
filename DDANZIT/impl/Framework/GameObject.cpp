@@ -79,7 +79,7 @@ GameObject::GameObject(const GameObject& other)
 	_active = other._active;
 	parentActive = true;
 
-	_transform = other._transform->Clone();
+	_transform = other._transform->CloneTransform();
 	_transform->_gameObject = this;
 
 	for (Component* comp : other.pComponentList) 

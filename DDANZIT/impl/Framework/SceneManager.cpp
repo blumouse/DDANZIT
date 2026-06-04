@@ -93,7 +93,7 @@ void SceneManager::LoadScene(Scene* scene)
 
 	// ¾îÂ¼±¸ÀúÂ¼±¸
 
-
+	pLoadedSceneList.push_back(scene);
 	scene->isLoaded = true;
 }
 
@@ -107,6 +107,7 @@ void SceneManager::LoadScene(Scene* scene, LoadSceneMode mode)
 			mainScene = scene;
 
 
+		pLoadedSceneList.push_back(scene);
 		mainScene->isLoaded = true;
 	}
 }
@@ -152,7 +153,12 @@ bool SceneManager::UnloadScene(Scene* scene)
 	{
 		GameObject::Destroy(go);
 	}
-	
+
+
+	pLoadedSceneList.erase(remove(
+		pLoadedSceneList.begin(),
+		pLoadedSceneList.end(), scene),
+		pLoadedSceneList.end());
 	scene->isLoaded = false;
 }
 

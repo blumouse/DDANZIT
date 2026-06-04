@@ -65,8 +65,15 @@ void Transform::SetDepth(int depth)
 
 #pragma region Clone
 
-Transform* Transform::Clone() const
+Component* Transform::Clone() const
 {
+	// ASSERT: 사용되지 않음
+	return nullptr;
+}
+
+Transform* Transform::CloneTransform() const
+{
+	// ASSERT: 사용되지 않음
 	return new Transform(*this);
 }
 

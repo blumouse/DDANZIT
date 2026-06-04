@@ -39,9 +39,9 @@ public:
 
 #pragma region Clone
 
-	// 트랜스폼은 고정이라 전용으로 하면 될거같은데? 가려버려
 private:
-	Transform* Clone() const;
+	Component* Clone() const;
+	Transform* CloneTransform() const;
 
 #pragma endregion
 

@@ -23,6 +23,7 @@ using namespace std;
 
 using BitmapInfo = renderHelp::BitmapInfo;
 
+// TODO: 탬플릿 구현용 헤더 만들고 분리
 
 // 지금 하고있는것... 너무 많은걸 하고 있는 느낌이..!! 중요한거부터 해! 금방하고 d2d해야돼.. <- 사실 gdi로 돌아가면 된다
 // 

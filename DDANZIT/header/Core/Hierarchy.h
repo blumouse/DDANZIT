@@ -12,6 +12,7 @@
 
 class Scene;
 class GameObject;
+class Component;
 
 
 // TODO_LATER: 직렬화를 만들기...?
