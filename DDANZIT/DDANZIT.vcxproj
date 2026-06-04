@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
