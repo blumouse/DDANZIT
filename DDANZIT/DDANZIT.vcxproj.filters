@@ -28,31 +28,28 @@
     <Filter Include="헤더 파일\Util">
       <UniqueIdentifier>{f6949aaa-6811-48ae-bd3c-d8b331d78a6b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\DDANZIT">
-      <UniqueIdentifier>{db462ead-7f1a-4c8f-a4fe-7a8f52947a59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\DDANZIT">
-      <UniqueIdentifier>{9e320377-1461-4863-a5e5-830995a7f2f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\사용해보기\Origin">
-      <UniqueIdentifier>{738550ec-451c-4c2f-b7f1-aa779c3d3bd1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\DDANZIT\Origin">
-      <UniqueIdentifier>{a316dcb5-82bc-4462-82a0-1807ea0f76b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\DDANZIT\Origin">
-      <UniqueIdentifier>{5c71a7a9-214c-47ef-ac28-ece557ab84d2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="헤더 파일\Service">
       <UniqueIdentifier>{12a0622b-81a4-4d12-b049-c1202d64a258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Origin">
+      <UniqueIdentifier>{a316dcb5-82bc-4462-82a0-1807ea0f76b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework">
+      <UniqueIdentifier>{9e320377-1461-4863-a5e5-830995a7f2f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Origin">
+      <UniqueIdentifier>{5c71a7a9-214c-47ef-ac28-ece557ab84d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Framework">
+      <UniqueIdentifier>{db462ead-7f1a-4c8f-a4fe-7a8f52947a59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Service">
+      <UniqueIdentifier>{525bda81-b704-4ee2-93d8-114b7d315a19}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일\사용해보기</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\IDrawable.cpp">
-      <Filter>소스 파일\Core</Filter>
     </ClCompile>
     <ClCompile Include="Util\GameTimer.cpp">
       <Filter>소스 파일\Util</Filter>
@@ -63,77 +60,65 @@
     <ClCompile Include="Util\Utillity.cpp">
       <Filter>소스 파일\Util</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="Lifecycle.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="MonoBehavior.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="MngObject.cpp">
-      <Filter>소스 파일\사용해보기\Origin</Filter>
-    </ClCompile>
-    <ClCompile Include="NewObject.cpp">
-      <Filter>소스 파일\사용해보기\Origin</Filter>
-    </ClCompile>
-    <ClCompile Include="NewVisual.cpp">
-      <Filter>소스 파일\사용해보기\Origin</Filter>
-    </ClCompile>
     <ClCompile Include="Script.h">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
     <ClCompile Include="MyObject.h">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
-    <ClCompile Include="Hierarchy.cpp">
+    <ClCompile Include="impl\Core\Application.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectData.cpp">
-      <Filter>소스 파일\DDANZIT\Origin</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectLogic.cpp">
-      <Filter>소스 파일\DDANZIT\Origin</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectVisual.cpp">
-      <Filter>소스 파일\DDANZIT\Origin</Filter>
-    </ClCompile>
-    <ClCompile Include="DDANZIT.cpp">
+    <ClCompile Include="impl\Core\DDANZIT.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\DDANZIT_Core.cpp">
+    <ClCompile Include="impl\Core\DDANZIT_Core.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Component.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\NzWndBase.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Transform.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>소스 파일\DDANZIT</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectDesciptor.cpp">
+    <ClCompile Include="impl\Core\Debug.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Debug.cpp">
+    <ClCompile Include="impl\Core\GameObjectDesciptor.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
-    <ClCompile Include="CodeEdit.cpp">
-      <Filter>소스 파일\Util</Filter>
+    <ClCompile Include="impl\Core\Hierarchy.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Core\IDrawable.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Component.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Draw2D.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\GameObject.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\MonoBehavior.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Scene.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\SceneManager.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\SpriteRenderer.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Transform.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Service\CodeEdit.cpp">
+      <Filter>소스 파일\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Core\Lifecycle.cpp">
+      <Filter>소스 파일\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\IDrawable.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Util\Utillity.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
@@ -146,62 +131,62 @@
     <ClInclude Include="Util\GameTimer.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="Lifecycle.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="MonoBehavior.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="Hierarchy.h">
+    <ClInclude Include="header\Core\Application.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectData.h">
-      <Filter>헤더 파일\DDANZIT\Origin</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectLogic.h">
-      <Filter>헤더 파일\DDANZIT\Origin</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectVisual.h">
-      <Filter>헤더 파일\DDANZIT\Origin</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\NzWndBase.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DefineOption.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
-    </ClInclude>
-    <ClInclude Include="DDANZIT.h">
+    <ClInclude Include="header\Core\DDANZIT.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\DDANZIT_Core.h">
+    <ClInclude Include="header\Core\DDANZIT_Core.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Component.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
+    <ClInclude Include="header\Core\Debug.h">
+      <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Transform.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
+    <ClInclude Include="header\Core\GameObjectDesciptor.h">
+      <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>헤더 파일\DDANZIT</Filter>
+    <ClInclude Include="header\Core\Hierarchy.h">
+      <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="SceneManagement.h">
+    <ClInclude Include="header\Core\IDrawable.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Component.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Draw2D.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\GameObject.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\MonoBehavior.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Scene.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\SceneManager.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\SpriteRenderer.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Transform.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\CodeEdit.h">
       <Filter>헤더 파일\Service</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectDesciptor.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="CodeEdit.h">
+    <ClInclude Include="Service\DefineOption.h">
       <Filter>헤더 파일\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\SceneManagement.h">
+      <Filter>헤더 파일\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Core\Lifecycle.h">
+      <Filter>헤더 파일\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
