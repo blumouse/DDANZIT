@@ -5,6 +5,8 @@
 #include "SceneManager.h"
 #include "Scene.h"
 
+#include "Transform.h"
+
 using namespace std;
 
 
@@ -82,7 +84,7 @@ GameObject* Hierarchy::RegisterGameObject()
 	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
 	{
 		// DEBUG: 디버그 메세지
-		return;
+		return nullptr;
 	}
 
 	GameObject* go = new GameObject(scene);

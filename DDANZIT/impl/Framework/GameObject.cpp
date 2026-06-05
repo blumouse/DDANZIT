@@ -201,7 +201,7 @@ void GameObject::SetSceneRecursive(Scene* scene)
 
 void GameObject::InitializeLifecycle(MonoBehavior* behavior)
 {
-	if (Application::isPlaying)
+	if (Application::isPlaying())
 	{
 		if (behavior->activeAwake)
 			behavior->Awake();

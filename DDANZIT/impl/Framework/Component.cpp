@@ -1,5 +1,9 @@
 #include "Component.h"
 
+#include "GameObject.h"
+
+using namespace std;
+
 
 #pragma region Constructor
 
@@ -28,6 +32,24 @@ GameObject* const Component::gameObject()
 	}
 
 	return _gameObject;
+}
+
+
+const string& Component::name() const 
+{ 
+	return _gameObject->_name; 
+}
+
+
+const Tag& Component::tag() const 
+{ 
+	return _gameObject->_tag; 
+}
+
+
+Transform* const Component::transform() 
+{ 
+	return _gameObject->_transform; 
 }
 
 #pragma endregion

@@ -7,11 +7,6 @@
 
 #include "DefineOption.h"
 
-#include "DDANZIT_Core.h"
-#include "Scene.h"
-#include "Component.h"
-#include "MonoBehavior.h"
-
 class Lifecycle;
 
 namespace learning 
@@ -99,7 +94,7 @@ public:
 private:
 	Transform* _transform;
 public:
-	Transform* const transform() { return _transform; }
+	Transform* const transform();
 
 
 	
@@ -154,80 +149,20 @@ public:
 
 
 	template <std::derived_from<Component> T>
-	void GetComponents(std::vector<T*>& componentList) const
-	{
-		componentList.clear();
-
-		for (Component* comp : pComponentList)
-		{
-			if (comp->isKilled)
-				continue;
-
-			if (T* targetComponent = dynamic_cast<T*>(comp))
-				componentList.push_back(targetComponent);
-		}
-	}
+	void GetComponents(std::vector<T*>& componentList) const;
 
 	template <std::derived_from<Component> T>
-	T* GetComponent() const 
-	{
-		for (Component* comp : pComponentList)
-		{
-			if (comp->isKilled)
-				continue;
-
-			if (T* targetComponent = dynamic_cast<T*>(comp))
-				return targetComponent;
-		}
-
-		// DEBUG: 그런 컴포넌트 없음 메세지
-		return nullptr;
-	}
+	T* GetComponent() const;
 
 	template <std::derived_from<Component> T>
-	bool TryGetComponent(T*& component) const
-	{
-		for (Component* comp : pComponentList)
-		{
-			if (comp->isKilled)
-				continue;
-
-			if (T* targetComponent = dynamic_cast<T*>(comp))
-			{
-				component = targetComponent;
-				return true;
-			}
-		}
-
-		return false;
-	}
+	bool TryGetComponent(T*& component) const;
 
 
 public:
 	// 컴포넌트 등록 함수 (MonoBehavior 스크립트 포함)
 	// 생성자에서 등록하세요
 	template <std::derived_from<Component> T>
-	T* AddComponent()
-	{
-		if (pComponentList.size() == MAX_COMPONENT_NUM)
-		{
-			// DEBUG: 디버그 메세지
-			return;
-		}
-		
-		T* component = new T(this);
-
-		pComponentList.push_back(component);
-
-
-		if (isInitialized)
-		{
-			if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(component))
-			{
-				InitializeLifecycle(b);
-			}
-		}
-	}
+	T* AddComponent();
 
 #pragma endregion
 

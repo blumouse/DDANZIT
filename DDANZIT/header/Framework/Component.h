@@ -6,8 +6,6 @@
 
 #include "DefineOption.h"
 
-#include "GameObject.h"
-
 class Scene;
 class GameObject;
 class Transform;
@@ -56,15 +54,15 @@ public:
 
 
 public:
-	const std::string& name() const { return _gameObject->_name; }
+	const std::string& name() const;
 
 
 public:
-	const Tag& tag() const { return _gameObject->_tag; }
+	const Tag& tag() const;
 
 
 public:
-	Transform* const transform() { return _gameObject->_transform; }
+	Transform* const transform();
 
 
 	// ³»ºÎ¿ë
@@ -101,52 +99,13 @@ private:
 
 public:
 	template <std::derived_from<Component> T>
-	void GetComponents(std::vector<T*>& componentList) const
-	{
-		componentList.clear();
-
-		for (Component* comp : _gameObject->pComponentList)
-		{
-			if (comp->isKilled)
-				continue;
-
-			if (T* targetComponent = dynamic_cast<T*>(comp))
-				componentList.push_back(targetComponent);
-		}
-	}
+	void GetComponents(std::vector<T*>& componentList) const;
 
 	template <std::derived_from<Component> T>
-	T* GetComponent() const
-	{
-		for (Component* comp : _gameObject->pComponentList)
-		{
-			if (comp->isKilled)
-				continue;
-
-			if (T* targetComponent = dynamic_cast<T*>(comp))
-				return targetComponent;
-		}
-
-		return nullptr;
-	}
+	T* GetComponent() const;
 
 	template <std::derived_from<Component> T>
-	bool TryGetComponent(T*& component) const
-	{
-		for (Component* comp : _gameObject->pComponentList)
-		{
-			if (T* targetComponent = dynamic_cast<T*>(comp))
-			{
-				if (comp->isKilled)
-					continue;
-
-				component = targetComponent;
-				return true;
-			}
-		}
-
-		return false;
-	}
+	bool TryGetComponent(T*& component) const;
 
 #pragma endregion
 

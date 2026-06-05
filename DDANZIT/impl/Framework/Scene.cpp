@@ -75,7 +75,7 @@ GameObject* Scene::AddGameObject()
     if (hierarchy.pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
     {
         // DEBUG: 너무많아
-        return;
+        return nullptr;
     }
 
     return hierarchy.RegisterGameObject();

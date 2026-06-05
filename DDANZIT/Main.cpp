@@ -28,8 +28,6 @@ void Mycode() {
 
 	Scene* scene1 = SceneManager::CreateScene("Scene1");
 
-	scene1->AddGameObject<MyObject>();
-
 	GameObject* go = scene1->hierarchy.RegisterGameObject<MyObject>();
 
 

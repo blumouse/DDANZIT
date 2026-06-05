@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,7 +146,9 @@
     <ClCompile Include="impl\Framework\SpriteRenderer.cpp" />
     <ClCompile Include="impl\Framework\Transform.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MyObject.cpp" />
     <ClCompile Include="MyObject.h" />
+    <ClCompile Include="Script.cpp" />
     <ClCompile Include="Script.h" />
     <ClCompile Include="Service\CodeEdit.cpp" />
     <ClCompile Include="Util\GameTimer.cpp" />
@@ -162,6 +164,7 @@
     <ClInclude Include="header\Core\Hierarchy.h" />
     <ClInclude Include="header\Core\IDrawable.h" />
     <ClInclude Include="header\Core\Lifecycle.h" />
+    <ClInclude Include="header\Core\template\Engine_impl.h" />
     <ClInclude Include="header\Framework\Component.h" />
     <ClInclude Include="header\Framework\Draw2D.h" />
     <ClInclude Include="header\Framework\GameObject.h" />

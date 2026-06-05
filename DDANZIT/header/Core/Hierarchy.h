@@ -7,9 +7,6 @@
 #include "DefineOption.h"
 #include "GameObjectDesciptor.h"
 
-#include "GameObject.h"
-#include "Transform.h"
-
 class Scene;
 class GameObject;
 class Component;
@@ -54,40 +51,13 @@ public:
 	Hierarchy& operator+=(GameObject* go);
 	Hierarchy& operator-=(GameObject* go);
 
-	// 위 오퍼레이터랑 같은 동작.. 이면 안된다
-	// 이쪽은 생성까지 해주자! 그럼 제네릭으로도 받아야함?
+
+	// 그냥 여기서만 생성 (빈 오브젝트)
 	GameObject* RegisterGameObject();
 
+	// 사용자 정의 컴포넌트 미리 달린 오브젝트
 	template <std::derived_from<GameObject> T>
-	T* RegisterGameObject()
-	{
-		if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
-		{
-			// DEBUG: 디버그 메세지
-			return;
-		}
-
-		T* go = new T(scene);		// 여기서 유저설정한 컴포넌트들 일단 붙어서 나옴
-
-
-		pGameObjectList.push_back(go);
-		go->ownerHierarchy = this;
-
-		if (go->transform()->parent() == HIERARCY_ROOT)
-			pRootGameObjectList.push_back(go);
-
-		for (Component* comp : go->pComponentList)
-		{
-			if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(comp))
-			{
-				go->InitializeLifecycle(b);
-			}
-		}
-
-		go->isInitialized = true;
-
-		return go;
-	}
+	T* RegisterGameObject();
 
 
 	// 기깔나는 검색기능 없나 전체 리스트로 보여주지 뭐
@@ -112,4 +82,3 @@ private:
 #pragma endregion
 
 };
-

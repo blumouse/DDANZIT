@@ -46,6 +46,9 @@
     <Filter Include="소스 파일\Service">
       <UniqueIdentifier>{525bda81-b704-4ee2-93d8-114b7d315a19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Core\template">
+      <UniqueIdentifier>{314fef3b-bf94-4dbb-bfc9-e8e07dcc1cd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -117,6 +120,12 @@
     <ClCompile Include="impl\Core\Lifecycle.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
+    <ClCompile Include="MyObject.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util\Utillity.h">
@@ -187,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="header\Core\Lifecycle.h">
       <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Core\template\Engine_impl.h">
+      <Filter>헤더 파일\Core\template</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

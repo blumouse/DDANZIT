@@ -5,9 +5,7 @@
 
 #include "DefineOption.h"
 
-class Scene;
 class GameObject;
-class Lifecycle;
 class MonoBehavior;
 
 namespace renderHelp
