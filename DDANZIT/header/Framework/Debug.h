@@ -8,10 +8,10 @@ class Debug
 {
 
 public:
-	static void Log(std::string message);
+	static void Log(const std::string& message);
 
 	static void Assert(bool condition);
-	static void Assert(bool condition, std::string message);
+	static void Assert(bool condition, const std::string& message);
 	//static void Assert(bool condition, std::string message, Object context);
 
 	// static void Break(); ÀÏ´Ü Application Pause¶û ¿¬µ¿

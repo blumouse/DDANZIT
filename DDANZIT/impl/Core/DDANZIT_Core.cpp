@@ -2,6 +2,7 @@
 
 #include "SceneManager.h"
 #include "Scene.h"
+
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
@@ -38,6 +39,22 @@ void DDANZIT_Core::DestroyScheduled()
 
 
 #pragma region Lifecycles
+
+queue<MonoBehavior*> DDANZIT_Core::awakeExecQueue;
+queue<MonoBehavior*> DDANZIT_Core::onEnableExecQueue;
+queue<MonoBehavior*> DDANZIT_Core::startExecQueue;
+
+vector<MonoBehavior*> DDANZIT_Core::fixedUpdateExecList;
+vector<MonoBehavior*> DDANZIT_Core::updateExecList;
+vector<MonoBehavior*> DDANZIT_Core::lateUpdateExecList;
+
+queue<MonoBehavior*> DDANZIT_Core::onDisableExecQueue;
+queue<MonoBehavior*> DDANZIT_Core::onDestroyExecQueue;
+
+
+queue<MonoBehavior*> DDANZIT_Core::registerUpdateScheduledQueue;
+queue<MonoBehavior*> DDANZIT_Core::quitUpdateScheduledQueue;
+
 
 void DDANZIT_Core::_Awake()
 {

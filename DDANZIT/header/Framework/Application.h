@@ -12,7 +12,7 @@ public:
 private:
 	static bool _isPlaying;
 public:
-	static bool& isPlaying() { return _isPlaying; }
+	static bool isPlaying() { return _isPlaying; }
 
 
 private:

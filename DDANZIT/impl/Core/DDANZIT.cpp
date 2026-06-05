@@ -6,10 +6,10 @@
 #include "Application.h"
 #include "SceneManager.h"
 
-#include "IDrawable.h"
-
 #include "Scene.h"
 #include "GameObject.h"
+
+#include "IDrawable.h"
 
 #include "GameTimer.h"
 #include "INC_Windows.h"
@@ -143,6 +143,14 @@ namespace
 
     void _OnResize(int width, int height);
     void _OnClose();
+
+
+    // 윈도우 관련
+
+    LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+    bool Create(const wchar_t* className, const wchar_t* windowName, int width, int height);
+    void DestroyWnd();
+    void OnResize(int width, int height);
 }
 
 
@@ -179,9 +187,6 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
     Application::_isPlaying = false;
     Application::_isQuit = false;
-
-    SceneManager::mainScene = nullptr;
-    SceneManager::dontDestroyOnLoad = nullptr;
 
 
     return true;
@@ -370,7 +375,7 @@ namespace
 {
     bool PreLoadResources(const wchar_t** pfilePath, unsigned int size)
     {
-        for (int i = 0; i < size; i++)
+        for (unsigned int i = 0; i < size; i++)
         {
             if (bmiIndex == MAX_RESOURCE_NUM)
             {
@@ -444,6 +449,7 @@ namespace
         {
             GetWindowLongPtr(hwnd, GWLP_USERDATA);
             _OnResize(LOWORD(lparam), HIWORD(lparam));
+            break;
         }
 
         case WM_CLOSE:
@@ -501,7 +507,7 @@ namespace
         return true;
     }
 
-    // 이름 바꿔야겠는데
+
     void DestroyWnd()
     {
         if (NULL != g_hWnd)

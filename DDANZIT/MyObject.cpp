@@ -1,5 +1,7 @@
 #include "MyObject.h"
 
+#include "DDANZITEngine.h"
+
 
 MyObject::MyObject(Scene* scene) : Draw2D(this)
 {

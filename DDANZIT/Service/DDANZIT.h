@@ -9,7 +9,7 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize);
 
 
-static void DDANZIT_Run();
+void DDANZIT_Run();
 
 
-static void DDANZIT_Finalize();
+void DDANZIT_Finalize();

@@ -53,11 +53,11 @@ public:
 
 
 	// 그냥 여기서만 생성 (빈 오브젝트)
-	GameObject* RegisterGameObject();
+	GameObject* AddGameObject();
 
 	// 사용자 정의 컴포넌트 미리 달린 오브젝트
 	template <std::derived_from<GameObject> T>
-	T* RegisterGameObject();
+	T* AddGameObject();
 
 
 	// 기깔나는 검색기능 없나 전체 리스트로 보여주지 뭐

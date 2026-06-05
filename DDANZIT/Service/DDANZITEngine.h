@@ -12,5 +12,5 @@
 #include "SpriteRenderer.h"
 
 
-// 순서를 보장해야하는 작업 (탬플릿)
+// 순서를 보장해야하는 작업 (탬플릿) 이거 필요한거 맞나..?
 #include "Engine_impl.h"

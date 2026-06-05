@@ -1,5 +1,7 @@
 #include "Script.h"
 
+#include "DDANZITEngine.h"
+
 Script::Script(GameObject* gameObject) : MonoBehavior(gameObject)
 {
 	EnableAwake();

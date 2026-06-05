@@ -69,16 +69,10 @@
     <ClCompile Include="MyObject.h">
       <Filter>소스 파일\사용해보기</Filter>
     </ClCompile>
-    <ClCompile Include="impl\Core\Application.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
     <ClCompile Include="impl\Core\DDANZIT.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="impl\Core\Debug.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
     <ClCompile Include="impl\Core\GameObjectDesciptor.cpp">
@@ -90,7 +84,25 @@
     <ClCompile Include="impl\Core\IDrawable.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
+    <ClCompile Include="impl\Core\Lifecycle.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="MyObject.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
+      <Filter>소스 파일\사용해보기</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\CodeEdit.cpp">
+      <Filter>소스 파일\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Application.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
     <ClCompile Include="impl\Framework\Component.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Debug.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
     <ClCompile Include="impl\Framework\Draw2D.cpp">
@@ -114,18 +126,6 @@
     <ClCompile Include="impl\Framework\Transform.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Service\CodeEdit.cpp">
-      <Filter>소스 파일\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="impl\Core\Lifecycle.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="MyObject.cpp">
-      <Filter>소스 파일\사용해보기</Filter>
-    </ClCompile>
-    <ClCompile Include="Script.cpp">
-      <Filter>소스 파일\사용해보기</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util\Utillity.h">
@@ -140,16 +140,7 @@
     <ClInclude Include="Util\GameTimer.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
-    <ClInclude Include="header\Core\Application.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="header\Core\DDANZIT.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
     <ClInclude Include="header\Core\DDANZIT_Core.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="header\Core\Debug.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
     <ClInclude Include="header\Core\GameObjectDesciptor.h">
@@ -161,7 +152,19 @@
     <ClInclude Include="header\Core\IDrawable.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
+    <ClInclude Include="header\Core\Lifecycle.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Core\template\Engine_impl.h">
+      <Filter>헤더 파일\Core\template</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Application.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
     <ClInclude Include="header\Framework\Component.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Debug.h">
       <Filter>헤더 파일\Framework</Filter>
     </ClInclude>
     <ClInclude Include="header\Framework\Draw2D.h">
@@ -188,17 +191,17 @@
     <ClInclude Include="Service\CodeEdit.h">
       <Filter>헤더 파일\Service</Filter>
     </ClInclude>
+    <ClInclude Include="Service\DDANZIT.h">
+      <Filter>헤더 파일\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Service\DDANZITEngine.h">
+      <Filter>헤더 파일\Service</Filter>
+    </ClInclude>
     <ClInclude Include="Service\DefineOption.h">
       <Filter>헤더 파일\Service</Filter>
     </ClInclude>
     <ClInclude Include="Service\SceneManagement.h">
       <Filter>헤더 파일\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="header\Core\Lifecycle.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="header\Core\template\Engine_impl.h">
-      <Filter>헤더 파일\Core\template</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

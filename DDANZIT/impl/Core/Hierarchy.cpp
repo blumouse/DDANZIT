@@ -5,6 +5,7 @@
 #include "SceneManager.h"
 #include "Scene.h"
 
+#include "GameObject.h"
 #include "Transform.h"
 
 using namespace std;
@@ -79,7 +80,7 @@ Hierarchy& Hierarchy::operator-=(GameObject* go)
 }
 
 
-GameObject* Hierarchy::RegisterGameObject()
+GameObject* Hierarchy::AddGameObject()
 {
 	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
 	{

@@ -68,7 +68,7 @@ private:
 
 public:
     std::vector<GameObject*> GetRootGameObjects() const;
-    const int& rootCount() const;
+    int rootCount() const;
 
 
     // 유사 하이라키

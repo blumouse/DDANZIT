@@ -26,7 +26,7 @@ using namespace std;
 #pragma region Constructor
 
 GameObject::GameObject() : 
-	_active(true), parentActive(true), _tag(Tag::Default)
+	_active(true), parentActive(true), _name("GameObject"), _tag(Tag::Default)
 {
 	if (SceneManager::mainScene)
 		_scene = SceneManager::mainScene;
@@ -40,7 +40,7 @@ GameObject::GameObject() :
 }
 
 GameObject::GameObject(Scene* scene) : 
-	_active(true), parentActive(true), _tag(Tag::Default)
+	_active(true), parentActive(true), _name("GameObject"), _tag(Tag::Default)
 {
 	if (scene)
 		_scene = scene;
@@ -54,7 +54,7 @@ GameObject::GameObject(Scene* scene) :
 }
 
 GameObject::GameObject(Scene* scene, bool parentActive) : 
-	_active(true), parentActive(parentActive), _tag(Tag::Default)
+	_active(true), parentActive(parentActive), _name("GameObject"), _tag(Tag::Default)
 {
 	if (scene)
 		_scene = scene;

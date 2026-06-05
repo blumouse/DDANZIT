@@ -6,7 +6,6 @@
 #include "SceneManager.h"
 #include "GameObject.h"
 #include "Transform.h"
-#include "MonoBehavior.h"
 
 using namespace std;
 
@@ -40,7 +39,7 @@ vector<GameObject*> Scene::GetRootGameObjects() const
     return hierarchy.pRootGameObjectList;
 }
 
-const int& Scene::rootCount() const 
+int Scene::rootCount() const 
 {
     return hierarchy.pRootGameObjectList.size();
 }
@@ -69,16 +68,5 @@ void Scene::RemoveFromHierarchy(GameObject* go)
 
 
 #pragma region GameObjectManagement
-
-GameObject* Scene::AddGameObject()
-{
-    if (hierarchy.pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
-    {
-        // DEBUG: 너무많아
-        return nullptr;
-    }
-
-    return hierarchy.RegisterGameObject();
-}
 
 #pragma endregion

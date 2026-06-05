@@ -72,15 +72,15 @@ public:
 
 protected:
 	std::string _name;
-	std::string& name() { return _name; }				// 원본 수정가능 (set)
 public:
+	std::string& name() { return _name; }				// 원본 수정가능 (set)
 	const std::string& name() const { return _name; }	// 원본 읽기전용 (get)
 
 
 protected:
 	Tag _tag;
-	Tag& tag() { return _tag; }
 public:
+	Tag& tag() { return _tag; }
 	const Tag& tag() const { return _tag; }
 
 

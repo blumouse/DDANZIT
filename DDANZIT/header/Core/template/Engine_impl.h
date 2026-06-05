@@ -62,7 +62,7 @@ T* GameObject::AddComponent()
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
 		// DEBUG: 디버그 메세지
-		return;
+		return nullptr;
 	}
 
 	T* component = new T(this);
@@ -77,6 +77,8 @@ T* GameObject::AddComponent()
 			InitializeLifecycle(b);
 		}
 	}
+
+	return component;
 }
 
 #pragma endregion
@@ -139,12 +141,12 @@ bool Component::TryGetComponent(T*& component) const
 #pragma region Hierarchy
 
 template <std::derived_from<GameObject> T>
-T* Hierarchy::RegisterGameObject()
+T* Hierarchy::AddGameObject()
 {
 	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
 	{
 		// DEBUG: 디버그 메세지
-		return;
+		return nullptr;
 	}
 
 	T* go = new T(scene);		// 여기서 유저설정한 컴포넌트들 일단 붙어서 나옴

@@ -8,6 +8,20 @@
 using namespace std;
 
 
+#pragma region Properties
+
+Scene* SceneManager::mainScene = nullptr;
+Scene* SceneManager::dontDestroyOnLoad = nullptr;
+
+vector<Scene*> SceneManager::pSceneList;
+vector<Scene*> SceneManager::pSceneInstanceList;
+
+vector<Scene*> SceneManager::pLoadedSceneList;
+
+#pragma endregion
+
+
+
 #pragma region Methods
 
 bool SceneManager::SetActiveScene(Scene* scene) 
@@ -147,6 +161,14 @@ void SceneManager::LoadScene(string name, LoadSceneMode mode)
 // 이거 유니티에서는 [사용되지 않음] ..라네
 bool SceneManager::UnloadScene(Scene* scene)
 {
+	if (scene == nullptr)
+	{
+		// DEBUG: 
+		return false;
+	}
+
+	// TODO: 로드되지 않은 씬이면 리턴
+
 	// 하이라키의 모든 오브젝트를 파괴한다!
 	// 루트만 지우면 재귀적으로 다 없어짐
 	for (GameObject* go : scene->GetRootGameObjects())
@@ -154,12 +176,14 @@ bool SceneManager::UnloadScene(Scene* scene)
 		GameObject::Destroy(go);
 	}
 
-
 	pLoadedSceneList.erase(remove(
 		pLoadedSceneList.begin(),
 		pLoadedSceneList.end(), scene),
 		pLoadedSceneList.end());
+
 	scene->isLoaded = false;
+
+	return true;
 }
 
 bool SceneManager::UnloadScene(string name)
@@ -169,10 +193,10 @@ bool SceneManager::UnloadScene(string name)
 	if (scene == nullptr)
 	{
 		// DEBUG: 그없
-		return;
+		return false;
 	}
 
-	UnloadScene(scene);
+	return UnloadScene(scene);
 }
 
 

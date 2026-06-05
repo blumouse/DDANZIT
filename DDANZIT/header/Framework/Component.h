@@ -84,7 +84,7 @@ private:
 public:
 	// 매우매우 고민하다 상속주기..
 	virtual void SetActive(bool newActive);
-	const bool& isActiveAndEnabled() const { return _active && parentActive; }
+	bool isActiveAndEnabled() const { return _active && parentActive; }
 
 
 	// 내부용

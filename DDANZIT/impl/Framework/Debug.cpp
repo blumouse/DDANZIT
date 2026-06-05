@@ -11,7 +11,8 @@
 
 using namespace std;
 
-void Debug::Log(std::string message) 
+
+void Debug::Log(const std::string& message) 
 {
 #ifdef USE_DEBUG
 
@@ -32,7 +33,7 @@ void Debug::Assert(bool condition)
 
 }
 
-void Debug::Assert(bool condition, std::string message) 
+void Debug::Assert(bool condition, const std::string& message)
 {
 #ifdef USE_DEBUG
 
