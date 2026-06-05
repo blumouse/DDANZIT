@@ -4,6 +4,7 @@
 #include "IDrawable.h"
 
 class GameObject;
+class SpriteRenderer;
 
 
 #ifdef PROPS_MODE_2D
@@ -31,6 +32,8 @@ public:
 private:
 	int layer = 0;
 	GameObject* gameObject;
+
+	SpriteRenderer* spriteRenderer;
 
 #pragma endregion
 
