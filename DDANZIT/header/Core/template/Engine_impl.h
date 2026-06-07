@@ -81,6 +81,15 @@ T* GameObject::AddComponent()
 	return component;
 }
 
+
+// 기본 컴포넌트들은 선언만
+
+template <>
+SpriteRenderer* GameObject::AddComponent<SpriteRenderer>();
+
+template <>
+Camera* GameObject::AddComponent<Camera>();
+
 #pragma endregion
 
 

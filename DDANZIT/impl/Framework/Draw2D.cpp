@@ -1,8 +1,11 @@
 #include "Draw2D.h"
 
+#include "DDANZIT_Core.h"
 #include "GameObject.h"
-#include "Component.h"
+#include "Transform.h"
 #include "SpriteRenderer.h"
+
+using namespace std;
 
 
 #ifdef PROPS_MODE_2D
@@ -10,9 +13,15 @@
 
 #pragma region Constructor
 
-Draw2D::Draw2D(GameObject* gameObject) : gameObject(gameObject)
+Draw2D::Draw2D(GameObject* pGameObject) : gameObject(pGameObject), spriteRenderer(nullptr)
 {
+	DDANZIT_Core::RegisterDrawable(this);
+}
 
+
+Draw2D::~Draw2D() 
+{
+	DDANZIT_Core::QuitDrawable(this);
 }
 
 #pragma endregion
@@ -21,25 +30,71 @@ Draw2D::Draw2D(GameObject* gameObject) : gameObject(gameObject)
 
 #pragma region IDrawable
 
-void Draw2D::Draw(HDC hdc) 
+void Draw2D::Draw() 
 {
-	// TODO: 이거 직접 찾지말고 (유니티도 그러니) 칸 하나 딱 뚫어놓은 다음에
-	// 컴포넌트가 여기에 와서 넣어주고 가자 Add 할때
-	// 이렇게 생각하니까 기본 컴포넌트는 고유의 초기화 동작이 좀 있어야되네?
-	// 암튼 스프라이트는 AddComponent 시점에 자신을 넣어주고 가야함
+	// TODO: 그리는 컴포넌트들 AddComponent 탬플릿 명시적 인스턴스 및 구현
+	// 트랜스폼에서 뎁스 바뀌면 바로 이거 바꿔주기
 
-	for (Component* comp : gameObject->pComponentList)
+	// TODO: 콜라이더 만든후 디버그 드로우
+
+	if (!gameObject->_active || !gameObject->parentActive || gameObject->isKilled)
+		return;
+
+
+	Transform* transform = gameObject->_transform;
+
+	if (spriteRenderer && spriteRenderer->isActiveAndEnabled())
 	{
-		if (!comp->isActiveAndEnabled())
-			continue;
-		
-		if (SpriteRenderer* sp = dynamic_cast<SpriteRenderer*>(comp))
-		{
-			// TODO: 속성가지고 와랄라라이
-			// 여기서 hdc를 쓰지말까..? 커맨드로 갖다가 그러니까 스케치를 하는거야
-			// 생각해보면 또 하나.. 카메라를 도입한다면 결국 그리는 시점은 카메라가 보는 시점이네 오호..
-		}
+		const Color& c = spriteRenderer->color;
+
+		int colorRGBA =
+			((int)(c.r / 255.0f) << 24) |
+			((int)(c.g / 255.0f) << 16) |
+			((int)(c.b / 255.0f) << 8) |
+			((int)(c.a / 255.0f));
+
+		DDANZIT_Core::drawCommandLists[layer].push_back(
+			DrawCommand{
+				transform->position().x,	// TODO: 부모 기준 좌표로 계산 (헬퍼를 추가해야겟다)
+				transform->position().y,
+				transform->scale().x,
+				transform->scale().y,
+				spriteRenderer->sprite,
+				colorRGBA,
+				spriteRenderer->flipX,
+				spriteRenderer->flipY,
+				false,
+				0,
+				0,
+				0,
+				0
+			});
 	}
+
+	// TODO: 아틀라스를 만들어야하나 유니티에 어케돼있지?
+
+#ifdef USE_DEBUG
+
+	for (Collider2D* col : pColliderList)
+	{
+		// TODO: 액티브 검사
+
+		// 초록
+		int colorRGBA = 0x00ff00ff;
+
+		DDANZIT_Core::debugDrawCommandLists[layer].push_back(
+			DebugDrawCommand{
+				transform->position().x,
+				transform->position().y,
+				transform->scale().x,
+				transform->scale().y,
+				// TODO: 타입
+				colorRGBA
+			});
+	}
+
+#endif // USE_DEBUG
+
 }
 
 

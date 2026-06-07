@@ -7,6 +7,7 @@
 
 #include "DefineOption.h"
 
+class Hierarchy;
 class Lifecycle;
 
 namespace learning 
@@ -32,10 +33,6 @@ public:
 	friend class Component;
 	friend class Transform;
 	friend class MonoBehavior;
-
-	//friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
-	//friend void DDANZIT_Run();
-	//friend void DDANZIT_Finalize();
 
 #pragma region Constructor
 

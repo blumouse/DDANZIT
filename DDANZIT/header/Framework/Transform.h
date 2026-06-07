@@ -17,6 +17,7 @@ class Transform : public Component
 public:
 	friend class DDANZIT_Core;
 	friend class GameObject;
+	friend class Camera;
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
 	friend void DDANZIT_Run();
@@ -132,6 +133,9 @@ private:
 
 public:
 	void SetActive(bool newActive) override;
+
+	// TODO: 로컬 / 월드(+부모) 기준 좌표 반환용 함수 만들기
+	// 유니티 그럼 기본 포지션 찍으면 나오는게 어느 기준인거지?
 
 
 	// 내부용

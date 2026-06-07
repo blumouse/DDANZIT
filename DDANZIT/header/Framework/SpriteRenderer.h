@@ -1,17 +1,9 @@
 #pragma once
 
 #include "DefineOption.h"
+#include "Color.h"
+
 #include "Component.h"
-
-typedef SpriteIndex Sprite;
-
-struct Color 
-{
-	float a;
-	float r;
-	float g;
-	float b;
-};
 
 //enum class SpriteDrawMode
 //{
@@ -33,7 +25,7 @@ public:
 #pragma region Constructor
 
 private:
-	SpriteRenderer() = default;
+	SpriteRenderer() = delete;
 	SpriteRenderer(const SpriteRenderer& other) = default;
 	SpriteRenderer(GameObject* pGameObject);
 
@@ -68,6 +60,8 @@ public:
 
 
 #pragma region Methods
+
+
 
 #pragma endregion
 

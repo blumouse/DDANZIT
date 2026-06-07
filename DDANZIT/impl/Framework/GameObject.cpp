@@ -8,17 +8,18 @@
 
 #include "SceneManager.h"
 #include "Scene.h"
+
 #include "Component.h"
 #include "MonoBehavior.h"
 
 #include "Transform.h"
+#include "SpriteRenderer.h"
+#include "Camera.h"
 
-// TODO: MAX_...어쩌고를 인덱스 넘으려고 하면 방어를 해주고싶은데
-// 그냥 팩토리면 방어되나? new를 가리고 friend로 빼주고서..
-// ...강제는 못하겠고 차피 뭐 게임에서 돌아갈라면 등록을 해야되니까
-// 컴포넌트도 맡기는 함수가 있어야겠다 암튼 (결국)
-// 하이라키에 등록하거나 Instantiate하거나 하면 그후에 내부에서 등록.. 할때!
-// 아닌가 굳이 방어할거 없나..? 이건 너무 예외처리 영역인데 일단 킵
+#ifdef PROPS_MODE_2D
+#include "Draw2D.h"
+
+#endif // PROPS_MODE_2D
 
 using namespace std;
 
@@ -32,7 +33,7 @@ GameObject::GameObject() :
 		_scene = SceneManager::mainScene;
 	else 
 	{
-		// 굉장한 오류
+		// DEBUG: 굉장한 오류
 		return;
 	}
 
@@ -46,7 +47,7 @@ GameObject::GameObject(Scene* scene) :
 		_scene = scene;
 	else
 	{
-		// 오류
+		// DEBUG: 오류
 		return;
 	}
 
@@ -60,7 +61,7 @@ GameObject::GameObject(Scene* scene, bool parentActive) :
 		_scene = scene;
 	else
 	{
-		// 오류
+		// DEBUG: 오류
 		return;
 	}
 
@@ -232,6 +233,51 @@ void GameObject::InitializeLifecycle(MonoBehavior* behavior)
 
 
 #pragma region Component
+
+// 기본 컴포넌트 추가 시 특수동작
+
+template <>
+SpriteRenderer* GameObject::AddComponent<SpriteRenderer>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	Draw2D* draw = dynamic_cast<Draw2D*>(this);
+
+	if (draw == nullptr)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+
+	SpriteRenderer* spriteRenderer = new SpriteRenderer(this);
+	draw->spriteRenderer = spriteRenderer;
+
+	pComponentList.push_back(spriteRenderer);
+
+	return spriteRenderer;
+}
+
+template <>
+Camera* GameObject::AddComponent<Camera>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	Camera* camera = new Camera(this);
+	
+
+	pComponentList.push_back(camera);
+
+	return camera;
+}
 
 #pragma endregion
 
@@ -448,6 +494,8 @@ void GameObject::Destroy(GameObject* gameObject)
 			if (b->activeOnDestroy)
 				DDANZIT_Core::onDestroyExecQueue.push(b);
 		}
+
+		DDANZIT_Core::destroyScheduledQueue.push(gameObject);
 	}
 
 	for (Transform* tr : gameObject->_transform->pChildList)

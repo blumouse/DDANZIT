@@ -2,11 +2,49 @@
 
 #include <vector>
 #include <queue>
+#include "INC_Windows.h"
 
 #include "DefineOption.h"
 
 class GameObject;
 class MonoBehavior;
+class IDrawable;
+class IRenderer;
+
+// 임시로 여따 둡시다
+
+// TODO: 아잇 회전값도 해야함;
+struct DrawCommand
+{
+	float posX;
+	float posY;
+	float scaleX;
+	float scaleY;
+	SpriteIndex spriteIndex;
+	int colorRGBA;
+	bool flipX;
+	bool flipY;
+	bool useAtlas;
+	int sliceWidth;
+	int sliceHeight;
+	int sliceIndexX;
+	int sliceIndexY;
+};
+
+#ifdef USE_DEBUG
+
+struct DebugDrawCommand
+{
+	float posX;
+	float posY;
+	float scaleX;
+	float scaleY;
+	int debugDrawType;
+	int colorRGBA;
+};
+
+#endif // USE_DEBUG
+
 
 namespace renderHelp
 {
@@ -22,19 +60,40 @@ class DDANZIT_Core
 public:
 	friend class GameObject;
 	friend class MonoBehavior;
+	friend class Camera;
 
-	friend class IDrawable;
+#ifdef PROPS_MODE_2D
+
+	friend class Draw2D;
+
+#endif // PROPS_MODE_2D
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
+	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize);
 	friend void DDANZIT_Run();
 	friend void DDANZIT_Finalize();
+
+	friend void _OnClose();
 	
 #pragma region Properties
 
 private:
+	HWND hWnd;
+	static int width;
+	static int height;
 
-	// TODO_LATER: Object로 바꾸기?
-	std::queue<GameObject*> destroyScheduledQueue;
+#ifdef RENDER_MODE_WINGDI
+
+	HDC hFrontDC = nullptr;
+	HDC hBackDC = nullptr;
+	HBITMAP hBackBitmap = nullptr;
+	HBITMAP hDefaultBitmap = nullptr;
+
+	static std::vector<BitmapInfo*> bitmapResourceList;
+	// TODO: 소리파일용 리소스도 확보
+
+#endif // RENDER_MODE_WINGDI
+
 
 #pragma endregion
 
@@ -42,6 +101,14 @@ private:
 
 #pragma region Methods
 
+private:
+	void InitGraphicSettings(HWND hWnd);
+	void FinalizeGraphicSettings();
+
+	void _OnResize(int width, int height);
+
+public:
+	static int LoadBitmapResource(const wchar_t* filePath);
 
 #pragma endregion
 
@@ -80,6 +147,9 @@ private:
 	static std::queue<MonoBehavior*> registerUpdateScheduledQueue;
 	static std::queue<MonoBehavior*> quitUpdateScheduledQueue;
 
+	// TODO_LATER: Object로 바꾸기?
+	static std::queue<GameObject*> destroyScheduledQueue;
+
 	// 이건 위에서 호출
 
 	void RegisterUpdateScheduled();
@@ -99,15 +169,26 @@ private:
 #pragma region Render
 
 private:
-	// TODO: 레이어(depth) 적용해서 만들기
-	// 뭐 최적화 캐시히트 그런건 나중에 고려하자..
-	std::vector<IDrawable*> drawableRenderLists[MAX_LAYER_NUM];
+	static std::vector<IDrawable*> drawableList;
+	static std::vector<DrawCommand> drawCommandLists[MAX_LAYER_NUM];	// 배칭을 어케 할수잇을까
+
+#ifdef USE_DEBUG
+
+	static std::vector<DebugDrawCommand> debugDrawCommandLists[MAX_LAYER_NUM];
+
+#endif // USE_DEBUG
 
 	static void RegisterDrawable(IDrawable* drawable);
-	static void RegisterDrawable(IDrawable* drawable, int layer);
-
 	static void QuitDrawable(IDrawable* drawable);
-	static void QuitDrawable(IDrawable* drawable, int layer);
+
+
+private:
+	void _InitDraw();
+	void _Sketch();
+	void _Render();
+	//void _PostProcess();
+	void _Present();
+	void _Clear();
 
 #pragma endregion
 
@@ -124,5 +205,4 @@ private:
 
 #pragma endregion
 
-	BitmapInfo* LoadResource(const wchar_t* filePath);
 };

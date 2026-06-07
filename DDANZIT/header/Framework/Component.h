@@ -6,10 +6,8 @@
 
 #include "DefineOption.h"
 
-class Scene;
 class GameObject;
 class Transform;
-class MonoBehavior;
 
 
 class Component
@@ -18,7 +16,7 @@ public:
 	friend class GameObject;
 	friend class Transform;
 	friend class MonoBehavior;
-	// 이걸 상속 주는대로 다뚫어야 된다고?? 그래야 안보이긴 함;
+	friend class Camera;
 
 #pragma region Constructor
 

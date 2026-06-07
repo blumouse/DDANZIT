@@ -47,7 +47,7 @@ const Tag& Component::tag() const
 }
 
 
-Transform* const Component::transform() 
+Transform* const Component::transform()
 { 
 	return _gameObject->_transform; 
 }

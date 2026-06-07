@@ -6,6 +6,11 @@
 
 #include "GameObject.h"
 
+#ifdef PROPS_MODE_2D
+#include "Draw2D.h"
+
+#endif // PROPS_MODE_2D
+
 using namespace std;
 
 
@@ -56,6 +61,11 @@ void Transform::SetDepth(int depth)
 	{
 		// DEBUG: 레이어 범위 밖
 		return;
+	}
+
+	if (Draw2D* draw = dynamic_cast<Draw2D*>(_gameObject))
+	{
+		draw->SetLayer(depth);
 	}
 
 	_depth = depth;

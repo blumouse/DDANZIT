@@ -12,7 +12,7 @@ using namespace std;
 
 #pragma region Constructor
 
-Scene::Scene(std::string name) : _name(name), isLoaded(false), hierarchy(this)
+Scene::Scene(std::string name) : _name(name), _backgroundColor(Color{1.0f, 1.0f, 1.0f, 1.0f}), isLoaded(false), hierarchy(this)
 {
 
 }
@@ -47,7 +47,7 @@ int Scene::rootCount() const
 
 void Scene::AddToHierarchy(GameObject* go, Transform* parent) 
 {
-    go->SetSceneRecursive(this);
+    go->SetSceneAndDetach(this);
 
     // 대상이 루트면 할 필요도 없고 하면 안됨 (셋파랜트 내부적으로도 루트에 추가되기 때문)
     if (parent != HIERARCY_ROOT)

@@ -49,6 +49,12 @@
     <Filter Include="헤더 파일\Core\template">
       <UniqueIdentifier>{314fef3b-bf94-4dbb-bfc9-e8e07dcc1cd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Framework\Component">
+      <UniqueIdentifier>{86e3a057-5d41-4b20-ac0b-06d532e6adc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Framework\Component">
+      <UniqueIdentifier>{5cb97d5a-9520-48c6-968c-ab3828f3ddf3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -120,11 +126,14 @@
     <ClCompile Include="impl\Framework\SceneManager.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="impl\Framework\SpriteRenderer.cpp">
-      <Filter>소스 파일\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="impl\Framework\Transform.cpp">
-      <Filter>소스 파일\Framework</Filter>
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\SpriteRenderer.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,12 +191,6 @@
     <ClInclude Include="header\Framework\SceneManager.h">
       <Filter>헤더 파일\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="header\Framework\SpriteRenderer.h">
-      <Filter>헤더 파일\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="header\Framework\Transform.h">
-      <Filter>헤더 파일\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="Service\CodeEdit.h">
       <Filter>헤더 파일\Service</Filter>
     </ClInclude>
@@ -202,6 +205,21 @@
     </ClInclude>
     <ClInclude Include="Service\SceneManagement.h">
       <Filter>헤더 파일\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Transform.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\SpriteRenderer.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderer.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>헤더 파일\Util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

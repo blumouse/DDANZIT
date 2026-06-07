@@ -1,18 +1,17 @@
 #pragma once
 
-#include "INC_Windows.h"
 
-// 이것의 구현체를 하나 더 만들어서 그걸 상속주는걸로 하자 (후일)
+// 이것의 구현체를 하나 더 만들어서 그걸 상속주는걸로 하자
 class IDrawable 
 {
 protected:
 	IDrawable() = default;
-	IDrawable(const IDrawable&) = default;
 
 public:
+	IDrawable(const IDrawable&) = default;
 	virtual ~IDrawable() = default;
 
-	virtual void Draw(HDC hdc) = 0;
+	virtual void Draw() = 0;
 
 	// depth랑 연동해서 로직타임에 바꿔놓기로 하자
 	virtual int GetLayer() = 0;

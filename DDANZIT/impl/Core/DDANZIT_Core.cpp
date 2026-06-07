@@ -1,37 +1,118 @@
 #include "DDANZIT_Core.h"
 
+#include "Color.h"
+
 #include "SceneManager.h"
 #include "Scene.h"
+
+#include "Camera.h"
+#include "IDrawable.h"
 
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
 #include "MonoBehavior.h"
 
+#include "RenderHelp.h"
+
 using namespace std;
+
+
+#pragma region Properties
+
+int DDANZIT_Core::width = 0;
+int DDANZIT_Core::height = 0;
+
+#pragma endregion
+
 
 
 #pragma region Methods
 
-void DDANZIT_Core::DestroyScheduled()
+void DDANZIT_Core::InitGraphicSettings(HWND hWnd)
 {
-    while (!destroyScheduledQueue.empty())
+    this->hWnd = hWnd;
+
+#ifdef RENDER_MODE_WINGDI
+
+    RECT rcClient = {};
+    GetClientRect(hWnd, &rcClient);
+    width = rcClient.right - rcClient.left;
+    height = rcClient.bottom - rcClient.top;
+
+    hFrontDC = GetDC(hWnd);
+    hBackDC = CreateCompatibleDC(hFrontDC);
+    hBackBitmap = CreateCompatibleBitmap(hFrontDC, width, height);
+
+    hDefaultBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+
+#endif // RENDER_MODE_DIRECT2D
+
+}
+
+void DDANZIT_Core::FinalizeGraphicSettings()
+{
+
+#ifdef RENDER_MODE_WINGDI
+
+    SelectObject(hBackDC, hDefaultBitmap);
+
+    DeleteObject(hBackBitmap);
+    DeleteDC(hBackDC);
+
+    ReleaseDC(hWnd, hFrontDC);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+
+#endif // RENDER_MODE_DIRECT2D
+
+}
+
+
+void DDANZIT_Core::_OnResize(int width, int height)
+{
+    this->width = width;
+    this->height = height;
+
+#ifdef RENDER_MODE_WINGDI
+
+    hBackBitmap = CreateCompatibleBitmap(hFrontDC, width, height);
+
+    HANDLE hPrevBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
+
+    DeleteObject(hPrevBitmap);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+
+#endif // RENDER_MODE_DIRECT2D
+}
+
+
+int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
+{
+    if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
     {
-        GameObject* gameObject = destroyScheduledQueue.front();
-        Scene* targetScene = gameObject->_scene;
-
-
-        // 씬 / 하이라키(루트)에서 빼버리기
-        targetScene->RemoveFromHierarchy(gameObject);
-
-
-        // TODO_LATER: 큐가 (게임아닌)오브젝트를 받는다면... 컴포넌트인 경우의 처리(분기)
-
-
-        // 삭제!
-        delete destroyScheduledQueue.front();
-        destroyScheduledQueue.pop();
+        // DEBUG: 꽉찻어
+        return -1;
     }
+
+    bitmapResourceList.push_back(renderHelp::CreateBitmapInfo(filePath));
+
+    return (bitmapResourceList.size() - 1);
 }
 
 #pragma endregion
@@ -54,6 +135,8 @@ queue<MonoBehavior*> DDANZIT_Core::onDestroyExecQueue;
 
 queue<MonoBehavior*> DDANZIT_Core::registerUpdateScheduledQueue;
 queue<MonoBehavior*> DDANZIT_Core::quitUpdateScheduledQueue;
+
+queue<GameObject*> DDANZIT_Core::destroyScheduledQueue;
 
 
 void DDANZIT_Core::_Awake()
@@ -127,9 +210,6 @@ void DDANZIT_Core::_OnDestroy()
     while (!onDestroyExecQueue.empty())
     {
         onDestroyExecQueue.front()->OnDestroy();
-
-        destroyScheduledQueue.push(onDestroyExecQueue.front()->gameObject());
-
         onDestroyExecQueue.pop();
     }
 }
@@ -184,6 +264,28 @@ void DDANZIT_Core::QuitUpdateScheduled()
 }
 
 
+void DDANZIT_Core::DestroyScheduled()
+{
+    while (!destroyScheduledQueue.empty())
+    {
+        GameObject* gameObject = destroyScheduledQueue.front();
+        Scene* targetScene = gameObject->_scene;
+
+
+        // 씬 / 하이라키(루트)에서 빼버리기
+        targetScene->RemoveFromHierarchy(gameObject);
+
+
+        // TODO_LATER: 큐가 (게임아닌)오브젝트를 받는다면... 컴포넌트인 경우의 처리(분기)
+
+
+        // 삭제!
+        delete destroyScheduledQueue.front();
+        destroyScheduledQueue.pop();
+    }
+}
+
+
 void DDANZIT_Core::RegisterUpdateExecLists(MonoBehavior* behavior)
 {
     // 오기전에 걸렀어
@@ -198,6 +300,105 @@ void DDANZIT_Core::RegisterUpdateExecLists(MonoBehavior* behavior)
 void DDANZIT_Core::QuitUpdateExecLists(MonoBehavior* behavior)
 {
     quitUpdateScheduledQueue.push(behavior);
+}
+
+#pragma endregion
+
+
+
+#pragma region Render
+
+vector<IDrawable*> DDANZIT_Core::drawableList;
+
+vector<DrawCommand> DDANZIT_Core::drawCommandLists[MAX_LAYER_NUM];
+vector<DebugDrawCommand> debugDrawCommandLists[MAX_LAYER_NUM];
+
+
+void DDANZIT_Core::RegisterDrawable(IDrawable* drawable) 
+{
+    drawableList.push_back(drawable);
+}
+
+void DDANZIT_Core::QuitDrawable(IDrawable* drawable) 
+{
+    drawableList.erase(remove(
+        drawableList.begin(),
+        drawableList.end(), drawable),
+        drawableList.end());
+}
+
+
+void DDANZIT_Core::_InitDraw()
+{
+    // TODO: 메인 씬 배경색으로 칠
+
+#ifdef RENDER_MODE_WINGDI
+
+    if (Camera::currentCamera == nullptr)
+        ::PatBlt(hBackDC, 0, 0, width, height, BLACKNESS);
+    else
+    {
+        Color c = Camera::currentCamera->backgroundColor();
+
+        HBRUSH hGrayBrush = CreateSolidBrush(RGB((int)(c.r / 255.0f), (int)(c.g / 255.0f), (int)(c.b / 255.0f)));
+        HBRUSH hOldBrush = (HBRUSH)SelectObject(hBackDC, hGrayBrush);
+
+        ::PatBlt(hBackDC, 0, 0, width, height, PATCOPY);
+
+        SelectObject(hBackDC, hOldBrush);
+        DeleteObject(hGrayBrush);
+    }
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+#endif // RENDER_MODE_DIRECT2D
+}
+
+void DDANZIT_Core::_Sketch()
+{
+    for (IDrawable* drawable : drawableList)
+        drawable->Draw();
+}
+
+void DDANZIT_Core::_Render()
+{
+    if (Camera::currentCamera == nullptr)
+        return;
+
+    // 0번 레이어가 가장 위
+    for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
+    {
+        Camera::currentCamera->Render(hBackDC);
+    }
+}
+
+void DDANZIT_Core::_Present()
+{
+    if (Camera::currentCamera == nullptr)
+        return;
+
+
+#ifdef RENDER_MODE_WINGDI
+
+    BitBlt(hFrontDC, 0, 0, width, height, hBackDC, 0, 0, SRCCOPY);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+#endif // RENDER_MODE_DIRECT2D
+}
+
+void DDANZIT_Core::_Clear()
+{
+    for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
+    {
+        drawCommandLists[i].clear();
+    }
 }
 
 #pragma endregion

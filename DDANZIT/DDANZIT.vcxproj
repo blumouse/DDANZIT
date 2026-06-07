@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
@@ -156,6 +157,8 @@
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
     <ClInclude Include="header\Core\Hierarchy.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="header\Framework\SceneManager.h" />
     <ClInclude Include="header\Framework\SpriteRenderer.h" />
     <ClInclude Include="header\Framework\Transform.h" />
+    <ClInclude Include="IRenderer.h" />
     <ClInclude Include="Service\CodeEdit.h" />
     <ClInclude Include="Service\DDANZIT.h" />
     <ClInclude Include="Service\DDANZITEngine.h" />

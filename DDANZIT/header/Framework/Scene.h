@@ -4,12 +4,12 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include "Color.h"
 
 #include "Hierarchy.h"
 
 class GameObject;
 class IDrawable;
-class Lifecycle;
 
 
 class Scene
@@ -18,9 +18,6 @@ public:
     friend class DDANZIT_Core;
     friend class SceneManager;
     friend class GameObject;
-    friend class MonoBehavior;
-
-    friend class IDrawable;     // TODO: ? 이건 전처리기로 걸러야겠군.. 아니 뭐 걍 다 써놔도 되긴하겠지만
 
 
     friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
@@ -29,6 +26,7 @@ public:
 
 #pragma region Constructor
 
+public:
     Scene() = delete;
     Scene(std::string name);
     Scene(const Scene&) = delete;
@@ -41,11 +39,19 @@ public:
 
 #pragma region Properties
 
-protected:
+private:
     std::string _name;
-    std::string& name() { return _name; }
 public:
+    std::string& name() { return _name; }
     const std::string& name() const { return _name; }
+
+
+private:
+    Color _backgroundColor;
+public:
+    Color& backgroundColor();
+    const Color& backgroundColor() const;
+    
 
 
 public:
