@@ -126,13 +126,13 @@
     <ClCompile Include="impl\Framework\SceneManager.cpp">
       <Filter>소스 파일\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="impl\Framework\Transform.cpp">
+    <ClCompile Include="impl\Framework\Component\Camera.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
-    <ClCompile Include="impl\Framework\SpriteRenderer.cpp">
+    <ClCompile Include="impl\Framework\Component\SpriteRenderer.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="impl\Framework\Component\Transform.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
   </ItemGroup>
@@ -206,19 +206,19 @@
     <ClInclude Include="Service\SceneManagement.h">
       <Filter>헤더 파일\Service</Filter>
     </ClInclude>
-    <ClInclude Include="header\Framework\Transform.h">
-      <Filter>헤더 파일\Framework\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="header\Framework\SpriteRenderer.h">
-      <Filter>헤더 파일\Framework\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderer.h">
+    <ClInclude Include="header\Core\IRenderer.h">
       <Filter>헤더 파일\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="header\Framework\Component\Camera.h">
       <Filter>헤더 파일\Framework\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Color.h">
+    <ClInclude Include="header\Framework\Component\SpriteRenderer.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Component\Transform.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Color.h">
       <Filter>헤더 파일\Util</Filter>
     </ClInclude>
   </ItemGroup>
