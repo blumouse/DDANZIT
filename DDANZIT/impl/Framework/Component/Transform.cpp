@@ -17,7 +17,7 @@ using namespace std;
 #pragma region Constructor
 
 Transform::Transform(GameObject* pGameObject) : 
-	Component(pGameObject), _parent(HIERARCY_ROOT), _position(Vector2(0, 0)), _direction(Vector2(1.0f, 0)), _scale(Vector2(1.0f, 1.0f)), _depth(0)
+	Component(pGameObject), _parent(HIERARCY_ROOT), _localPosition(Vector2(0, 0)), _direction(Vector2(1.0f, 0)), _scale(Vector2(1.0f, 1.0f)), _depth(0)
 {
 	//RegisterTransform(this);
 }
@@ -25,7 +25,7 @@ Transform::Transform(GameObject* pGameObject) :
 Transform::Transform(const Transform& other) :
 	Component(other)
 {
-	_position = other._position;
+	_localPosition = other._localPosition;
 	_direction = other._direction;
 	_scale = other._scale;
 	_depth = other._depth;
@@ -39,6 +39,27 @@ Transform::Transform(const Transform& other) :
 
 
 #pragma region Properties
+
+#ifdef PROPS_MODE_2D
+
+Vector2& Transform::position() 
+{ 
+	return _localPosition;	//TODO
+}
+
+Vector2 Transform::position() const 
+{ 
+	Vector2 worldPosition = _localPosition;
+	Transform* par = _parent;
+
+	while (par != HIERARCY_ROOT)
+	{
+		worldPosition += par->_parent->_localPosition;
+		par = par->_parent;
+	}
+
+	return worldPosition;
+}
 
 void Transform::SetAngle(float degree)
 { 
@@ -70,6 +91,8 @@ void Transform::SetDepth(int depth)
 
 	_depth = depth;
 }
+
+#endif // PROPS_MODE_2D
 
 #pragma endregion
 

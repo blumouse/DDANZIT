@@ -55,14 +55,18 @@ private:
 	static constexpr float DEG2RAD = 3.14159265f / 180.0f;
 	static constexpr float RAD2DEG = 180.0f / 3.14159265f;
 
-	// TODO: 부모 오브젝트 기준으로 움직이게 하기
+	// TODO: 부모 오브젝트 기준으로 움직이게 하기 회전값 스케일도!
 #ifdef PROPS_MODE_2D
 	
 private:
-	Vector2 _position;
+	Vector2 _localPosition;
 public:
-	Vector2& position() { return _position; }				// 원본 수정가능 (set)
-	const Vector2& position() const { return _position; }	// 원본 읽기전용 (get)
+	Vector2& localPosition() { return _localPosition; }				// 원본 수정가능 (set)
+	const Vector2& localPosition() const { return _localPosition; }	// 원본 읽기전용 (get)
+
+public:
+	Vector2& position() { return _localPosition; }
+	Vector2 position() const { return _localPosition; }
 
 
 private:

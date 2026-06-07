@@ -374,7 +374,7 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, Ve
 	GameObject* clone = gameObject->Clone();
 	clone->_transform->_parent = HIERARCY_ROOT;
 
-	clone->_transform->_position = position;
+	clone->_transform->_localPosition = position;
 	clone->_transform->_direction = direction;
 
 	SceneManager::mainScene->hierarchy += clone;
@@ -409,7 +409,7 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, Ve
 	clone->_transform->SetParent(parent);
 
 	// 월드 기준이라 할거 없음 오예
-	clone->_transform->_position = position;
+	clone->_transform->_localPosition = position;
 	clone->_transform->_direction = direction;
 
 	SceneManager::mainScene->hierarchy += clone;

@@ -95,8 +95,8 @@ void Camera::Render(HDC hdc)
 	// 카메라 단 오브젝트의 뎁스부터 컬링
 #ifdef PROPS_MODE_2D
 
-	float camPosX = transform()->_position.x;
-	float camPosY = transform()->_position.y;
+	float camPosX = transform()->_localPosition.x;
+	float camPosY = transform()->_localPosition.y;
 
 	for (int i = MAX_LAYER_NUM; i >= depth(); i--)
 	{
