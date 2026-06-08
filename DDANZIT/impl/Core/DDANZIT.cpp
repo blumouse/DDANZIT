@@ -370,8 +370,8 @@ void DDANZIT_Finalize()
         delete scene;
     }
 
-
-    gameCore.FinalizeGraphicSettings();
+    if (gameCore.isInitialized)
+        gameCore.FinalizeGraphicSettings();
 
 
     DestroyWnd();

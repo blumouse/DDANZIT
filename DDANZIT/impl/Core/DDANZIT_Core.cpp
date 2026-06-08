@@ -97,12 +97,13 @@ void DDANZIT_Core::FinalizeGraphicSettings()
 
 #ifdef RENDER_MODE_DIRECT2D
 
-    d2dRenderer->D2DRenderFinalize();
-
-    wicFactory->Release();
-
     if (d2dRenderer != nullptr)
+    {
+        d2dRenderer->D2DRenderFinalize();
+
+        wicFactory->Release();
         delete d2dRenderer;
+    }
 
 #endif // RENDER_MODE_DIRECT2D
 
@@ -139,26 +140,8 @@ void DDANZIT_Core::_OnResize(int width, int height)
 
 void DDANZIT_Core::_OnClose()
 {
-#ifdef RENDER_MODE_WINGDI
-
-    SelectObject(hBackDC, hDefaultBitmap);
-
-    DeleteObject(hBackBitmap);
-    DeleteDC(hBackDC);
-
-    ReleaseDC(hWnd, hFrontDC);
-
-#endif // RENDER_MODE_WINGDI
-
-#ifdef RENDER_MODE_DIRECT2D
-
-    d2dRenderer->D2DRenderFinalize();
-
-    if (d2dRenderer != nullptr)
-        delete d2dRenderer;
-
-#endif // RENDER_MODE_DIRECT2D
-
+    if (isInitialized)
+        FinalizeGraphicSettings();
 }
 
 

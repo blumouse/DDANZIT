@@ -7,7 +7,6 @@
 
 #include "MyObject.h"
 
-
 void Mycode() {
 
 	// 에디터 / 직렬화가 없기 때문에 무조건 전부 동적생성;
