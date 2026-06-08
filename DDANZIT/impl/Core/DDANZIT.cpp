@@ -6,8 +6,8 @@
 #include "Application.h"
 #include "SceneManager.h"
 #include "GameTime.h"
+#include "Input.h"
 
-#include "GameTimer.h"
 #include "INC_Windows.h"
 #include "RenderHelp.h"
 #include "Utillity.h"
@@ -28,9 +28,9 @@ using namespace std;
 //
 // 타임 아직도 안만들었어? <- 끝
 // 
-// 배열들 미리 reserve해놓기?
-// 
 // 인풋이벤트 만들기 적어도 마우스 방향키 필요한거 정도
+// 
+// 배열들 미리 reserve해놓기?
 
 
 
@@ -43,7 +43,7 @@ using namespace std;
 // 더 많은 오브젝트 / 컴포넌트 속성
 // 코루틴 사이클
 // 인풋시스템
-// 애플리케이션
+// 애플리케이션   끗
 // 
 // 
 // 필드/메서드명 다시 정리하기...
@@ -95,9 +95,9 @@ namespace
     unsigned int g_height = 0;
 
 
-    // TODO: Time 네임스페이스 / 클래스로 분리할 필요가 있다
     Time time;
 
+    Input input;
 
     // 내부로직에서 접근가능하게 빼기
     DDANZIT_Core gameCore;
@@ -123,13 +123,12 @@ namespace
     //void _OnDestroy();
 
 
-    // Input Events ...추가 예정
-    void _OnMouseMove(int x, int y);
-    void _OnLButtonDown(int x, int y);
-    void _OnLButtonUp(int x, int y);
-    void _OnRButtonDown(int x, int y);
-    void _OnRButtonUp(int x, int y);
-
+    // Input Events 클래스로 이사감 이벤트 안해!
+    //void _OnMouseMove(int x, int y);
+    //void _OnLButtonDown(int x, int y);
+    //void _OnLButtonUp(int x, int y);
+    //void _OnRButtonDown(int x, int y);
+    //void _OnRButtonUp(int x, int y);
 
 
     // 윈도우 관련
@@ -196,26 +195,38 @@ void DDANZIT_Run()
     {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
+            // 마우스
             if (msg.message == WM_MOUSEMOVE)
             {
-                _OnMouseMove(LOWORD(msg.lParam), HIWORD(msg.lParam));
+                input._OnMouseMove(LOWORD(msg.lParam), HIWORD(msg.lParam));
             }
             else if (msg.message == WM_LBUTTONDOWN)
             {
-                _OnLButtonDown(LOWORD(msg.lParam), HIWORD(msg.lParam));
-            }
-            else if (msg.message == WM_RBUTTONDOWN)
-            {
-                _OnRButtonDown(LOWORD(msg.lParam), HIWORD(msg.lParam));
+                input._OnKeyDown(KeyCode::Mouse0);
             }
             else if (msg.message == WM_LBUTTONUP)
             {
-                _OnLButtonUp(LOWORD(msg.lParam), HIWORD(msg.lParam));
+                input._OnKeyUp(KeyCode::Mouse0);
+            }
+            else if (msg.message == WM_RBUTTONDOWN)
+            {
+                input._OnKeyDown(KeyCode::Mouse1);
             }
             else if (msg.message == WM_RBUTTONUP)
             {
-                _OnRButtonUp(LOWORD(msg.lParam), HIWORD(msg.lParam));
+                input._OnKeyUp(KeyCode::Mouse1);
             }
+
+            //키보드
+            else if (msg.message == WM_KEYDOWN)
+            {
+                input._OnKeyDown(static_cast<KeyCode>(msg.wParam));
+            }
+            else if (msg.message == WM_KEYUP)
+            {
+                input._OnKeyUp(static_cast<KeyCode>(msg.wParam));
+            }
+
             else
             {
                 TranslateMessage(&msg);
@@ -242,7 +253,6 @@ void DDANZIT_Run()
 
             /* DDANZIT_Update() */
             {
-                // TODO: Time 클래스에 접근해서 틱
                 time.Tick();
 
 
@@ -271,6 +281,8 @@ void DDANZIT_Run()
 
 
                 time.fFrameCount += time.deltaTime();
+
+                input.Tick();
             }
 
 
@@ -331,7 +343,7 @@ void DDANZIT_Run()
     Application::_isPlaying = false;
 }
 
-// TODO ...손도못댐
+
 void DDANZIT_Finalize() 
 {
     time.Finalize();
@@ -386,30 +398,6 @@ void _OnClose()
 // 구현부
 namespace 
 {
-    // TODO: 이벤트 등록된 함수 호출
-    // 아냐 이것도 큐로해야되;
-    void _OnMouseMove(int x, int y)
-    {
-    }
-
-    void _OnLButtonDown(int x, int y)
-    {
-    }
-
-    void _OnRButtonDown(int x, int y)
-    {
-    }
-
-    void _OnLButtonUp(int x, int y)
-    {
-    }
-
-    void _OnRButtonUp(int x, int y)
-    {
-    }
-
-
-
     LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     {
 

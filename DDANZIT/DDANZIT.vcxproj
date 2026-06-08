@@ -148,6 +148,7 @@
     <ClCompile Include="impl\Framework\Scene.cpp" />
     <ClCompile Include="impl\Framework\SceneManager.cpp" />
     <ClCompile Include="impl\Framework\GameTime.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MyObject.cpp" />
     <ClCompile Include="MyObject.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="header\Framework\Scene.h" />
     <ClInclude Include="header\Framework\SceneManager.h" />
     <ClInclude Include="header\Framework\GameTime.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Service\CodeEdit.h" />
     <ClInclude Include="Service\DDANZIT.h" />
     <ClInclude Include="Service\DDANZITEngine.h" />

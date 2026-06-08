@@ -102,6 +102,14 @@ private:
 
 #pragma region StaticMethod
 
+#ifdef PROPS_MODE_2D
+
+public:
+	static const float worldToScreenRatio;
+
+#endif // PROPS_MODE_2D
+
+
 private:
 	static Camera* currentCamera;
 	static std::vector<Camera*> allCameraList;

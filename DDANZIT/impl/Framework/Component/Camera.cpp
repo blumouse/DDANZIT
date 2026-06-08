@@ -99,8 +99,6 @@ void Camera::Render(HDC hdc)
 	float camPosX = camPos.x;
 	float camPosY = camPos.y;
 
-	const float WorldToScreen = 1.0f;
-
 #ifdef RENDER_MODE_WINGDI
 	static struct SquareSprite {
 		HDC hDC = NULL;
@@ -163,11 +161,11 @@ void Camera::Render(HDC hdc)
 
 					defalutSpriteHDC = squareSprite.hDC;
 
-					relativeScaleX = cmd.scaleX * 100.0f;
-					relativeScaleY = cmd.scaleY * 100.0f;
+					relativeScaleX = cmd.scaleX;
+					relativeScaleY = cmd.scaleY;
 
-					x = (int)((relativeCamX - relativeScaleX / 2.0f) * WorldToScreen) + DDANZIT_Core::width / 2;
-					y = (int)((relativeCamY - relativeScaleY / 2.0f) * WorldToScreen) + DDANZIT_Core::height / 2;
+					x = (int)((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + DDANZIT_Core::width / 2;
+					y = (int)((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + DDANZIT_Core::height / 2;
 
 
 					srcX = 0;
@@ -194,7 +192,7 @@ void Camera::Render(HDC hdc)
 				blend.SourceConstantAlpha = (cmd.colorRGBA & 0x000000ff);
 				blend.AlphaFormat = 0;
 
-				AlphaBlend(hdc, x, y, relativeScaleX * WorldToScreen, relativeScaleY* WorldToScreen,
+				AlphaBlend(hdc, x, y, relativeScaleX * worldToScreenRatio, relativeScaleY * worldToScreenRatio,
 					defalutSpriteHDC, srcX, srcY, srcWidth, srcHeight, blend);
 			}
 			else
@@ -221,19 +219,19 @@ void Camera::Render(HDC hdc)
 
 				if (cmd.useAtlas)
 				{
-					relativeScaleX = cmd.scaleX * cmd.sliceWidth;
-					relativeScaleY = cmd.scaleY * cmd.sliceHeight;
+					relativeScaleX = cmd.scaleX * (float)cmd.sliceWidth / worldToScreenRatio;
+					relativeScaleY = cmd.scaleY * (float)cmd.sliceHeight / worldToScreenRatio;
 				}
 				else
 				{
 					GetObject(bmi->GetBitmapHandle(), sizeof(BITMAP), &bmp);
 
-					relativeScaleX = cmd.scaleX * bmp.bmWidth;
-					relativeScaleY = cmd.scaleY * bmp.bmHeight;
+					relativeScaleX = cmd.scaleX * (float)bmp.bmWidth / worldToScreenRatio;
+					relativeScaleY = cmd.scaleY * (float)bmp.bmHeight / worldToScreenRatio;
 				}
 
-				int x = (int)((relativeCamX - relativeScaleX / 2.0f) * WorldToScreen) + DDANZIT_Core::width / 2;
-				int y = (int)((relativeCamY - relativeScaleY / 2.0f) * WorldToScreen) + DDANZIT_Core::height / 2;
+				int x = (int)((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + DDANZIT_Core::width / 2;
+				int y = (int)((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + DDANZIT_Core::height / 2;
 
 
 				int srcX;	int srcWidth;
@@ -266,7 +264,7 @@ void Camera::Render(HDC hdc)
 
 				// TODO: 플립 반영하기 (파라미터만 뒤집음 된다)
 
-				AlphaBlend(hdc, x, y, relativeScaleX* WorldToScreen, relativeScaleY* WorldToScreen,
+				AlphaBlend(hdc, x, y, relativeScaleX * worldToScreenRatio, relativeScaleY * worldToScreenRatio,
 					hBitmapDC, srcX, srcY, srcWidth, srcHeight, blend);
 
 
@@ -314,6 +312,8 @@ void Camera::Render(HDC hdc)
 
 
 #pragma region StaticMethod
+
+const float Camera::worldToScreenRatio = 100.0f;
 
 Camera* Camera::currentCamera = nullptr;
 

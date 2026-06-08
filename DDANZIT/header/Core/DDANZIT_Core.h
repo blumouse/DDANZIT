@@ -60,9 +60,10 @@ class DDANZIT_Core
 	using BitmapInfo = renderHelp::BitmapInfo;
 
 public:
+	friend class Input;
+	friend class Camera;
 	friend class GameObject;
 	friend class MonoBehavior;
-	friend class Camera;
 
 #ifdef PROPS_MODE_2D
 
@@ -193,19 +194,6 @@ private:
 	//void _PostProcess();
 	void _Present();
 	void _Clear();
-
-#pragma endregion
-
-
-
-	// TODO: 이벤트로 가자 function 인풋매니저를 여기 하나또 둘까
-#pragma region InputEvents
-
-	void OnMouseMove(int x, int y);
-	void OnLButtonDown(int x, int y);
-	void OnLButtonUp(int x, int y);
-	void OnRButtonDown(int x, int y);
-	void OnRButtonUp(int x, int y);
 
 #pragma endregion
 
