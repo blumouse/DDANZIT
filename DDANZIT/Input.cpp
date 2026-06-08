@@ -9,6 +9,9 @@ using namespace std;
 //Vector2 Input::prevMousePosition = Vector2(0.0f, 0.0f);
 Vector2 Input::curMousePosition = Vector2(0.0f, 0.0f);
 
+int Input::curPositionX = 0;
+int Input::curPositionY = 0;
+
 bitset<256> Input::isKeyDown;
 bitset<256> Input::isKey;
 bitset<256> Input::isKeyUp;
@@ -16,9 +19,8 @@ bitset<256> Input::isKeyUp;
 
 void Input::_OnMouseMove(int x, int y)
 {
-	curMousePosition = Vector2(
-		(float)(x - DDANZIT_Core::width) / Camera::worldToScreenRatio,
-		(float)(y - DDANZIT_Core::height) / Camera::worldToScreenRatio);
+	curPositionX = x;
+	curPositionY = y;
 }
 
 
@@ -45,7 +47,9 @@ void Input::Tick()
 
 Vector2 Input::mousePosition()
 {
-	return curMousePosition;
+	return Vector2(
+		(float)(curPositionX - DDANZIT_Core::width) / Camera::worldToScreenRatio,
+		(float)(curPositionY - DDANZIT_Core::height) / Camera::worldToScreenRatio);
 }
 
 

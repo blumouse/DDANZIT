@@ -56,6 +56,9 @@ private:
     //static Vector2 prevMousePosition;
     static Vector2 curMousePosition;
 
+    static int curPositionX;
+    static int curPositionY;
+
     static std::bitset<256> isKeyDown;
     static std::bitset<256> isKey;
     static std::bitset<256> isKeyUp;
