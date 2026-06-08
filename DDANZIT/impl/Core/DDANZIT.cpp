@@ -9,8 +9,8 @@
 #include "Input.h"
 
 #include "INC_Windows.h"
-#include "RenderHelp.h"
 #include "Utillity.h"
+#include "RenderHelp.h"
 
 #include <vector>
 #include <queue>
@@ -163,10 +163,6 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     time.Init();
 
 
-    // 이쯤에서 그래픽 엔진 초기화
-    gameCore.InitGraphicSettings(g_hWnd);
-
-
     Application::_isPlaying = false;
     Application::_isQuit = false;
 
@@ -176,16 +172,15 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
 bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize)
 {
+    // 이걸 먼저해야겟다
+    gameCore.InitGraphicSettings(g_hWnd);
+
     for (unsigned int i = 0; i < resourceSize; i++)
     {
-        if (gameCore.bitmapResourceList.size() == MAX_RESOURCE_NUM)
-        {
-            // 오류..
+        if (gameCore.LoadBitmapResource(pfilePath[i]) == -1)
             return false;
-        }
-
-        gameCore.bitmapResourceList.push_back(renderHelp::CreateBitmapInfo(pfilePath[i]));
     }
+
 
     return DDANZIT_Initialize(windowName, width, height);
 }

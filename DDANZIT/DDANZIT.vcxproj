@@ -77,6 +77,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -92,6 +93,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,6 +108,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,6 +125,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="D2DRenderer.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
@@ -161,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
     <ClInclude Include="header\Core\Hierarchy.h" />

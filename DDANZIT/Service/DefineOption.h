@@ -32,8 +32,8 @@ typedef enum class SpriteIndex
 //#define USE_EDITOR
 
 
-#define RENDER_MODE_WINGDI
-//#define RENDER_MODE_DIRECT2D
+//#define RENDER_MODE_WINGDI
+#define RENDER_MODE_DIRECT2D
 
 
 #define PROPS_MODE_2D

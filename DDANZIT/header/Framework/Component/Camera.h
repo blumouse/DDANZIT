@@ -94,7 +94,15 @@ public:
 #pragma region IRenderer
 
 private:
+#ifdef RENDER_MODE_WINGDI
 	void Render(HDC hdc) override;
+
+#endif
+
+#ifdef RENDER_MODE_DIRECT2D
+	void Render(ComPtr<ID2D1DeviceContext4> d2dcontext, ComPtr<ID2D1SolidColorBrush> d2dbrush, ComPtr<ID2D1Bitmap1> d2dtargetBitmap) override;
+
+#endif
 
 #pragma endregion
 

@@ -3,8 +3,12 @@
 #include <vector>
 #include <queue>
 #include "INC_Windows.h"
-
 #include "DefineOption.h"
+
+#ifdef RENDER_MODE_DIRECT2D
+#include "D2DRenderer.h"
+
+#endif // RENDER_MODE_DIRECT2D
 
 class GameObject;
 class MonoBehavior;
@@ -20,8 +24,7 @@ struct DrawCommand
 	float posY;
 	float scaleX;
 	float scaleY;
-	float dirX;
-	float dirY;
+	float angle;
 	SpriteIndex spriteIndex;
 	int colorRGBA;
 	bool flipX;
@@ -94,10 +97,20 @@ private:
 	HBITMAP hDefaultBitmap = nullptr;
 
 	static std::vector<BitmapInfo*> bitmapResourceList;
-	// TODO: 소리파일용 리소스도 확보
 
 #endif // RENDER_MODE_WINGDI
 
+#ifdef RENDER_MODE_DIRECT2D
+
+	D2DRenderer* d2dRenderer = nullptr;
+
+	// 파일 로드용
+	ComPtr<IWICImagingFactory> wicFactory;
+	static std::vector<ComPtr<ID2D1Bitmap>> bitmapResourceList;
+
+#endif // RENDER_MODE_DIRECT2D
+
+	// TODO: 소리파일용 리소스도 확보
 
 #pragma endregion
 
@@ -113,7 +126,14 @@ private:
 	void _OnClose();
 
 public:
-	static int LoadBitmapResource(const wchar_t* filePath);
+	int LoadBitmapResource(const wchar_t* filePath);
+
+#ifdef RENDER_MODE_DIRECT2D
+	// 내부용
+private:
+	HRESULT LoadBitmapFromFile(ID2D1DeviceContext* pContext, LPCWSTR filePath, ID2D1Bitmap** ppOutBitmap);
+
+#endif // RENDER_MODE_DIRECT2D
 
 #pragma endregion
 

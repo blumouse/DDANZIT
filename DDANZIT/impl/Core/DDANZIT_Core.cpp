@@ -25,7 +25,17 @@ using BitmapInfo = renderHelp::BitmapInfo;
 int DDANZIT_Core::width = 0;
 int DDANZIT_Core::height = 0;
 
+#ifdef RENDER_MODE_WINGDI
+
 vector<BitmapInfo*> DDANZIT_Core::bitmapResourceList;
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+vector<ComPtr<ID2D1Bitmap>> DDANZIT_Core::bitmapResourceList;
+
+#endif // RENDER_MODE_DIRECT2D
 
 #pragma endregion
 
@@ -54,7 +64,14 @@ void DDANZIT_Core::InitGraphicSettings(HWND hWnd)
 
 #ifdef RENDER_MODE_DIRECT2D
 
+    d2dRenderer = new D2DRenderer(width, height);
 
+    CoCreateInstance(
+        CLSID_WICImagingFactory,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&wicFactory)
+    );
 
 #endif // RENDER_MODE_DIRECT2D
 
@@ -76,7 +93,12 @@ void DDANZIT_Core::FinalizeGraphicSettings()
 
 #ifdef RENDER_MODE_DIRECT2D
 
+    d2dRenderer->D2DRenderFinalize();
 
+    wicFactory->Release();
+
+    if (d2dRenderer != nullptr)
+        delete d2dRenderer;
 
 #endif // RENDER_MODE_DIRECT2D
 
@@ -100,7 +122,7 @@ void DDANZIT_Core::_OnResize(int width, int height)
 
 #ifdef RENDER_MODE_DIRECT2D
 
-
+    d2dRenderer->OnResize(width, height);
 
 #endif // RENDER_MODE_DIRECT2D
 
@@ -121,7 +143,10 @@ void DDANZIT_Core::_OnClose()
 
 #ifdef RENDER_MODE_DIRECT2D
 
+    d2dRenderer->D2DRenderFinalize();
 
+    if (d2dRenderer != nullptr)
+        delete d2dRenderer;
 
 #endif // RENDER_MODE_DIRECT2D
 
@@ -130,6 +155,8 @@ void DDANZIT_Core::_OnClose()
 
 int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
 {
+#ifdef RENDER_MODE_WINGDI
+
     if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
     {
         // DEBUG: ²ËÂþ¾î
@@ -139,6 +166,59 @@ int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
     bitmapResourceList.push_back(renderHelp::CreateBitmapInfo(filePath));
 
     return (bitmapResourceList.size() - 1);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+    if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
+    {
+        // DEBUG: ²ËÂþ¾î
+        return -1;
+    }
+
+    ComPtr<ID2D1Bitmap> newBitmap;
+    LoadBitmapFromFile(d2dRenderer->D2DGetContext().Get(), filePath, &newBitmap);
+
+    bitmapResourceList.push_back(newBitmap);
+
+    return (bitmapResourceList.size() - 1);
+
+#endif // RENDER_MODE_DIRECT2D
+
+}
+
+
+HRESULT DDANZIT_Core::LoadBitmapFromFile(ID2D1DeviceContext* pContext, LPCWSTR filePath, ID2D1Bitmap** ppOutBitmap)
+{
+    if (!wicFactory || !pContext) return E_FAIL;
+    // ¹¹ÀÌ¸® º¹ÀâÇØ
+
+    ComPtr<IWICBitmapDecoder> pDecoder;
+    wicFactory->CreateDecoderFromFilename(
+        filePath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+
+
+    ComPtr<IWICBitmapFrameDecode> pFrame;
+    pDecoder->GetFrame(0, &pFrame);
+
+
+    ComPtr<IWICFormatConverter> pConverter;
+    wicFactory->CreateFormatConverter(&pConverter);
+
+    pConverter->Initialize(
+        pFrame.Get(),
+        GUID_WICPixelFormat32bppPBGRA,
+        WICBitmapDitherTypeNone,
+        nullptr,
+        0.0f,
+        WICBitmapPaletteTypeMedianCut);
+
+
+    HRESULT hr = pContext->CreateBitmapFromWicBitmap(
+        pConverter.Get(), nullptr, ppOutBitmap);
+
+    return hr;
 }
 
 #pragma endregion
@@ -379,6 +459,10 @@ void DDANZIT_Core::_InitDraw()
 
 #ifdef RENDER_MODE_DIRECT2D
 
+    if (Camera::currentCamera == nullptr)
+        d2dRenderer->D2DInitDraw(Color{ 0.0f, 0.0f, 0.0f, 0.0f });
+    else
+        d2dRenderer->D2DInitDraw(Camera::currentCamera->backgroundColor());
 
 #endif // RENDER_MODE_DIRECT2D
 }
@@ -394,7 +478,18 @@ void DDANZIT_Core::_Render()
     if (Camera::currentCamera == nullptr)
         return;
 
+#ifdef RENDER_MODE_WINGDI
+
     Camera::currentCamera->Render(hBackDC);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+    Camera::currentCamera->Render(d2dRenderer->D2DGetContext());
+
+#endif // RENDER_MODE_DIRECT2D
+
 }
 
 void DDANZIT_Core::_Present()
@@ -408,8 +503,10 @@ void DDANZIT_Core::_Present()
 
 #ifdef RENDER_MODE_DIRECT2D
 
+    d2dRenderer->D2DPresent();
 
 #endif // RENDER_MODE_DIRECT2D
+
 }
 
 void DDANZIT_Core::_Clear()
