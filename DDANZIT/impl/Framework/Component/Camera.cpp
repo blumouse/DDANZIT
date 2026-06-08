@@ -291,7 +291,7 @@ void Camera::Render(HDC hdc)
 
 #ifdef RENDER_MODE_DIRECT2D
 
-void Camera::Render(ComPtr<ID2D1DeviceContext4> d2dcontext, ComPtr<ID2D1SolidColorBrush> d2dbrush, ComPtr<ID2D1Bitmap1> d2dtargetBitmap)
+void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Bitmap1* d2dtargetBitmap)
 {
 	// 카메라 단 오브젝트의 뎁스부터 컬링
 #ifdef PROPS_MODE_2D
@@ -348,7 +348,7 @@ void Camera::Render(ComPtr<ID2D1DeviceContext4> d2dcontext, ComPtr<ID2D1SolidCol
 					y = ((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
 
 
-					d2dcontext->FillRectangle(D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio), d2dbrush.Get());
+					d2dcontext->FillRectangle(D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio), d2dbrush);
 
 					break;
 
@@ -366,7 +366,7 @@ void Camera::Render(ComPtr<ID2D1DeviceContext4> d2dcontext, ComPtr<ID2D1SolidCol
 							D2D1::Point2F(x, y),
 							(relativeScaleX / 2.0f) * worldToScreenRatio,
 							(relativeScaleY / 2.0f) * worldToScreenRatio),
-						d2dbrush.Get());
+						d2dbrush);
 
 					break;
 
@@ -474,14 +474,15 @@ void Camera::Render(ComPtr<ID2D1DeviceContext4> d2dcontext, ComPtr<ID2D1SolidCol
 
 				// 그리기~
 				D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
+				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 
-				// TODO: 아틀라스 반영하기
+
 				d2dcontext->DrawBitmap(
 					pBitmap,
 					&destRect,
 					blendColor.a,
-					D2D1_BITMAP_INTERPOLATION_MODE_LINEAR
-				);
+					D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+					&srcRect);
 
 
 				if (cmd.angle != 0.0f || cmd.flipX || cmd.flipY)

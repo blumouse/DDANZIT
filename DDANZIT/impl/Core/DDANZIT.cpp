@@ -5,6 +5,7 @@
 #include "DDANZIT_Core.h"
 #include "Application.h"
 #include "SceneManager.h"
+#include "Scene.h"
 #include "GameTime.h"
 #include "Input.h"
 
@@ -162,10 +163,12 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
     time.Init();
 
+    if (!gameCore.isInitialized)
+        gameCore.InitGraphicSettings(g_hWnd);
+
 
     Application::_isPlaying = false;
     Application::_isQuit = false;
-
 
     return true;
 }

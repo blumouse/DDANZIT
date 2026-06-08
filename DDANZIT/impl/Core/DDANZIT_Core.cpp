@@ -66,6 +66,8 @@ void DDANZIT_Core::InitGraphicSettings(HWND hWnd)
 
     d2dRenderer = new D2DRenderer(width, height);
 
+    d2dRenderer->D2DRenderInitialize(hWnd);
+
     CoCreateInstance(
         CLSID_WICImagingFactory,
         nullptr,
@@ -74,6 +76,8 @@ void DDANZIT_Core::InitGraphicSettings(HWND hWnd)
     );
 
 #endif // RENDER_MODE_DIRECT2D
+
+    isInitialized = true;
 
 }
 
@@ -102,6 +106,8 @@ void DDANZIT_Core::FinalizeGraphicSettings()
 
 #endif // RENDER_MODE_DIRECT2D
 
+    isInitialized = false;
+
 }
 
 
@@ -109,6 +115,9 @@ void DDANZIT_Core::_OnResize(int width, int height)
 {
     this->width = width;
     this->height = height;
+
+    if (!isInitialized)
+        return;
 
 #ifdef RENDER_MODE_WINGDI
 
@@ -436,7 +445,6 @@ void DDANZIT_Core::QuitDrawable(IDrawable* drawable)
 
 void DDANZIT_Core::_InitDraw()
 {
-    // TODO: ¸ÞÀÎ ¾À ¹è°æ»öÀ¸·Î Ä¥
 
 #ifdef RENDER_MODE_WINGDI
 
@@ -486,7 +494,7 @@ void DDANZIT_Core::_Render()
 
 #ifdef RENDER_MODE_DIRECT2D
 
-    Camera::currentCamera->Render(d2dRenderer->D2DGetContext());
+    Camera::currentCamera->Render(d2dRenderer->D2DGetContext().Get(), d2dRenderer->D2DGetBrush().Get(), d2dRenderer->D2DGetBitmap().Get());
 
 #endif // RENDER_MODE_DIRECT2D
 

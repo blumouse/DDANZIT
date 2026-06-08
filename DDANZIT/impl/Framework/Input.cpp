@@ -95,6 +95,11 @@ Vector2 Input::GetAxis(const std::string& axisName)
 		axisVector.y = 0.0f;
 		return axisVector;
 	}
+	else
+	{
+		// DEBUG: 그없
+		return Vector2(0, 0);
+	}
 }
 
 Vector2 Input::GetAxisRaw(const std::string& axisName)
@@ -120,5 +125,10 @@ Vector2 Input::GetAxisRaw(const std::string& axisName)
 	{
 		axisVector.y = 0.0f;
 		return axisVector;
+	}
+	else
+	{
+		// DEBUG: 그없
+		return Vector2(0, 0);
 	}
 }

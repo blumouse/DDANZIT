@@ -88,6 +88,7 @@ private:
 	HWND hWnd;
 	static int width;
 	static int height;
+	bool isInitialized = false;
 
 #ifdef RENDER_MODE_WINGDI
 

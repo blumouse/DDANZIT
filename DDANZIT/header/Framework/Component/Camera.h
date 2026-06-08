@@ -100,7 +100,7 @@ private:
 #endif
 
 #ifdef RENDER_MODE_DIRECT2D
-	void Render(ComPtr<ID2D1DeviceContext4> d2dcontext, ComPtr<ID2D1SolidColorBrush> d2dbrush, ComPtr<ID2D1Bitmap1> d2dtargetBitmap) override;
+	void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Bitmap1* d2dtargetBitmap) override;
 
 #endif
 

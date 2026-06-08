@@ -149,7 +149,7 @@ void D2DRenderer::D2DRenderFinalize()
 
 void D2DRenderer::OnResize(int width, int height)
 {
-    m_swapChain->ResizeBuffers(2, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, 0);
+    m_swapChain->ResizeBuffers(2, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 }
 
 
