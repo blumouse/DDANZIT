@@ -15,7 +15,7 @@ public:
 	friend void DDANZIT_Run();
 	friend void DDANZIT_Finalize();
 
-#pragma region Construntor
+#pragma region Constructor
 
 protected:
 	Lifecycle() = default;

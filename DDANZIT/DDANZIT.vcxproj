@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Collider.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
     <ClInclude Include="header\Core\Hierarchy.h" />
