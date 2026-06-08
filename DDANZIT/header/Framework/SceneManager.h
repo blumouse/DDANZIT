@@ -51,23 +51,23 @@ public:
 	static bool SetActiveScene(Scene* scene);
 	static Scene* GetActiveScene();
 
-	static Scene* CreateScene(std::string name);
-	static Scene* CreateScene(std::string name, LoadSceneMode mode);	// 이것도 원래 없지만 편의를 위해 추가
+	static Scene* CreateScene(const std::string& name);
+	static Scene* CreateScene(const std::string& name, LoadSceneMode mode);	// 이것도 원래 없지만 편의를 위해 추가
 
 	static Scene* GetSceneAt(int index);
-	static Scene* GetSceneByName(std::string name);
+	static Scene* GetSceneByName(const std::string& name);
 
 	// 원래는 없다
 	static void LoadScene(Scene* scene);
 	static void LoadScene(Scene* scene, LoadSceneMode mode);
-	static void LoadScene(std::string name);
-	static void LoadScene(std::string name, LoadSceneMode mode);
+	static void LoadScene(const std::string& name);
+	static void LoadScene(const std::string& name, LoadSceneMode mode);
 
 	//static void LoadSceneAsync(std::string name);
 	//static void LoadSceneAsync(std::string name, LoadSceneMode mode);
 
 	static bool UnloadScene(Scene* scene);
-	static bool UnloadScene(std::string name);
+	static bool UnloadScene(const std::string& name);
 
 	//static void UnloadSceneAsync(Scene* scene);
 	//static void UnloadSceneAsync(std::string name);

@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "DDANZIT_Core.h"
+
 #include "Component.h"
 #include "IRenderer.h"
 
@@ -47,13 +49,10 @@ public:
 	Scene*& scene() { return _scene; }
 
 
-private:
-	int _width;
-	int _height;
 public:
-	int pixelWidth() const { return _width; }
-	int pixelHeight() const { return _height; }
-	float aspect() const { return (float)_width / (float)_height; }
+	int pixelWidth() const { return DDANZIT_Core::width; }
+	int pixelHeight() const { return DDANZIT_Core::height; }
+	float aspect() const { return (float)DDANZIT_Core::width / (float)DDANZIT_Core::height; }
 
 
 public:

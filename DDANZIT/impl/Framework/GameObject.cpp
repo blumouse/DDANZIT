@@ -375,7 +375,7 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, Ve
 	clone->_transform->_parent = HIERARCY_ROOT;
 
 	clone->_transform->_localPosition = position;
-	clone->_transform->_direction = direction;
+	clone->_transform->_localDirection = direction;
 
 	SceneManager::mainScene->hierarchy += clone;
 
@@ -410,7 +410,7 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Vector2 position, Ve
 
 	// 월드 기준이라 할거 없음 오예
 	clone->_transform->_localPosition = position;
-	clone->_transform->_direction = direction;
+	clone->_transform->_localDirection = direction;
 
 	SceneManager::mainScene->hierarchy += clone;
 
@@ -494,9 +494,9 @@ void GameObject::Destroy(GameObject* gameObject)
 			if (b->activeOnDestroy)
 				DDANZIT_Core::onDestroyExecQueue.push(b);
 		}
-
-		DDANZIT_Core::destroyScheduledQueue.push(gameObject);
 	}
+
+	DDANZIT_Core::destroyScheduledQueue.push(gameObject);
 
 	for (Transform* tr : gameObject->_transform->pChildList)
 	{

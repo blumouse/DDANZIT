@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Application.h"
+#include "GameTime.h"
+
 //#include "Scene.h"
 #include "Hierarchy.h"
 

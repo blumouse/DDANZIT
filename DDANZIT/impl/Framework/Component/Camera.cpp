@@ -52,7 +52,7 @@ Component* Camera::Clone() const
 
 Color& Camera::backgroundColor()
 {
-	if (_scene != nullptr)
+	if (_scene == nullptr)
 		return SceneManager::GetActiveScene()->backgroundColor();
 	else
 		return _scene->backgroundColor();
@@ -60,7 +60,7 @@ Color& Camera::backgroundColor()
 
 const Color& Camera::backgroundColor() const
 {
-	if (_scene != nullptr)
+	if (_scene == nullptr)
 		return SceneManager::GetActiveScene()->backgroundColor();
 	else
 		return _scene->backgroundColor();
@@ -94,33 +94,108 @@ void Camera::Render(HDC hdc)
 {
 	// 카메라 단 오브젝트의 뎁스부터 컬링
 #ifdef PROPS_MODE_2D
+	
+	Vector2 camPos = transform()->position();
+	float camPosX = camPos.x;
+	float camPosY = camPos.y;
 
-	float camPosX = transform()->_localPosition.x;
-	float camPosY = transform()->_localPosition.y;
+	const float WorldToScreen = 1.0f;
 
-	for (int i = MAX_LAYER_NUM; i >= depth(); i--)
+#ifdef RENDER_MODE_WINGDI
+	static struct SquareSprite {
+		HDC hDC = NULL;
+		HBITMAP hBmp = NULL;
+		HBITMAP hOldBmp = NULL;
+
+		SquareSprite() {
+			HDC hScreenDC = GetDC(NULL);
+			hDC = CreateCompatibleDC(hScreenDC);
+			hBmp = CreateCompatibleBitmap(hScreenDC, 1, 1);
+			hOldBmp = (HBITMAP)SelectObject(hDC, hBmp);
+			ReleaseDC(NULL, hScreenDC);
+		}
+
+		~SquareSprite() {
+			if (hDC) {
+				SelectObject(hDC, hOldBmp);
+				DeleteObject(hBmp);
+				DeleteDC(hDC);
+			}
+		}
+	} squareSprite;
+
+#endif // RENDER_MODE_WINGDI
+
+
+	for (int i = MAX_LAYER_NUM - 1; i >= depth(); i--)
 	{
 		for (const DrawCommand& cmd : DDANZIT_Core::drawCommandLists[i])
 		{
 #ifdef RENDER_MODE_WINGDI
 			if ((int)cmd.spriteIndex < 0)
 			{
+				HDC defalutSpriteHDC = NULL;
+
+				float relativeCamX = cmd.posX - camPosX;
+				float relativeCamY = cmd.posY - camPosY;
+
+				int x;
+				int y;
+
+				float relativeScaleX;
+				float relativeScaleY;
+
+				int srcX;	int srcWidth;
+				int srcY;	int srcHeight;
+
+				int xBGR;
+
 				switch (cmd.spriteIndex)
 				{
 				default:
 				case SpriteIndex::None:
-
 					continue;
+
 				case SpriteIndex::Sqaure:
-					// TODO: 직접 그려서 만들고 캐싱
+					// 직접 그려서 만들고 캐싱
+
+					SetPixel(squareSprite.hDC, 0, 0, RGB(((cmd.colorRGBA >> 24) & 0x000000ff), ((cmd.colorRGBA >> 16) & 0x000000ff), ((cmd.colorRGBA >> 8) & 0x000000ff)));
+
+					defalutSpriteHDC = squareSprite.hDC;
+
+					relativeScaleX = cmd.scaleX * 100.0f;
+					relativeScaleY = cmd.scaleY * 100.0f;
+
+					x = (int)((relativeCamX - relativeScaleX / 2.0f) * WorldToScreen) + DDANZIT_Core::width / 2;
+					y = (int)((relativeCamY - relativeScaleY / 2.0f) * WorldToScreen) + DDANZIT_Core::height / 2;
+
+
+					srcX = 0;
+					srcY = 0;
+
+					srcWidth = 1;
+					srcHeight = 1;
+
 					break;
+
 				case SpriteIndex::Circle:
 
 					break;
+
 				case SpriteIndex::Capsule:
 
 					break;
 				}
+
+
+
+				BLENDFUNCTION blend = { 0 };
+				blend.BlendOp = AC_SRC_OVER;
+				blend.SourceConstantAlpha = (cmd.colorRGBA & 0x000000ff);
+				blend.AlphaFormat = 0;
+
+				AlphaBlend(hdc, x, y, relativeScaleX * WorldToScreen, relativeScaleY* WorldToScreen,
+					defalutSpriteHDC, srcX, srcY, srcWidth, srcHeight, blend);
 			}
 			else
 			{
@@ -136,15 +211,13 @@ void Camera::Render(HDC hdc)
 				// 카메라 + 화면 중심 좌표로 계산
 				// 카메라 벡터는 빼고 화면 중심좌표 계산해서 더해 (y축 뒤집어야되나?)
 				// 아 하나더 원본 비트맵 기준으로 배율을 주는거로 계산..
-
-				const float WorldToScreen = 5.0f;
 				
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
 				BITMAP bmp;
-				int relativeScaleX;
-				int relativeScaleY;
+				float relativeScaleX;
+				float relativeScaleY;
 
 				if (cmd.useAtlas)
 				{
@@ -160,7 +233,7 @@ void Camera::Render(HDC hdc)
 				}
 
 				int x = (int)((relativeCamX - relativeScaleX / 2.0f) * WorldToScreen) + DDANZIT_Core::width / 2;
-				int y = (int)((relativeCamX - relativeScaleY / 2.0f) * WorldToScreen) + DDANZIT_Core::height / 2;
+				int y = (int)((relativeCamY - relativeScaleY / 2.0f) * WorldToScreen) + DDANZIT_Core::height / 2;
 
 
 				int srcX;	int srcWidth;
@@ -186,13 +259,14 @@ void Camera::Render(HDC hdc)
 				// GDI로 다른색상 곱하기는 무리
 				BLENDFUNCTION blend = { 0 };
 				blend.BlendOp = AC_SRC_OVER;
-				blend.SourceConstantAlpha = (cmd.colorRGBA ^ 0x000000ff);
+				blend.SourceConstantAlpha = (cmd.colorRGBA & 0x000000ff);
 				blend.AlphaFormat = AC_SRC_ALPHA;
 
-				// 회전도 무리
+				// 회전도 무리 dir 안써!
 
+				// TODO: 플립 반영하기 (파라미터만 뒤집음 된다)
 
-				AlphaBlend(hdc, x, y, relativeScaleX, relativeScaleY,
+				AlphaBlend(hdc, x, y, relativeScaleX* WorldToScreen, relativeScaleY* WorldToScreen,
 					hBitmapDC, srcX, srcY, srcWidth, srcHeight, blend);
 
 
@@ -213,7 +287,7 @@ void Camera::Render(HDC hdc)
 
 
 	// TODO: 콜라이더 선 그리기
-	for (int i = MAX_LAYER_NUM; i >= depth(); i--)
+	for (int i = MAX_LAYER_NUM - 1; i >= depth(); i--)
 	{
 		for (const DebugDrawCommand& cmd : DDANZIT_Core::debugDrawCommandLists[i])
 		{

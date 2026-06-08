@@ -48,17 +48,19 @@ void Draw2D::Draw()
 		const Color& c = spriteRenderer->color;
 
 		int colorRGBA =
-			((int)(c.r / 255.0f) << 24) |
-			((int)(c.g / 255.0f) << 16) |
-			((int)(c.b / 255.0f) << 8) |
-			((int)(c.a / 255.0f));
+			((int)(c.r * 255.0f) << 24) |
+			((int)(c.g * 255.0f) << 16) |
+			((int)(c.b * 255.0f) << 8) |
+			((int)(c.a * 255.0f));
 
 		DDANZIT_Core::drawCommandLists[layer].push_back(
 			DrawCommand{
-				transform->position().x,	// TODO: 부모 기준 좌표로 계산 (헬퍼를 추가해야겟다)
+				transform->position().x,
 				transform->position().y,
 				transform->scale().x,
 				transform->scale().y,
+				transform->direction().x,
+				transform->direction().y,
 				spriteRenderer->sprite,
 				colorRGBA,
 				spriteRenderer->flipX,

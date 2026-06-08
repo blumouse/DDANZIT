@@ -12,7 +12,7 @@ using namespace std;
 
 #pragma region Constructor
 
-Scene::Scene(std::string name) : _name(name), _backgroundColor(Color{1.0f, 1.0f, 1.0f, 1.0f}), isLoaded(false), hierarchy(this)
+Scene::Scene(const string& name) : _name(name), _backgroundColor(Color{1.0f, 1.0f, 1.0f, 1.0f}), isLoaded(false), hierarchy(this)
 {
 
 }
@@ -26,6 +26,17 @@ Scene::Scene(std::string name) : _name(name), _backgroundColor(Color{1.0f, 1.0f,
 bool Scene::isSubScene() const 
 {
     return SceneManager::GetActiveScene() != this;
+}
+
+
+Color& Scene::backgroundColor()
+{
+    return _backgroundColor;
+}
+
+const Color& Scene::backgroundColor() const
+{
+    return _backgroundColor;
 }
 
 #pragma endregion

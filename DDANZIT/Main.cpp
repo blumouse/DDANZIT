@@ -13,14 +13,17 @@ void Mycode() {
 	// 에디터 / 직렬화가 없기 때문에 무조건 전부 동적생성;
 
 	Scene* scene1 = SceneManager::CreateScene("Scene1");
+	scene1->backgroundColor() = Color(0.25f, 0.25f, 0.25f, 1.0f);
+
+	GameObject* cam = hierarchy()->AddGameObject();
+	cam->AddComponent<Camera>();
 
 	GameObject* go = scene1->hierarchy.AddGameObject<MyObject>();
-	go->name() = "MyObject";
+	SpriteRenderer* sp = go->AddComponent<SpriteRenderer>();
+	sp->sprite = SpriteIndex::Sqaure;
+	sp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
 
-	for (GameObject* g : hierarchy()->GetObjectList()) 
-	{
-		Debug::Log(g->name());
-	}
+	go->name() = "MyObject";
 }
 
 

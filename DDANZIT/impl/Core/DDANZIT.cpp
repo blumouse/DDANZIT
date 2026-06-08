@@ -5,6 +5,7 @@
 #include "DDANZIT_Core.h"
 #include "Application.h"
 #include "SceneManager.h"
+#include "GameTime.h"
 
 #include "GameTimer.h"
 #include "INC_Windows.h"
@@ -20,16 +21,16 @@ using namespace std;
 // 지금 하고있는것
 // 
 // 
-// 다음은 바로 렌더러 구현 / 테스트하자.. <- 하는중
+// 다음은 바로 렌더러 구현 / 테스트하자.. <- 일단 gdi끝?
 // 
-// 아씨 트렌스폼 부모기준으로도 해야되는데..? 근데 이건 상위에서 결산할때 그렇게 하면 되기도 하고 <- 트랜스폼에 헬퍼 만들기
+// 아씨 트렌스폼 부모기준으로도 해야되는데..? 근데 이건 상위에서 결산할때 그렇게 하면 되기도 하고 
+// <- 끝? 근데 벡터2 기준이라 잘 모르겟다 테스트 필요
 //
-// 타임 아직도 안만들었어?
+// 타임 아직도 안만들었어? <- 끝
 // 
 // 배열들 미리 reserve해놓기?
 // 
-// GO에 달려있는 트랜스폼 이거 그냥 변수로 해도 될거같은데..(그게 나을듯) 근데 갖다쓴데가 많아서 엄청난 수정소요
-// 걍 하지말자 이제와서..
+// 인풋이벤트 만들기 적어도 마우스 방향키 필요한거 정도
 
 
 
@@ -89,15 +90,13 @@ using namespace std;
 // 시크릿 내부함수 선언부
 namespace
 {
-    // TODO: Time 네임스페이스 / 클래스로 분리할 필요가 있다
-    GameTimer* pGameTimer = nullptr;
-    float fDeltaTime = 0.0f;
-    float fFrameCount = 0.0f;
-
-
     HWND g_hWnd = HWND();
     unsigned int g_width = 0;
     unsigned int g_height = 0;
+
+
+    // TODO: Time 네임스페이스 / 클래스로 분리할 필요가 있다
+    Time time;
 
 
     // 내부로직에서 접근가능하게 빼기
@@ -132,9 +131,6 @@ namespace
     void _OnRButtonUp(int x, int y);
 
 
-    void _OnResize(int width, int height);
-    void _OnClose();
-
 
     // 윈도우 관련
 
@@ -144,20 +140,23 @@ namespace
     void OnResize(int width, int height);
 }
 
+// 선언도 빼야함
+
+void _OnResize(int width, int height);
+void _OnClose();
 
 
 // 파라미터로 뭘 받아야할까 설정값들
 // 창 이름 창 크기*2 리소스(초기) 정보
 
-bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height) {
-
-    pGameTimer = new GameTimer();
-    pGameTimer->Reset();
-
+bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height) 
+{
     const wchar_t* className = L"DDANZIT";
 
     if (!Create(className, windowName, width, height))
         return false;
+
+    time.Init();
 
 
     // 이쯤에서 그래픽 엔진 초기화
@@ -244,10 +243,10 @@ void DDANZIT_Run()
             /* DDANZIT_Update() */
             {
                 // TODO: Time 클래스에 접근해서 틱
-                pGameTimer->Tick();
+                time.Tick();
 
 
-                while (fFrameCount >= 200.0f)
+                while (time.fFrameCount >= 200.0f)
                 {
                     gameCore._FixedUpdate();
 
@@ -256,7 +255,7 @@ void DDANZIT_Run()
 
                     // gameCore._WaitForFixedUpdate();
 
-                    fFrameCount -= 200.0f;
+                    time.fFrameCount -= 200.0f;
                 }
 
 
@@ -271,8 +270,7 @@ void DDANZIT_Run()
                 gameCore._LateUpdate();
 
 
-                fDeltaTime = pGameTimer->DeltaTimeMS();
-                fFrameCount += fDeltaTime;
+                time.fFrameCount += time.deltaTime();
             }
 
 
@@ -334,10 +332,9 @@ void DDANZIT_Run()
 }
 
 // TODO ...손도못댐
-void DDANZIT_Finalize() {
-
-    delete pGameTimer;
-    pGameTimer = nullptr;
+void DDANZIT_Finalize() 
+{
+    time.Finalize();
 
     SceneManager::mainScene = nullptr;
 
@@ -352,11 +349,36 @@ void DDANZIT_Finalize() {
     gameCore.QuitUpdateScheduled();
     gameCore.DestroyScheduled();
 
+    // 임시
+    for (Scene* scene : SceneManager::pSceneInstanceList)
+    {
+        delete scene;
+    }
+
 
     gameCore.FinalizeGraphicSettings();
 
 
     DestroyWnd();
+}
+
+
+// 일단 임시로 빼야겟다;
+
+void _OnResize(int width, int height)
+{
+    learning::SetScreenSize(width, height);
+
+    OnResize(width, height);
+
+    // TODO: 여기서 코어로 접근해야되는데.. 익명이라 안뚫리네 하핫; 방법찾기
+    gameCore._OnResize(width, height);
+}
+
+
+void _OnClose()
+{
+    gameCore._OnClose();
 }
 
 
@@ -384,34 +406,6 @@ namespace
 
     void _OnRButtonUp(int x, int y)
     {
-    }
-
-
-
-    void _OnResize(int width, int height)
-    {
-        learning::SetScreenSize(width, height);
-
-        OnResize(width, height);
-
-        // TODO: 여기서 코어로 접근해야되는데.. 익명이라 안뚫리네 하핫; 방법찾기
-
-        hBackBitmap = CreateCompatibleBitmap(hFrontDC, g_width, g_height);
-
-        HANDLE hPrevBitmap = (HBITMAP)SelectObject(hBackDC, hBackBitmap);
-
-        DeleteObject(hPrevBitmap);
-    }
-
-
-    void _OnClose()
-    {
-        SelectObject(hBackDC, hDefaultBitmap);
-
-        DeleteObject(hBackBitmap);
-        DeleteDC(hBackDC);
-
-        ReleaseDC(g_hWnd, hFrontDC);
     }
 
 

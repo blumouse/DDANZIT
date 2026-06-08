@@ -17,7 +17,7 @@ using namespace std;
 #pragma region Constructor
 
 Transform::Transform(GameObject* pGameObject) : 
-	Component(pGameObject), _parent(HIERARCY_ROOT), _localPosition(Vector2(0, 0)), _direction(Vector2(1.0f, 0)), _scale(Vector2(1.0f, 1.0f)), _depth(0)
+	Component(pGameObject), _parent(HIERARCY_ROOT), _localPosition(Vector2(0, 0)), _localDirection(Vector2(1.0f, 0)), _localScale(Vector2(1.0f, 1.0f)), _depth(0)
 {
 	//RegisterTransform(this);
 }
@@ -26,8 +26,8 @@ Transform::Transform(const Transform& other) :
 	Component(other)
 {
 	_localPosition = other._localPosition;
-	_direction = other._direction;
-	_scale = other._scale;
+	_localDirection = other._localDirection;
+	_localScale = other._localScale;
 	_depth = other._depth;
 	_parent = HIERARCY_ROOT;
 
@@ -40,11 +40,21 @@ Transform::Transform(const Transform& other) :
 
 #pragma region Properties
 
+// TODO_LATER: 이것들 캐싱해서 최적화하기?
 #ifdef PROPS_MODE_2D
 
-Vector2& Transform::position() 
-{ 
-	return _localPosition;	//TODO
+void Transform::SetPosition(Vector2 newPosition)
+{
+	Vector2 parentPosition = Vector2(0,0);
+	Transform* par = _parent;
+
+	while (par != HIERARCY_ROOT)
+	{
+		parentPosition += par->_parent->_localPosition;
+		par = par->_parent;
+	}
+
+	_localPosition = newPosition - parentPosition;
 }
 
 Vector2 Transform::position() const 
@@ -61,20 +71,80 @@ Vector2 Transform::position() const
 	return worldPosition;
 }
 
+
+void Transform::SetScale(Vector2 newScale)
+{
+	Vector2 parentScale = Vector2(0, 0);
+	Transform* par = _parent;
+
+	while (par != HIERARCY_ROOT)
+	{
+		parentScale += par->_parent->_localScale;
+		par = par->_parent;
+	}
+
+	_localScale = newScale - parentScale;
+}
+
+Vector2 Transform::scale() const
+{
+	Vector2 worldScale = _localScale;
+	Transform* par = _parent;
+
+	while (par != HIERARCY_ROOT)
+	{
+		worldScale += par->_parent->_localScale;
+		par = par->_parent;
+	}
+
+	return worldScale;
+}
+
+
+void Transform::SetDirection(Vector2 newDirection)
+{
+	Vector2 parentDirection = Vector2(0, 0);
+	Transform* par = _parent;
+
+	while (par != HIERARCY_ROOT)
+	{
+		parentDirection += par->_parent->_localDirection;
+		par = par->_parent;
+	}
+
+	_localDirection = newDirection - parentDirection;
+}
+
+Vector2 Transform::direction() const
+{
+	Vector2 worldDirection = _localDirection;
+	Transform* par = _parent;
+
+	while (par != HIERARCY_ROOT)
+	{
+		worldDirection += par->_parent->_localDirection;
+		par = par->_parent;
+	}
+
+	return worldDirection;
+}
+
+
 void Transform::SetAngle(float degree)
 { 
 	float radians = degree * DEG2RAD;
 
-	_direction.x = cos(radians);
-	_direction.y = sin(radians);
+	_localDirection.x = cos(radians);
+	_localDirection.y = sin(radians);
 }
 
 float Transform::angle() const 
 { 
-	float radians = atan2(_direction.y, _direction.x);
+	float radians = atan2(_localDirection.y, _localDirection.x);
 
 	return radians * RAD2DEG;
 }
+
 
 void Transform::SetDepth(int depth) 
 {

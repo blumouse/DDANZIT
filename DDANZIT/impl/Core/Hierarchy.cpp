@@ -40,7 +40,7 @@ Hierarchy& Hierarchy::operator+=(GameObject* go)
 	pGameObjectList.push_back(go);
 	go->ownerHierarchy = this;
 
-	if (go->transform()->parent() == HIERARCY_ROOT)
+	if (go->_transform->parent() == HIERARCY_ROOT)
 		pRootGameObjectList.push_back(go);
 
 
@@ -69,7 +69,7 @@ Hierarchy& Hierarchy::operator-=(GameObject* go)
 
 	go->ownerHierarchy = nullptr;
 
-	if (go->transform()->parent() == HIERARCY_ROOT)
+	if (go->_transform->parent() == HIERARCY_ROOT)
 		pRootGameObjectList.erase(remove(
 			pRootGameObjectList.begin(),
 			pRootGameObjectList.end(), go),

@@ -13,13 +13,15 @@ class IRenderer;
 
 // 임시로 여따 둡시다
 
-// TODO: 아잇 회전값도 해야함;
+
 struct DrawCommand
 {
 	float posX;
 	float posY;
 	float scaleX;
 	float scaleY;
+	float dirX;
+	float dirY;
 	SpriteIndex spriteIndex;
 	int colorRGBA;
 	bool flipX;
@@ -73,6 +75,7 @@ public:
 	friend void DDANZIT_Run();
 	friend void DDANZIT_Finalize();
 
+	friend void _OnResize(int width, int height);
 	friend void _OnClose();
 	
 #pragma region Properties
@@ -106,6 +109,7 @@ private:
 	void FinalizeGraphicSettings();
 
 	void _OnResize(int width, int height);
+	void _OnClose();
 
 public:
 	static int LoadBitmapResource(const wchar_t* filePath);

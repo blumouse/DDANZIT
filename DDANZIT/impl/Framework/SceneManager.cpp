@@ -40,7 +40,7 @@ Scene* SceneManager::GetActiveScene()
 }
 
 
-Scene* SceneManager::CreateScene(string name)
+Scene* SceneManager::CreateScene(const string& name)
 {
 	Scene* newScene = new Scene(name);
 
@@ -51,7 +51,7 @@ Scene* SceneManager::CreateScene(string name)
 	return newScene;
 }
 
-Scene* SceneManager::CreateScene(string name, LoadSceneMode mode)
+Scene* SceneManager::CreateScene(const string& name, LoadSceneMode mode)
 {
 	Scene* newScene = new Scene(name);
 
@@ -77,7 +77,7 @@ Scene* SceneManager::GetSceneAt(int index)
 		return pSceneList[index];
 }
 
-Scene* SceneManager::GetSceneByName(string name)
+Scene* SceneManager::GetSceneByName(const string& name)
 {
 	for (Scene* s : pSceneList)
 	{
@@ -126,7 +126,7 @@ void SceneManager::LoadScene(Scene* scene, LoadSceneMode mode)
 	}
 }
 
-void SceneManager::LoadScene(string name)
+void SceneManager::LoadScene(const string& name)
 {
 	Scene* scene = GetSceneByName(name);
 
@@ -139,7 +139,7 @@ void SceneManager::LoadScene(string name)
 	LoadScene(scene);
 }
 
-void SceneManager::LoadScene(string name, LoadSceneMode mode)
+void SceneManager::LoadScene(const string& name, LoadSceneMode mode)
 {
 	Scene* scene = GetSceneByName(name);
 
@@ -186,7 +186,7 @@ bool SceneManager::UnloadScene(Scene* scene)
 	return true;
 }
 
-bool SceneManager::UnloadScene(string name)
+bool SceneManager::UnloadScene(const string& name)
 {
 	Scene* scene = GetSceneByName(name);
 

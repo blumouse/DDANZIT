@@ -28,7 +28,7 @@ public:
 
 public:
     Scene() = delete;
-    Scene(std::string name);
+    Scene(const std::string& name);
     Scene(const Scene&) = delete;
 
     ~Scene() = default;

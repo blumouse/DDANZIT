@@ -13,7 +13,6 @@
 //};
 
 
-// TODO: 기본 컴포넌트들 초기값 어케 넣어줄까?
 // 비트맵 / 텍스처 ...가 있는 곳 정보와 기타등등 가질 것이다
 class SpriteRenderer : public Component
 {

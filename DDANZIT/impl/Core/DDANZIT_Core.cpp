@@ -17,11 +17,15 @@
 
 using namespace std;
 
+using BitmapInfo = renderHelp::BitmapInfo;
+
 
 #pragma region Properties
 
 int DDANZIT_Core::width = 0;
 int DDANZIT_Core::height = 0;
+
+vector<BitmapInfo*> DDANZIT_Core::bitmapResourceList;
 
 #pragma endregion
 
@@ -99,6 +103,28 @@ void DDANZIT_Core::_OnResize(int width, int height)
 
 
 #endif // RENDER_MODE_DIRECT2D
+
+}
+
+void DDANZIT_Core::_OnClose()
+{
+#ifdef RENDER_MODE_WINGDI
+
+    SelectObject(hBackDC, hDefaultBitmap);
+
+    DeleteObject(hBackBitmap);
+    DeleteDC(hBackDC);
+
+    ReleaseDC(hWnd, hFrontDC);
+
+#endif // RENDER_MODE_WINGDI
+
+#ifdef RENDER_MODE_DIRECT2D
+
+
+
+#endif // RENDER_MODE_DIRECT2D
+
 }
 
 
@@ -259,7 +285,7 @@ void DDANZIT_Core::QuitUpdateScheduled()
                 lateUpdateExecList.end(), b),
                 lateUpdateExecList.end());
 
-        registerUpdateScheduledQueue.pop();
+        quitUpdateScheduledQueue.pop();
     }
 }
 
@@ -311,7 +337,7 @@ void DDANZIT_Core::QuitUpdateExecLists(MonoBehavior* behavior)
 vector<IDrawable*> DDANZIT_Core::drawableList;
 
 vector<DrawCommand> DDANZIT_Core::drawCommandLists[MAX_LAYER_NUM];
-vector<DebugDrawCommand> debugDrawCommandLists[MAX_LAYER_NUM];
+vector<DebugDrawCommand> DDANZIT_Core::debugDrawCommandLists[MAX_LAYER_NUM];
 
 
 void DDANZIT_Core::RegisterDrawable(IDrawable* drawable) 
@@ -338,9 +364,9 @@ void DDANZIT_Core::_InitDraw()
         ::PatBlt(hBackDC, 0, 0, width, height, BLACKNESS);
     else
     {
-        Color c = Camera::currentCamera->backgroundColor();
+        const Color& c = Camera::currentCamera->backgroundColor();
 
-        HBRUSH hGrayBrush = CreateSolidBrush(RGB((int)(c.r / 255.0f), (int)(c.g / 255.0f), (int)(c.b / 255.0f)));
+        HBRUSH hGrayBrush = CreateSolidBrush(RGB((int)(c.r * 255.0f), (int)(c.g * 255.0f), (int)(c.b * 255.0f)));
         HBRUSH hOldBrush = (HBRUSH)SelectObject(hBackDC, hGrayBrush);
 
         ::PatBlt(hBackDC, 0, 0, width, height, PATCOPY);
@@ -368,18 +394,11 @@ void DDANZIT_Core::_Render()
     if (Camera::currentCamera == nullptr)
         return;
 
-    // 0번 레이어가 가장 위
-    for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
-    {
-        Camera::currentCamera->Render(hBackDC);
-    }
+    Camera::currentCamera->Render(hBackDC);
 }
 
 void DDANZIT_Core::_Present()
 {
-    if (Camera::currentCamera == nullptr)
-        return;
-
 
 #ifdef RENDER_MODE_WINGDI
 

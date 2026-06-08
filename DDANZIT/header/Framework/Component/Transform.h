@@ -65,27 +65,35 @@ public:
 	const Vector2& localPosition() const { return _localPosition; }	// 원본 읽기전용 (get)
 
 public:
-	Vector2& position() { return _localPosition; }
-	Vector2 position() const { return _localPosition; }
+	void SetPosition(Vector2 newPosition);
+	Vector2 position() const;
 
 
 private:
-	Vector2 _scale;
+	Vector2 _localScale;
 public:
-	Vector2& scale() { return _scale; }
-	const Vector2& scale() const { return _scale; }
+	Vector2& localScale() { return _localScale; }
+	const Vector2& localScale() const { return _localScale; }
+
+public:
+	void SetScale(Vector2 newScale);
+	Vector2 scale() const;
 
 
 private:
-	Vector2 _direction;
+	Vector2 _localDirection;
 public:
 	// 유니티엔 없는 방향벡터
-	Vector2& direction() { return _direction; }
-	const Vector2& direction() const { return _direction; }
+	Vector2& localDirection() { return _localDirection; }
+	const Vector2& localDirection() const { return _localDirection; }
+
+public:
+	void SetDirection(Vector2 newDirection);
+	Vector2 direction() const;
 
 
 public:
-	// 보기좋은 degree
+	// 보기좋은 degree, 일단 지금은 로컬그대로 놔둠
 	void SetAngle(float degree);
 	float angle() const;
 
@@ -95,7 +103,7 @@ private:
 public:
 	// 인덱스 방식이기 때문에 음수는 없을 예정 작을수록 위쪽
 	void SetDepth(int depth);
-	const int& depth() const { return _depth; }
+	const unsigned int& depth() const { return _depth; }
 
 #endif // PROPS_MODE_2D
 
