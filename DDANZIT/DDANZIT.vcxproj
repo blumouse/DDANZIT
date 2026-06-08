@@ -133,9 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Collider.cpp" />
-    <ClCompile Include="D2DRenderer.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
+    <ClCompile Include="impl\Core\D2DRenderer.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
     <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
     <ClCompile Include="impl\Core\GameObjectDesciptor.cpp" />
@@ -145,6 +144,7 @@
     <ClCompile Include="impl\Framework\Application.cpp" />
     <ClCompile Include="impl\Framework\Component.cpp" />
     <ClCompile Include="impl\Framework\Component\Camera.cpp" />
+    <ClCompile Include="impl\Framework\Component\Collider.cpp" />
     <ClCompile Include="impl\Framework\Component\SpriteRenderer.cpp" />
     <ClCompile Include="impl\Framework\Component\Transform.cpp" />
     <ClCompile Include="impl\Framework\Debug.cpp" />
@@ -165,8 +165,7 @@
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Collider.h" />
-    <ClInclude Include="D2DRenderer.h" />
+    <ClInclude Include="header\Core\D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
     <ClInclude Include="header\Core\Hierarchy.h" />
@@ -177,6 +176,7 @@
     <ClInclude Include="header\Framework\Application.h" />
     <ClInclude Include="header\Framework\Component.h" />
     <ClInclude Include="header\Framework\Component\Camera.h" />
+    <ClInclude Include="header\Framework\Component\Collider.h" />
     <ClInclude Include="header\Framework\Component\SpriteRenderer.h" />
     <ClInclude Include="header\Framework\Component\Transform.h" />
     <ClInclude Include="header\Framework\Debug.h" />
