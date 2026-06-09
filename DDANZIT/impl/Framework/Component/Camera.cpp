@@ -291,7 +291,7 @@ void Camera::Render(HDC hdc)
 
 #ifdef RENDER_MODE_DIRECT2D
 
-void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Bitmap1* d2dtargetBitmap)
+void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect)
 {
 	// 카메라 단 오브젝트의 뎁스부터 컬링
 #ifdef PROPS_MODE_2D
@@ -395,29 +395,76 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				}
 
 
+				D2D1_MATRIX_3X2_F scaleFlipMatrix = D2D1::Matrix3x2F::Identity();
+				D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Identity();
+				D2D1_MATRIX_3X2_F transMatrix = D2D1::Matrix3x2F::Identity();
+
 
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
+				D2D1_POINT_2F centerPos = D2D1::Point2F((float)pBitmap->GetPixelSize().width, (float)pBitmap->GetPixelSize().height);
+
+
+				// 크기
 				float relativeScaleX;
 				float relativeScaleY;
 
-
 				if (cmd.useAtlas)
 				{
-					relativeScaleX = cmd.scaleX * (float)cmd.sliceWidth / worldToScreenRatio;
-					relativeScaleY = cmd.scaleY * (float)cmd.sliceHeight / worldToScreenRatio;
+					relativeScaleX = (float)cmd.sliceWidth * cmd.scaleX / worldToScreenRatio;	// 비트맵 픽셀좌표를 월드로 밀어넣는다
+					relativeScaleY = (float)cmd.sliceHeight * cmd.scaleY / worldToScreenRatio;
 				}
 				else
 				{
-					relativeScaleX = cmd.scaleX * pBitmap->GetPixelSize().width / worldToScreenRatio;
-					relativeScaleY = cmd.scaleY * pBitmap->GetPixelSize().height / worldToScreenRatio;
+					relativeScaleX = centerPos.x * cmd.scaleX / worldToScreenRatio;
+					relativeScaleY = centerPos.y * cmd.scaleY / worldToScreenRatio;
 				}
 
-				int x = (int)((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + DDANZIT_Core::width / 2;
-				int y = (int)((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + DDANZIT_Core::height / 2;
+
+				// 반전이랑 스케일링이랑 동치라고 하네요
+				if (cmd.flipX)
+				{
+					if (cmd.flipY)
+						scaleFlipMatrix = D2D1::Matrix3x2F::Scale(-relativeScaleX, -relativeScaleY, centerPos);
+					else
+						scaleFlipMatrix = D2D1::Matrix3x2F::Scale(-relativeScaleX, relativeScaleY, centerPos);
+				}
+				else if (cmd.flipY)
+				{
+					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, -relativeScaleY, centerPos);
+				}
+
+				// 회전
+				if (cmd.angle != 0.0f)
+					rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+
+				// 이동
+				transMatrix = D2D1::Matrix3x2F::Translation(
+					(relativeCamX * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
+					(relativeCamY * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f);
+
+				// 적용!
+				d2dcontext->SetTransform(scaleFlipMatrix * rotMatrix * transMatrix);
 
 
+				// 색상 곱하기!
+				float r;	float g;	float b;	float a;
+				r = (float)((cmd.colorRGBA >> 24) & 0x000000ff) / 255.0f;
+				g = (float)((cmd.colorRGBA >> 16) & 0x000000ff) / 255.0f;
+				b = (float)((cmd.colorRGBA >> 8) & 0x000000ff) / 255.0f;
+				a = (float)(cmd.colorRGBA & 0x000000ff) / 255.0f;
+
+				D2D1_MATRIX_5X4_F colorMatrix = D2D1::Matrix5x4F(
+					r, 0.0f, 0.0f, 0.0f,
+					0.0f, g, 0.0f, 0.0f,
+					0.0f, 0.0f, b, 0.0f,
+					0.0f, 0.0f, 0.0f, a,
+					0.0f, 0.0f, 0.0f, 0.0f   // Offset (더하기 값)
+				);
+
+
+				// 비트맵 자르기
 				int srcX;	int srcWidth;
 				int srcY;	int srcHeight;
 
@@ -438,58 +485,33 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 					srcHeight = pBitmap->GetPixelSize().height;
 				}
 
-				// 회전 반전!
-				D2D1_POINT_2F centerPos = D2D1::Point2F(relativeCamX, relativeCamY);
-
-				D2D1_MATRIX_3X2_F flipMatrix = D2D1::Matrix3x2F::Identity();
-				D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Identity();
-
-				// 반전이랑 스케일링이랑 동치라고 하네요
-				if (cmd.flipX)
-				{
-					if (cmd.flipY)
-						flipMatrix = D2D1::Matrix3x2F::Scale(-1.0f, -1.0f, centerPos);
-					else
-						flipMatrix = D2D1::Matrix3x2F::Scale(-1.0f, 1.0f, centerPos);
-				}
-				else if (cmd.flipY)
-				{
-					flipMatrix = D2D1::Matrix3x2F::Scale(1.0f, -1.0f, centerPos);
-				}
-
-				if (cmd.angle != 0.0f)
-					rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
-
-				d2dcontext->SetTransform(flipMatrix * rotMatrix);
-
-
-				// 색상 곱하기!
-				UINT32 rgb;
-				float a;
-				rgb = (cmd.colorRGBA >> 8) & 0x00ffffff;
-				a = (float)(cmd.colorRGBA & 0x000000ff) / 255.0f;
-
-				D2D1::ColorF blendColor = D2D1::ColorF(rgb, a);
-
 
 				// 그리기~
-				D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
+				D2D1_POINT_2F localOffset = D2D1::Point2F(-centerPos.x, -centerPos.y);
+				//D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
 				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 
 
-				d2dcontext->DrawBitmap(
-					pBitmap,
-					&destRect,
-					blendColor.a,
-					D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-					&srcRect);
+				colorMatrixEffect->SetInput(0, pBitmap);
+
+				colorMatrixEffect->SetValue(D2D1_COLORMATRIX_PROP_COLOR_MATRIX, colorMatrix);
 
 
-				if (cmd.angle != 0.0f || cmd.flipX || cmd.flipY)
-				{
-					d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
-				}
+				//d2dcontext->DrawBitmap(
+				//	pBitmap,
+				//	&destRect,
+				//	a,
+				//	D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+				//	&srcRect);
 
+				d2dcontext->DrawImage(
+					colorMatrixEffect,
+					&localOffset,
+					&srcRect,
+					D2D1_INTERPOLATION_MODE_LINEAR);
+
+
+				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
 			}
 
 		}

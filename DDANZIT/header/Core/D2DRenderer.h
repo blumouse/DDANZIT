@@ -23,6 +23,9 @@
 // WIC (Windows Imaging Component)
 #pragma comment(lib, "windowscodecs.lib")
 
+#pragma comment(lib, "dxguid.lib")
+#include <d2d1effects.h>
+
 using Microsoft::WRL::ComPtr;
 
 
@@ -63,6 +66,9 @@ private:
 	// Offscreen RenderTarget
 	ComPtr<ID2D1Bitmap1>			m_targetBitmap;
 
+
+	ComPtr<ID2D1Effect>				m_colorMatrixEffect;
+
 #pragma endregion
 
 
@@ -87,6 +93,7 @@ public:
 	void D2DRender();		// ¾È¾µµí
 	ComPtr<ID2D1DeviceContext4> D2DGetContext();
 	ComPtr<ID2D1SolidColorBrush> D2DGetBrush();
+	ComPtr<ID2D1Effect> D2DGetEffect();
 	ComPtr<ID2D1Bitmap1> D2DGetBitmap();
 
 	void D2DPresent();

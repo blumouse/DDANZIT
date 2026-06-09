@@ -114,7 +114,12 @@ bool D2DRenderer::D2DRenderInitialize(HWND hwnd)
     ComPtr<ID2D1SolidColorBrush> brush;
     hr = d2dContext->CreateSolidColorBrush(
         D2D1::ColorF(D2D1::ColorF::White), &brush);
-    if (FAILED(hr)) return false;
+    if (FAILED(hr)) return false; 
+    
+
+    // 이것도..
+    ComPtr<ID2D1Effect> colorMatrixEffect;
+    d2dContext->CreateEffect(CLSID_D2D1ColorMatrix, &colorMatrixEffect);
 
 
     // 8. 멤버로 저장
@@ -126,7 +131,7 @@ bool D2DRenderer::D2DRenderInitialize(HWND hwnd)
     m_d2dContext = d2dContext;
     m_targetBitmap = targetBitmap;
     m_brush = brush;
-
+    m_colorMatrixEffect = colorMatrixEffect;
 
 
 	return true;
@@ -134,11 +139,11 @@ bool D2DRenderer::D2DRenderInitialize(HWND hwnd)
 
 void D2DRenderer::D2DRenderFinalize()
 {
+    m_colorMatrixEffect.Reset();
     m_brush.Reset();
     m_targetBitmap.Reset();
 
     m_d2dContext.Reset();
-    m_d2dDevice.Reset();
     m_d2dDevice.Reset();
     m_d2dFactory.Reset();
     m_swapChain.Reset();
@@ -180,6 +185,11 @@ ComPtr<ID2D1DeviceContext4> D2DRenderer::D2DGetContext()
 ComPtr<ID2D1SolidColorBrush> D2DRenderer::D2DGetBrush()
 {
     return m_brush;
+}
+
+ComPtr<ID2D1Effect> D2DRenderer::D2DGetEffect()
+{
+    return m_colorMatrixEffect;
 }
 
 ComPtr<ID2D1Bitmap1> D2DRenderer::D2DGetBitmap()

@@ -101,7 +101,11 @@ void DDANZIT_Core::FinalizeGraphicSettings()
     {
         d2dRenderer->D2DRenderFinalize();
 
-        wicFactory->Release();
+        for (auto rsc : bitmapResourceList)
+            rsc.Reset();
+
+        wicFactory.Reset();
+
         delete d2dRenderer;
     }
 
@@ -477,7 +481,7 @@ void DDANZIT_Core::_Render()
 
 #ifdef RENDER_MODE_DIRECT2D
 
-    Camera::currentCamera->Render(d2dRenderer->D2DGetContext().Get(), d2dRenderer->D2DGetBrush().Get(), d2dRenderer->D2DGetBitmap().Get());
+    Camera::currentCamera->Render(d2dRenderer->D2DGetContext().Get(), d2dRenderer->D2DGetBrush().Get(), d2dRenderer->D2DGetEffect().Get());
 
 #endif // RENDER_MODE_DIRECT2D
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DefineOption.h"
+
 #ifdef RENDER_MODE_WINGDI
 typedef struct HDC__* HDC;
 
@@ -28,7 +30,7 @@ public:
 #endif
 
 #ifdef RENDER_MODE_DIRECT2D
-	virtual void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Bitmap1* d2dtargetBitmap) = 0;
+	virtual void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect) = 0;
 
 #endif
 
