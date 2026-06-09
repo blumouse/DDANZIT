@@ -12,6 +12,10 @@
 
 class GameObject;
 class MonoBehavior;
+
+class Collider2D;
+class Rigidbody2D;
+
 class IDrawable;
 class IRenderer;
 
@@ -148,6 +152,9 @@ private:
 	void _Start();
 
 	void _FixedUpdate();
+
+	void _OnTrigger();
+
 	void _Update();
 	void _LateUpdate();
 
@@ -187,6 +194,16 @@ private:
 
 	static void RegisterUpdateExecLists(MonoBehavior* behavior);
 	static void QuitUpdateExecLists(MonoBehavior* behavior);
+
+#pragma endregion
+
+
+
+#pragma region Physics
+
+private:
+	static std::vector<Collider2D*> collider2DList;
+	static std::vector<Rigidbody2D*> rigidbody2DList;
 
 #pragma endregion
 

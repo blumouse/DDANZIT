@@ -135,6 +135,24 @@
     <ClCompile Include="impl\Framework\Component\Transform.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
+    <ClCompile Include="impl\Core\D2DRenderer.cpp">
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\GameTime.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Input.cpp">
+      <Filter>소스 파일\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Component\Collider2D.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision2D.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Rigidbody2D.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util\Utillity.h">
@@ -220,6 +238,24 @@
     </ClInclude>
     <ClInclude Include="Util\Color.h">
       <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Core\D2DRenderer.h">
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Input.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\GameTime.h">
+      <Filter>헤더 파일\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Framework\Component\Collider2D.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision2D.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Rigidbody2D.h">
+      <Filter>헤더 파일\Framework\Component</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

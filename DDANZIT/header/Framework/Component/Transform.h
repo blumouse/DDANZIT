@@ -7,8 +7,6 @@
 
 #include "Utillity.h"
 
-using Vector2 = learning::Vector2f;
-
 class GameObject;
 
 

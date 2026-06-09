@@ -274,7 +274,7 @@ void DDANZIT_Core::_FixedUpdate()
 {
     for (MonoBehavior* b : fixedUpdateExecList)
     {
-        if (b->isActiveAndEnabled() && !b->gameObject()->isKilled)
+        if (b->isActiveAndEnabled() && !b->isKilled)
             b->FixedUpdate();
     }
 }
@@ -283,7 +283,7 @@ void DDANZIT_Core::_Update()
 {
     for (MonoBehavior* b : updateExecList)
     {
-        if (b->isActiveAndEnabled() && !b->gameObject()->isKilled)
+        if (b->isActiveAndEnabled() && !b->isKilled)
             b->Update();
     }
 }
@@ -292,7 +292,7 @@ void DDANZIT_Core::_LateUpdate()
 {
     for (MonoBehavior* b : lateUpdateExecList)
     {
-        if (b->isActiveAndEnabled() && !b->gameObject()->isKilled)
+        if (b->isActiveAndEnabled() && !b->isKilled)
             b->LateUpdate();
     }
 }
@@ -403,6 +403,16 @@ void DDANZIT_Core::QuitUpdateExecLists(MonoBehavior* behavior)
 {
     quitUpdateScheduledQueue.push(behavior);
 }
+
+#pragma endregion
+
+
+
+#pragma region Physics
+
+vector<Collider2D*> DDANZIT_Core::collider2DList;
+
+vector<Rigidbody2D*> DDANZIT_Core::rigidbody2DList;
 
 #pragma endregion
 

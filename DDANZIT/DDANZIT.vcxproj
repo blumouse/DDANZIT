@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Collision2D.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\D2DRenderer.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
@@ -144,7 +145,7 @@
     <ClCompile Include="impl\Framework\Application.cpp" />
     <ClCompile Include="impl\Framework\Component.cpp" />
     <ClCompile Include="impl\Framework\Component\Camera.cpp" />
-    <ClCompile Include="impl\Framework\Component\Collider.cpp" />
+    <ClCompile Include="impl\Framework\Component\Collider2D.cpp" />
     <ClCompile Include="impl\Framework\Component\SpriteRenderer.cpp" />
     <ClCompile Include="impl\Framework\Component\Transform.cpp" />
     <ClCompile Include="impl\Framework\Debug.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MyObject.cpp" />
     <ClCompile Include="MyObject.h" />
+    <ClCompile Include="Rigidbody2D.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Script.h" />
     <ClCompile Include="Util\GameTimer.cpp" />
@@ -165,6 +167,7 @@
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Collision2D.h" />
     <ClInclude Include="header\Core\D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
@@ -176,7 +179,7 @@
     <ClInclude Include="header\Framework\Application.h" />
     <ClInclude Include="header\Framework\Component.h" />
     <ClInclude Include="header\Framework\Component\Camera.h" />
-    <ClInclude Include="header\Framework\Component\Collider.h" />
+    <ClInclude Include="header\Framework\Component\Collider2D.h" />
     <ClInclude Include="header\Framework\Component\SpriteRenderer.h" />
     <ClInclude Include="header\Framework\Component\Transform.h" />
     <ClInclude Include="header\Framework\Debug.h" />
@@ -187,6 +190,7 @@
     <ClInclude Include="header\Framework\Scene.h" />
     <ClInclude Include="header\Framework\SceneManager.h" />
     <ClInclude Include="header\Framework\GameTime.h" />
+    <ClInclude Include="Rigidbody2D.h" />
     <ClInclude Include="Service\CodeEdit.h" />
     <ClInclude Include="Service\DDANZIT.h" />
     <ClInclude Include="Service\DDANZITEngine.h" />
