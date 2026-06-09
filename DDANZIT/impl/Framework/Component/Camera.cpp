@@ -97,7 +97,7 @@ void Camera::Render(HDC hdc)
 {
 	// 카메라 단 오브젝트의 뎁스부터 컬링
 #ifdef PROPS_MODE_2D
-	
+
 	Vector2 camPos = transform()->position();
 	float camPosX = camPos.x;
 	float camPosY = camPos.y;
@@ -207,7 +207,7 @@ void Camera::Render(HDC hdc)
 				// 카메라 + 화면 중심 좌표로 계산
 				// 카메라 벡터는 빼고 화면 중심좌표 계산해서 더해 (y축 뒤집어야되나?)
 				// 아 하나더 원본 비트맵 기준으로 배율을 주는거로 계산..
-				
+
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
@@ -344,8 +344,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 					relativeScaleX = cmd.scaleX;
 					relativeScaleY = cmd.scaleY;
 
-					x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f;
-					y = ((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
+					x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio / 10.0f) + (float)DDANZIT_Core::width / 2.0f;
+					y = ((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio / 10.0f) + (float)DDANZIT_Core::height / 2.0f;
 
 
 					d2dcontext->FillRectangle(D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio), d2dbrush);
@@ -403,7 +403,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
-				D2D1_POINT_2F centerPos = D2D1::Point2F((float)pBitmap->GetPixelSize().width, (float)pBitmap->GetPixelSize().height);
+				D2D1_POINT_2F centerPos = D2D1::Point2F((float)pBitmap->GetPixelSize().width / 2.0f, (float)pBitmap->GetPixelSize().height / 2.0f);
 
 
 				// 크기
@@ -417,8 +417,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				}
 				else
 				{
-					relativeScaleX = centerPos.x * cmd.scaleX / worldToScreenRatio;
-					relativeScaleY = centerPos.y * cmd.scaleY / worldToScreenRatio;
+					relativeScaleX = centerPos.x * 2.0f * cmd.scaleX / worldToScreenRatio;
+					relativeScaleY = centerPos.y * 2.0f * cmd.scaleY / worldToScreenRatio;
 				}
 
 
@@ -434,15 +434,18 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				{
 					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, -relativeScaleY, centerPos);
 				}
+				else
+				{
+					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleY, centerPos);
+				}
 
 				// 회전
-				if (cmd.angle != 0.0f)
-					rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+				rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
 
 				// 이동
 				transMatrix = D2D1::Matrix3x2F::Translation(
-					(relativeCamX * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
-					(relativeCamY * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f);
+					relativeCamX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
+					-relativeCamY + (float)DDANZIT_Core::height / 2.0f);
 
 				// 적용!
 				d2dcontext->SetTransform(scaleFlipMatrix * rotMatrix * transMatrix);
@@ -546,7 +549,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 #pragma region StaticMethod
 
-const float Camera::worldToScreenRatio = 100.0f;
+const float Camera::worldToScreenRatio = 1000.0f;
 
 Camera* Camera::currentCamera = nullptr;
 
