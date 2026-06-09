@@ -175,8 +175,16 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
 bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize)
 {
-    // 이걸 먼저해야겟다
-    gameCore.InitGraphicSettings(g_hWnd);
+    const wchar_t* className = L"DDANZIT";
+
+    if (!Create(className, windowName, width, height))
+        return false;
+
+    time.Init();
+
+    if (!gameCore.isInitialized)
+        gameCore.InitGraphicSettings(g_hWnd);
+
 
     for (unsigned int i = 0; i < resourceSize; i++)
     {
@@ -184,8 +192,10 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
             return false;
     }
 
+    Application::_isPlaying = false;
+    Application::_isQuit = false;
 
-    return DDANZIT_Initialize(windowName, width, height);
+    return true;
 }
 
 void DDANZIT_Run() 
