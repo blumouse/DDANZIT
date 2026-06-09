@@ -19,16 +19,15 @@ void Mycode() {
 
 	GameObject* go = scene1->hierarchy.AddGameObject<MyObject>();
 	SpriteRenderer* sp = go->AddComponent<SpriteRenderer>();
-	sp->sprite = SpriteIndex::Sqaure;
+	sp->sprite = (SpriteIndex)0;
 	sp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
 
-	go->name() = "MyObject";
 }
 
 
 int main()
 {
-	if (!DDANZIT_Initialize(L"Game", 1024, 760))
+	if (!DDANZIT_Initialize(L"Game", 1600, 900))
 		return -1;
 
 

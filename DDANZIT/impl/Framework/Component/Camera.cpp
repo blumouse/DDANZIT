@@ -403,8 +403,10 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
-				D2D1_POINT_2F centerPos = D2D1::Point2F((float)pBitmap->GetPixelSize().width / 2.0f, (float)pBitmap->GetPixelSize().height / 2.0f);
+				D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
 
+				float pixelWidth = (float)pBitmap->GetPixelSize().width;
+				float pixelHeight = (float)pBitmap->GetPixelSize().height;
 
 				// 크기
 				float relativeScaleX;
@@ -417,8 +419,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				}
 				else
 				{
-					relativeScaleX = centerPos.x * 2.0f * cmd.scaleX / worldToScreenRatio;
-					relativeScaleY = centerPos.y * 2.0f * cmd.scaleY / worldToScreenRatio;
+					relativeScaleX = cmd.scaleX / worldToScreenRatio;
+					relativeScaleY = cmd.scaleY / worldToScreenRatio;
 				}
 
 
@@ -484,13 +486,13 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 					srcX = 0;
 					srcY = 0;
 
-					srcWidth = pBitmap->GetPixelSize().width;
-					srcHeight = pBitmap->GetPixelSize().height;
+					srcWidth = pixelWidth;
+					srcHeight = pixelHeight;
 				}
 
 
 				// 그리기~
-				D2D1_POINT_2F localOffset = D2D1::Point2F(-centerPos.x, -centerPos.y);
+				D2D1_POINT_2F localOffset = D2D1::Point2F(pixelWidth / -2.0f, pixelHeight / -2.0f);
 				//D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
 				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 
@@ -549,7 +551,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 #pragma region StaticMethod
 
-const float Camera::worldToScreenRatio = 1000.0f;
+const float Camera::worldToScreenRatio = 5.0f;
 
 Camera* Camera::currentCamera = nullptr;
 
