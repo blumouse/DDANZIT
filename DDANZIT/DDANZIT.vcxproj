@@ -133,6 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoxCollider2D.cpp" />
+    <ClCompile Include="CircleCollider2D.cpp" />
     <ClCompile Include="Collision2D.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\D2DRenderer.cpp" />

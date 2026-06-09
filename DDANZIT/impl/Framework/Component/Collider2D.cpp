@@ -16,6 +16,7 @@ Collider2D::Collider2D(GameObject* pGameObject) : Component(pGameObject), _offse
 Collider2D::Collider2D(const Collider2D& other) : Component(other)
 {
 	// 강체보다 늦게 복사된 뒤에 그걸 가져와야하네.. 하지마이씨
+	// TODO_LATER
 }
 
 
@@ -43,9 +44,9 @@ Component* Collider2D::Clone() const
 
 #pragma region Properties
 
-const Rigidbody2D Collider2D::attachedRigidBody() const 
+Rigidbody2D* Collider2D::attachedRigidBody() const 
 { 
-	return *attachedBody; 
+	return attachedBody; 
 }
 
 #pragma endregion
@@ -54,19 +55,47 @@ const Rigidbody2D Collider2D::attachedRigidBody() const
 
 #pragma region Methods
 
-bool Collider2D::IsNearby(const Collider2D& other)
+bool Collider2D::IsNearby(Collider2D* other)
 {
-	// TODO
-	// 다른쪽 pos scale rot offset size 까지 해서! 대략적인 크기로 검사
+	// pos scale offset size 까지 해서! 대략적인 크기로 검사
 	// 대략적인 크기란 뭘까? ㅎ.. 사각형기준 두배? (최악 90도 회전이면 대강..)
 	// -> 걍 대각선 지름의 원을 가정해서 distance 검사하면 된다 와
 
-	Vector2 myOffsetPos;
+	Vector2 myOffsetPos = transform()->position() + _offset;
+	Vector2 otherOffsetPos = other->transform()->position() + other->_offset;
+
+	Vector2 myScaleSize = Vector2(transform()->scale().x * _size.x, transform()->scale().y * _size.y);
+	Vector2 otherScaleSize = Vector2(other->transform()->scale().x * other->_size.x, other->transform()->scale().y * other->_size.y);
+
+	float myRadius = myScaleSize.Length() * 0.5f;			// TODO?: 이걸 캐싱하면 좋다 루트씌워서
+	float otherRadius = otherScaleSize.Length() * 0.5f;
+
+	float radiusSum = myRadius + otherRadius;
+
+
+	if (myOffsetPos.DistanceSquared(otherOffsetPos) <= (radiusSum * radiusSum))
+		return true;
+
+	return false;
 }
 
-bool Collider2D::IsCollideWith(const Collider2D& other)
+bool Collider2D::IsCollideWith(Collider2D* other)
 {
+	// 일단 둘다 원 기준 땡처리
 
+	Vector2 myOffsetPos = transform()->position() + _offset;
+	Vector2 otherOffsetPos = other->transform()->position() + other->_offset;
+
+	float myRadius = transform()->scale().x * _size.x * 0.5f;
+	float otherRadius = other->transform()->scale().x * other->_size.x * 0.5f;
+
+	float radiusSum = myRadius + otherRadius;
+
+
+	if (myOffsetPos.DistanceSquared(otherOffsetPos) <= (radiusSum * radiusSum))
+		return true;
+
+	return false;
 }
 
 #pragma endregion

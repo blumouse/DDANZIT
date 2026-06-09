@@ -67,7 +67,7 @@ public:
 private:
 	Rigidbody2D* attachedBody;
 public:
-	const Rigidbody2D attachedRigidBody() const;	// 읽기만 하세요
+	Rigidbody2D* attachedRigidBody() const;
 
 	// 내부용
 protected:
@@ -83,8 +83,8 @@ protected:
 #pragma region Methods
 
 private:
-	bool IsNearby(const Collider2D& other);
-	bool IsCollideWith(const Collider2D& other);
+	bool IsNearby(Collider2D* other);
+	virtual bool IsCollideWith(Collider2D* other);
 
 #pragma endregion
 
@@ -127,6 +127,15 @@ public:
 
 #pragma endregion
 
+
+
+#pragma region Methods
+
+private:
+	bool IsCollideWith(Collider2D* other) override;
+
+#pragma endregion
+
 };
 
 
@@ -158,11 +167,18 @@ private:
 
 #pragma region Properties
 
-private:
-	float _radius;
 public:
-	float& radius() { return _radius; }
-	const float& radius() const { return _radius; }
+	float& radius() { return _size.x; }				// 엥 이게 돼?
+	const float& radius() const { return _size.x; }
+
+#pragma endregion
+
+
+
+#pragma region Methods
+
+private:
+	bool IsCollideWith(Collider2D* other) override;
 
 #pragma endregion
 
@@ -202,6 +218,15 @@ private:
 public:
 	Vector2& size() { return _size; }
 	const Vector2& size() const { return _size; }
+
+#pragma endregion
+
+
+
+#pragma region Methods
+
+private:
+	bool IsCollideWith(Collider2D* other) override;
 
 #pragma endregion
 

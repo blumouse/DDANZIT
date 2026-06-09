@@ -112,7 +112,7 @@ void Transform::SetDirection(Vector2 newDirection)
 		par = par->_parent;
 	}
 
-	_localDirection = newDirection - parentDirection;
+	_localDirection = (newDirection - parentDirection).Normalized();
 }
 
 Vector2 Transform::direction() const
@@ -126,7 +126,7 @@ Vector2 Transform::direction() const
 		par = par->_parent;
 	}
 
-	return worldDirection;
+	return worldDirection.Normalized();
 }
 
 
