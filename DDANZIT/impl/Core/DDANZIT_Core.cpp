@@ -298,34 +298,43 @@ void DDANZIT_Core::_OnTrigger()
     // rigid가 prevCollideList같은걸 들고있어야겟다 이거랑 또 비교
     // 
 
+    static vector<MonoBehavior*> execList;
+    static vector<Collider2D*> enteredColliderList;
+
 
     for (Rigidbody2D* rigid : rigidbody2DList)
     {
+        if (rigid->isKilled || !rigid->isActiveAndEnabled())
+            continue;
+
         // 1. 강체 리스트 비교, 하나 집어서 기준설정
 
 
         // rigid에서 쓸 것들 캐싱
         GameObject* go = rigid->_gameObject;
 
-        vector<MonoBehavior*> execList;
         go->GetComponents<MonoBehavior>(execList);
 
-        vector<Collider2D*> enteredColliderList;
 
-
-        // 2. 전체 콜라이더 순회
-        for (Collider2D* other : collider2DList)
+        // 2. 강체쪽의 콜라이더 집어서 비교 (여러 개일 수 있다)
+        for (Collider2D* col : rigid->attachedColliderList)
         {
-            if (other->_gameObject == go)       // 강체 자신의 콜라이더
+            if (!col->_isTrigger)           // 이 경우는 collision에서 검사합니다 (추후)
                 continue;
 
-            // 3. 강체쪽의 콜라이더 집어서 비교 (여러 개일 수 있다)
-            for (Collider2D* col : rigid->attachedColliderList)
+            // 3. 전체 콜라이더 순회
+            for (Collider2D* other : collider2DList)
             {
-                if (!col->IsNearby(*other))
+                if (other->isKilled || !other->isActiveAndEnabled())
                     continue;
 
-                if (!col->IsCollideWith(*other))
+                if (other->_gameObject == go)       // 강체 자신의 콜라이더
+                    continue;
+
+                if (!col->IsNearby(other))
+                    continue;
+
+                if (!col->IsCollideWith(other))
                     continue;
 
 
@@ -341,7 +350,7 @@ void DDANZIT_Core::_OnTrigger()
                     {
                         for (MonoBehavior* b : execList)
                         {
-                            if (b->activeOnTriggerStay2D)
+                            if (b->activeOnTriggerStay2D && b->isActiveAndEnabled())
                                 b->OnTriggerStay2D(prev);
                         }
 
@@ -355,7 +364,7 @@ void DDANZIT_Core::_OnTrigger()
                 {
                     for (MonoBehavior* b : execList)
                     {
-                        if (b->activeOnTriggerEnter2D)
+                        if (b->activeOnTriggerEnter2D && b->isActiveAndEnabled())
                             b->OnTriggerEnter2D(other);
                     }
 
@@ -364,7 +373,7 @@ void DDANZIT_Core::_OnTrigger()
                 }
 
             }
-        } // 전체 콜라이더 순회
+        }
 
 
         // 6. 나간 놈들 찾기, 저번 프레임 리스트 중 이번에 충돌 안한거 Exit 호출하고 빼버리기
@@ -374,7 +383,7 @@ void DDANZIT_Core::_OnTrigger()
             {
                 for (MonoBehavior* b : execList)
                 {
-                    if (b->activeOnTriggerExit2D)
+                    if (b->activeOnTriggerExit2D && b->isActiveAndEnabled())
                         b->OnTriggerExit2D(prev);
                 }
 
@@ -394,6 +403,9 @@ void DDANZIT_Core::_OnTrigger()
     
         
         // 강체 하나 검사 끝;
+        execList.clear();
+        enteredColliderList.clear();
+
     }
 
 }
