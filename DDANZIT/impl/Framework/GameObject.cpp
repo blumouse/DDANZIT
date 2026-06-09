@@ -282,7 +282,7 @@ SpriteRenderer* GameObject::AddComponent<SpriteRenderer>()
 }
 
 template <>
-Collider2D* GameObject::AddComponent<Collider2D>()
+BoxCollider2D* GameObject::AddComponent<BoxCollider2D>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
@@ -290,18 +290,47 @@ Collider2D* GameObject::AddComponent<Collider2D>()
 		return nullptr;
 	}
 
-	Collider2D* collider = new Collider2D(this);
+	BoxCollider2D* collider = new BoxCollider2D(this);
 
 	Rigidbody2D* rigid = nullptr;
 
 	for (Component* comp : pComponentList)
 	{
 		if (rigid = dynamic_cast<Rigidbody2D*>(comp))
+		{
+			collider->attachedBody = rigid;
+			rigid->attachedColliderList.push_back(collider);
 			break;
+		}
 	}
 
-	if (rigid != nullptr)
-		collider->attachedBody = rigid;
+	pComponentList.push_back(collider);
+
+	return collider;
+}
+
+template <>
+CircleCollider2D* GameObject::AddComponent<CircleCollider2D>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	CircleCollider2D* collider = new CircleCollider2D(this);
+
+	Rigidbody2D* rigid = nullptr;
+
+	for (Component* comp : pComponentList)
+	{
+		if (rigid = dynamic_cast<Rigidbody2D*>(comp))
+		{
+			rigid->attachedColliderList.push_back(collider);
+			collider->attachedBody = rigid;
+			break;
+		}
+	}
 
 	pComponentList.push_back(collider);
 
@@ -324,11 +353,8 @@ Rigidbody2D* GameObject::AddComponent<Rigidbody2D>()
 	for (Component* comp : pComponentList)
 	{
 		if (collider = dynamic_cast<Collider2D*>(comp))
-			break;
+			collider->attachedBody = rigidbody;			// 여러개일수
 	}
-
-	if (collider != nullptr)
-		collider->attachedBody = rigidbody;
 
 	pComponentList.push_back(rigidbody);
 

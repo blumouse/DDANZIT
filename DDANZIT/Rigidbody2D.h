@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Component.h"
 
 
@@ -13,13 +15,13 @@ public:
 
 #pragma region Constructor
 
-protected:
-	Rigidbody2D() = default;
-	Rigidbody2D(const Rigidbody2D& other);
+public:
+	Rigidbody2D() = delete;
+	Rigidbody2D(const Rigidbody2D& other) = default;
 	Rigidbody2D(GameObject* pGameObject);
 
 public:
-	virtual ~Rigidbody2D() = default;
+	~Rigidbody2D() = default;
 
 #pragma endregion
 
@@ -28,7 +30,24 @@ public:
 #pragma region Clone
 
 private:
-	virtual Component* Clone() const override;
+	Component* Clone() const override;
+
+#pragma endregion
+
+
+
+#pragma region Properties
+
+private:
+	std::vector<Collider2D*> attachedColliderList;
+public:
+	std::vector<Collider2D*> GetAttachedColliders() const;
+
+
+private:
+	std::vector<Collider2D*> prevCollideList;
+
+#pragma endregion
 
 };
 

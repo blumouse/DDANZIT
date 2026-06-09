@@ -263,7 +263,7 @@ void DDANZIT_Run()
                 {
                     gameCore._FixedUpdate();
 
-                    // gameCore._OnTrigger...();
+                    gameCore._OnTrigger();
                     // gameCore._OnCollision...();
 
                     // gameCore._WaitForFixedUpdate();

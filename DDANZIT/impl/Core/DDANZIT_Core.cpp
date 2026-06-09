@@ -5,15 +5,21 @@
 #include "SceneManager.h"
 #include "Scene.h"
 
-#include "Camera.h"
-#include "IDrawable.h"
-
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
 #include "MonoBehavior.h"
 
+#include "Collider2D.h"
+#include "Rigidbody2D.h"
+
+#include "Camera.h"
+#include "IDrawable.h"
+
+#ifdef RENDER_MODE_WINGDI
 #include "RenderHelp.h"
+
+#endif // RENDER_MODE_WINGDI
 
 using namespace std;
 
@@ -228,6 +234,9 @@ queue<MonoBehavior*> DDANZIT_Core::onEnableExecQueue;
 queue<MonoBehavior*> DDANZIT_Core::startExecQueue;
 
 vector<MonoBehavior*> DDANZIT_Core::fixedUpdateExecList;
+
+vector<MonoBehavior*> DDANZIT_Core::onTriggerStayExecList;
+
 vector<MonoBehavior*> DDANZIT_Core::updateExecList;
 vector<MonoBehavior*> DDANZIT_Core::lateUpdateExecList;
 
@@ -278,6 +287,117 @@ void DDANZIT_Core::_FixedUpdate()
             b->FixedUpdate();
     }
 }
+
+
+void DDANZIT_Core::_OnTrigger()
+{
+    // 먼저 컴포넌트 리스트 순회돌면서 충돌한거 체크.. rigid : collider로
+    // 새로 충돌한건 Enter 호출 및 exec리스트에 추가
+    // 기존에 충돌했던거 이번에도 충돌이면 stayExec 그대로 호출
+    // 나갔으면 Exit 호출 인데..
+    // rigid가 prevCollideList같은걸 들고있어야겟다 이거랑 또 비교
+    // 
+
+
+    for (Rigidbody2D* rigid : rigidbody2DList)
+    {
+        // 1. 강체 리스트 비교, 하나 집어서 기준설정
+
+
+        // rigid에서 쓸 것들 캐싱
+        GameObject* go = rigid->_gameObject;
+
+        vector<MonoBehavior*> execList;
+        go->GetComponents<MonoBehavior>(execList);
+
+        vector<Collider2D*> enteredColliderList;
+
+
+        // 2. 전체 콜라이더 순회
+        for (Collider2D* other : collider2DList)
+        {
+            if (other->_gameObject == go)       // 강체 자신의 콜라이더
+                continue;
+
+            // 3. 강체쪽의 콜라이더 집어서 비교 (여러 개일 수 있다)
+            for (Collider2D* col : rigid->attachedColliderList)
+            {
+                if (!col->IsNearby(*other))
+                    continue;
+
+                if (!col->IsCollideWith(*other))
+                    continue;
+
+
+                // 여기까지 왔으면 충돌
+
+                bool isNew = true;        // 더티체크
+
+                // 4. 와 충돌이다! 이전 프레임의 충돌여부 검사
+                for (Collider2D* prev : rigid->prevCollideList)     // 미띤
+                {
+                    // 5.1 저번 프레임에도 충돌이었어! Stay 호출해주기
+                    if (other == prev)
+                    {
+                        for (MonoBehavior* b : execList)
+                        {
+                            if (b->activeOnTriggerStay2D)
+                                b->OnTriggerStay2D(prev);
+                        }
+
+                        isNew = false;
+                        prev->hasCollided = true;       // 계속 충돌상태인지의 더티체크
+                    }
+                }
+
+                // 5.2 어라 새로운 놈이네 Enter 호출해주고서 기록!
+                if (isNew)
+                {
+                    for (MonoBehavior* b : execList)
+                    {
+                        if (b->activeOnTriggerEnter2D)
+                            b->OnTriggerEnter2D(other);
+                    }
+
+                    // 잠시 여기다 보관해두자
+                    enteredColliderList.push_back(other);
+                }
+
+            }
+        } // 전체 콜라이더 순회
+
+
+        // 6. 나간 놈들 찾기, 저번 프레임 리스트 중 이번에 충돌 안한거 Exit 호출하고 빼버리기
+        for (Collider2D* prev : rigid->prevCollideList)
+        {
+            if (!prev->hasCollided)
+            {
+                for (MonoBehavior* b : execList)
+                {
+                    if (b->activeOnTriggerExit2D)
+                        b->OnTriggerExit2D(prev);
+                }
+
+                rigid->prevCollideList.erase(remove(
+                    rigid->prevCollideList.begin(),
+                    rigid->prevCollideList.end(), prev),
+                    rigid->prevCollideList.end());
+            }
+        }
+
+
+        // 7. 새로 충돌한놈들 보관하기
+        // 괜찮겠지? 다썼으니께
+        rigid->prevCollideList.reserve(rigid->prevCollideList.size() + enteredColliderList.size());
+
+        rigid->prevCollideList.insert(rigid->prevCollideList.end(), enteredColliderList.begin(), enteredColliderList.end());
+    
+        
+        // 강체 하나 검사 끝;
+    }
+
+}
+
 
 void DDANZIT_Core::_Update()
 {
@@ -373,6 +493,7 @@ void DDANZIT_Core::DestroyScheduled()
         GameObject* gameObject = destroyScheduledQueue.front();
         Scene* targetScene = gameObject->_scene;
 
+        // 컴포넌트 리스트 탈퇴... 는 개별 소멸자에서 할까
 
         // 씬 / 하이라키(루트)에서 빼버리기
         targetScene->RemoveFromHierarchy(gameObject);
@@ -382,7 +503,7 @@ void DDANZIT_Core::DestroyScheduled()
 
 
         // 삭제!
-        delete destroyScheduledQueue.front();
+        delete gameObject;
         destroyScheduledQueue.pop();
     }
 }

@@ -72,6 +72,9 @@ public:
 	friend class GameObject;
 	friend class MonoBehavior;
 
+	friend class Collider2D;
+	friend class Rigidbody2D;
+
 #ifdef PROPS_MODE_2D
 
 	friend class Draw2D;
@@ -168,6 +171,9 @@ private:
 	static std::queue<MonoBehavior*> startExecQueue;
 
 	static std::vector<MonoBehavior*> fixedUpdateExecList;
+
+	static std::vector<MonoBehavior*> onTriggerStayExecList;
+
 	static std::vector<MonoBehavior*> updateExecList;
 	static std::vector<MonoBehavior*> lateUpdateExecList;
 
@@ -204,6 +210,8 @@ private:
 private:
 	static std::vector<Collider2D*> collider2DList;
 	static std::vector<Rigidbody2D*> rigidbody2DList;
+
+	void RefreshCollided();
 
 #pragma endregion
 

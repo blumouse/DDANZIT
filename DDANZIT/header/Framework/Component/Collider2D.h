@@ -32,7 +32,7 @@ protected:
 	Collider2D(GameObject* pGameObject);
 
 public:
-	virtual ~Collider2D() = default;
+	virtual ~Collider2D();
 
 #pragma endregion
 
@@ -72,6 +72,7 @@ public:
 	// 내부용
 protected:
 	Vector2 _size;		// 살짝훑기용
+	bool hasCollided = false;	// 합치는건 생각말자
 
 	ColliderType type;
 
@@ -82,7 +83,7 @@ protected:
 #pragma region Methods
 
 private:
-	bool IsNearby(Vector2 otherOffsetSize);
+	bool IsNearby(const Collider2D& other);
 	bool IsCollideWith(const Collider2D& other);
 
 #pragma endregion
