@@ -29,6 +29,7 @@ typedef enum class SpriteIndex
 
 
 #define USE_DEBUG
+#define USE_DEBUG_TUI
 //#define USE_EDITOR
 
 

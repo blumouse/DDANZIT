@@ -2,16 +2,27 @@
 
 #include "DefineOption.h"
 
-#include "DDANZIT_Core.h"
 #include "Application.h"
-#include "SceneManager.h"
-#include "Scene.h"
 #include "GameTime.h"
 #include "Input.h"
 
+#ifdef USE_DEBUG
+#include "Debug.h"
+
+#endif // USE_DEBUG
+
+
+#include "DDANZIT_Core.h"
+#include "SceneManager.h"
+#include "Scene.h"
+
 #include "INC_Windows.h"
 #include "Utillity.h"
+
+#ifdef RENDER_MODE_WINGDI
 #include "RenderHelp.h"
+
+#endif // RENDER_MODE_WINGDI
 
 #include <vector>
 #include <queue>
@@ -30,7 +41,7 @@ using namespace std;
 // 
 // UI..? 레이캐스트..?
 // 
-// 디버그용 화면
+// 디버그용 화면      <- 전에 타임스케일링부터 돼야겠어
 // 
 // 인스턴트를 위한 컴포넌트별 복사생성자와 클론과 순서/특수처리 ...
 // 
@@ -115,6 +126,12 @@ namespace
 
     // 내부로직에서 접근가능하게 빼기
     DDANZIT_Core gameCore;
+
+#ifdef USE_DEBUG
+    Debug debug;
+
+#endif // USE_DEBUG
+
 
 
     // Pipeline

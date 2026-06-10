@@ -42,6 +42,12 @@ Scene* SceneManager::GetActiveScene()
 
 Scene* SceneManager::CreateScene(const string& name)
 {
+	if (GetSceneByName(name))
+	{
+		// DEBUG: 씬 이름은 중복불가에용
+		return nullptr;
+	}
+
 	Scene* newScene = new Scene(name);
 
 	pSceneInstanceList.push_back(newScene);
@@ -53,6 +59,12 @@ Scene* SceneManager::CreateScene(const string& name)
 
 Scene* SceneManager::CreateScene(const string& name, LoadSceneMode mode)
 {
+	if (GetSceneByName(name))
+	{
+		// DEBUG: 씬 이름은 중복불가에용
+		return nullptr;
+	}
+
 	Scene* newScene = new Scene(name);
 
 	pSceneInstanceList.push_back(newScene);

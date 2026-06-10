@@ -24,6 +24,7 @@ class GameObject
 public:
 	friend class DDANZIT_Core;
 	friend class SceneManager;
+	friend class Debug;
 
 	friend class Scene;
 	friend class Hierarchy;
@@ -33,6 +34,7 @@ public:
 	friend class Component;
 	friend class Transform;
 	friend class MonoBehavior;
+
 
 #pragma region Constructor
 

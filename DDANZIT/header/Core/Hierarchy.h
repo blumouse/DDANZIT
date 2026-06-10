@@ -17,6 +17,7 @@ class Component;
 class Hierarchy
 {
 public:
+	friend class Debug;
 	friend class Scene;
 	friend class Transform;
 

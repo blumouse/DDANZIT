@@ -19,6 +19,7 @@ class SceneManager
 {
 	friend class DDANZIT_Core;
 	friend class GameObject;
+	friend class Debug;
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
 	friend void DDANZIT_Run();

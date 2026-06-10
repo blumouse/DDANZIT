@@ -14,6 +14,8 @@ class Component
 {
 public:
 	friend class DDANZIT_Core;
+	friend class Debug;
+
 	friend class GameObject;
 	friend class Transform;
 	friend class MonoBehavior;

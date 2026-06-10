@@ -3,26 +3,6 @@
 
 namespace learning
 {
-    class DebugConsole
-    {
-        DebugConsole(const DebugConsole&) = delete;
-        DebugConsole& operator=(const DebugConsole&) = delete;
-        DebugConsole(DebugConsole&&) = delete;
-        DebugConsole& operator=(DebugConsole&&) = delete;
-    public:
-        DebugConsole();
-        ~DebugConsole();
-
-        static void Show();
-
-        static void Hide();
-
-        static void SetTitle(const wchar_t* title);
-
-        static void ToggleShow();
-    };
-
-
     struct Vector2f
     {
         float x, y;
