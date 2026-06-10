@@ -19,6 +19,8 @@ void Mycode() {
 
 	GameObject* go = scene1->hierarchy.AddGameObject<MyObject>();
 	SpriteRenderer* sp = go->AddComponent<SpriteRenderer>();
+	go->AddComponent<CircleCollider2D>();
+	go->transform()->SetLocalAngle(10.0f);
 
 	sp->sprite = SpriteIndex::Sqaure;
 	sp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);

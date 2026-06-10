@@ -42,13 +42,21 @@ struct DrawCommand
 
 #ifdef USE_DEBUG
 
+enum class DebugDrawType
+{
+	BoxCollider,
+	CircleCollider,
+	CapsuleCollider,
+};
+
 struct DebugDrawCommand
 {
 	float posX;
 	float posY;
 	float scaleX;
 	float scaleY;
-	int debugDrawType;
+	float angle;
+	DebugDrawType debugDrawType;
 	int colorRGBA;
 };
 

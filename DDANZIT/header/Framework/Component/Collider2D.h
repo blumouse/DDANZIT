@@ -22,6 +22,8 @@ public:
 	friend class DDANZIT_Core;
 	friend class GameObject;
 	friend class Transform;
+	friend class Draw2D;
+
 	friend class BoxCollider2D;
 	friend class CircleCollider2D;
 	friend class CapsuleCollider2D;

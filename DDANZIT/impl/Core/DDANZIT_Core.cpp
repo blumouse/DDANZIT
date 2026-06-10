@@ -569,7 +569,7 @@ void DDANZIT_Core::RegisterCollider2DScheduled()
 
         collider2DList.push_back(col);
 
-        registerUpdateScheduledQueue.pop();
+        registerCollider2DScheduledQueue.pop();
     }
 }
 
@@ -584,7 +584,7 @@ void DDANZIT_Core::QuitCollider2DScheduled()
             collider2DList.end(), col),
             collider2DList.end());
 
-        quitUpdateScheduledQueue.pop();
+        quitCollider2DScheduledQueue.pop();
     }
 }
 
@@ -744,6 +744,7 @@ void DDANZIT_Core::_Clear()
     for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
     {
         drawCommandLists[i].clear();
+        debugDrawCommandLists[i].clear();
     }
 }
 
