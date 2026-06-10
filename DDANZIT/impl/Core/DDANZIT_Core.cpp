@@ -311,7 +311,11 @@ void DDANZIT_Core::_OnTrigger()
         // rigid에서 쓸 것들 캐싱
         GameObject* go = rigid->_gameObject;
 
-        go->GetComponents<MonoBehavior>(execList);
+        for (Component* comp : go->pComponentList)
+        {
+            if (MonoBehavior* targetComponent = dynamic_cast<MonoBehavior*>(comp))
+                execList.push_back(targetComponent);
+        }
 
 
         // 2. 강체쪽의 콜라이더 집어서 비교 (여러 개일 수 있다)

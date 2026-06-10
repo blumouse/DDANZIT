@@ -28,7 +28,7 @@ public:
 	Rigidbody2D(GameObject* pGameObject);
 
 public:
-	~Rigidbody2D() = default;
+	~Rigidbody2D();
 
 #pragma endregion
 

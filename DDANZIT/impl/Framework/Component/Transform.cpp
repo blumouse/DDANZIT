@@ -79,7 +79,12 @@ void Transform::SetLocalScale(Vector2 newScale)
 
 
 	vector<Collider2D*> colliders;
-	_gameObject->GetComponents<Collider2D>(colliders);
+
+	for (Component* comp : _gameObject->pComponentList)
+	{
+		if (Collider2D* targetComponent = dynamic_cast<Collider2D*>(comp))
+			colliders.push_back(targetComponent);
+	}
 
 	for (Collider2D* col : colliders)
 		col->SetBoundingRadius();
@@ -102,7 +107,12 @@ void Transform::SetScale(Vector2 newScale)
 
 
 	vector<Collider2D*> colliders;
-	_gameObject->GetComponents<Collider2D>(colliders);
+
+	for (Component* comp : _gameObject->pComponentList)
+	{
+		if (Collider2D* targetComponent = dynamic_cast<Collider2D*>(comp))
+			colliders.push_back(targetComponent);
+	}
 
 	for (Collider2D* col : colliders)
 		col->SetBoundingRadius();
