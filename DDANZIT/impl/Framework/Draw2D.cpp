@@ -58,23 +58,48 @@ void Draw2D::Draw()
 			((int)(c.b * 255.0f) << 8) |
 			((int)(c.a * 255.0f));
 
-		DDANZIT_Core::drawCommandLists[layer].push_back(
-			DrawCommand{
-				transform->position().x,
-				transform->position().y,
-				transform->scale().x,
-				transform->scale().y,
-				transform->angle(),
-				spriteRenderer->sprite,
-				colorRGBA,
-				spriteRenderer->flipX,
-				spriteRenderer->flipY,
-				false,
-				0,
-				0,
-				0,
-				0
-			});
+
+		if (spriteRenderer->useAtlas)
+		{
+			DDANZIT_Core::drawCommandLists[layer].push_back(
+				DrawCommand{
+					transform->position().x,
+					transform->position().y,
+					transform->scale().x,
+					transform->scale().y,
+					transform->angle(),
+					spriteRenderer->sprite,
+					colorRGBA,
+					spriteRenderer->flipX,
+					spriteRenderer->flipY,
+					true,
+					spriteRenderer->currentAtlas.pixel_OffsetX,
+					spriteRenderer->currentAtlas.pixel_OffsetY,
+					spriteRenderer->currentAtlas.pixel_Width,
+					spriteRenderer->currentAtlas.pixel_Height
+				});
+		}
+		else	// 그냥 통짜
+		{
+			DDANZIT_Core::drawCommandLists[layer].push_back(
+				DrawCommand{
+					transform->position().x,
+					transform->position().y,
+					transform->scale().x,
+					transform->scale().y,
+					transform->angle(),
+					spriteRenderer->sprite,
+					colorRGBA,
+					spriteRenderer->flipX,
+					spriteRenderer->flipY,
+					false,
+					0,
+					0,
+					0,
+					0
+				});
+		}
+
 	}
 
 	// TODO: 아틀라스를 만들어야하나 유니티에 어케돼있지?

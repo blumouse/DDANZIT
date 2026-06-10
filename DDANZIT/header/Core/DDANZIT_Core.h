@@ -34,10 +34,10 @@ struct DrawCommand
 	bool flipX;
 	bool flipY;
 	bool useAtlas;
+	int sliceOffsetX;
+	int sliceOffsetY;
 	int sliceWidth;
 	int sliceHeight;
-	int sliceIndexX;
-	int sliceIndexY;
 };
 
 #ifdef USE_DEBUG

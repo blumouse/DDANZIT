@@ -464,8 +464,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				if (cmd.useAtlas)
 				{
-					srcX = cmd.sliceWidth * cmd.sliceIndexX;
-					srcY = cmd.sliceHeight * cmd.sliceIndexY;
+					srcX = cmd.sliceOffsetX;
+					srcY = cmd.sliceOffsetY;
 
 					srcWidth = cmd.sliceWidth;
 					srcHeight = cmd.sliceHeight;
@@ -481,7 +481,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 
 				// ±×¸®±â~
-				D2D1_POINT_2F localOffset = D2D1::Point2F(pixelWidth / -2.0f, pixelHeight / -2.0f);
+				D2D1_POINT_2F localOffset = D2D1::Point2F(srcWidth / -2.0f, srcHeight / -2.0f);
 				//D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
 				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 
