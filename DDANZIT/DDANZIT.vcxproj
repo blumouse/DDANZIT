@@ -78,6 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -94,6 +95,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

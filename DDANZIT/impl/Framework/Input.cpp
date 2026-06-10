@@ -1,5 +1,6 @@
 #include "Input.h"
 
+#include <algorithm>
 #include "Camera.h"
 #include "DDANZIT_Core.h"
 
@@ -71,18 +72,19 @@ bool Input::GetKeyUp(KeyCode keyCode)
 
 Vector2 Input::GetAxis(const std::string& axisName)
 {
-	Vector2 axisVector = Vector2(0, 0);
+	Vector2 axisVector = Vector2(0.0f, 0.0f);
 
 	if (isKey.test(static_cast<size_t>(KeyCode::UpArrow)))
-		axisVector += Vector2(0, 1);
+		axisVector += Vector2(0.0f, 1.0f);
 	if (isKey.test(static_cast<size_t>(KeyCode::LeftArrow)))
-		axisVector += Vector2(-1, 0);
+		axisVector += Vector2(-1.0f, 0.0f);
 	if (isKey.test(static_cast<size_t>(KeyCode::DownArrow)))
-		axisVector += Vector2(0, -1);
+		axisVector += Vector2(0.0f, -1.0f);
 	if (isKey.test(static_cast<size_t>(KeyCode::RightArrow)))
-		axisVector += Vector2(1, 0);
+		axisVector += Vector2(1.0f, 0.0f);
 
-	axisVector.Normalize();
+	if (axisVector.x * axisVector.x + axisVector.y * axisVector.y > 1.0f)
+		axisVector.Normalize();
 
 	// 귀찮으니까 하드코딩함
 	if (axisName == "Horizontal")
@@ -98,37 +100,39 @@ Vector2 Input::GetAxis(const std::string& axisName)
 	else
 	{
 		// DEBUG: 그없
-		return Vector2(0, 0);
+		return Vector2(0.0f, 0.0f);
 	}
 }
 
 Vector2 Input::GetAxisRaw(const std::string& axisName)
 {
-	Vector2 axisVector = Vector2(0, 0);
+	Vector2 axisVector = Vector2(0.0f, 0.0f);
 
 	if (isKey.test(static_cast<size_t>(KeyCode::UpArrow)))
-		axisVector += Vector2(0, 1);
+		axisVector += Vector2(0.0f, 1.0f);
 	if (isKey.test(static_cast<size_t>(KeyCode::LeftArrow)))
-		axisVector += Vector2(-1, 0);
+		axisVector += Vector2(-1.0f, 0.0f);
 	if (isKey.test(static_cast<size_t>(KeyCode::DownArrow)))
-		axisVector += Vector2(0, -1);
+		axisVector += Vector2(0.0f, -1.0f);
 	if (isKey.test(static_cast<size_t>(KeyCode::RightArrow)))
-		axisVector += Vector2(1, 0);
+		axisVector += Vector2(1.0f, 0.0f);
 
 
 	if (axisName == "Horizontal")
 	{
 		axisVector.x = 0.0f;
+		axisVector.y = clamp(axisVector.y, -1.0f, 1.0f);
 		return axisVector;
 	}
 	else if (axisName == "Vertical")
 	{
 		axisVector.y = 0.0f;
+		axisVector.x = clamp(axisVector.x, -1.0f, 1.0f);
 		return axisVector;
 	}
 	else
 	{
 		// DEBUG: 그없
-		return Vector2(0, 0);
+		return Vector2(0.0f, 0.0f);
 	}
 }
