@@ -87,7 +87,7 @@ void Draw2D::Draw()
 			continue;
 
 
-		int colorRGBA = 0x00ff00ff;		// 초록
+		int colorRGBA = 0x44ff44ff;		// 초록
 		DebugDrawType type;
 
 		switch (col->type)

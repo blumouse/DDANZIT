@@ -314,11 +314,28 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
-				float x;
-				float y;
+				float relativeScaleX = cmd.scaleX;
+				float relativeScaleY = cmd.scaleY;
 
-				float relativeScaleX;
-				float relativeScaleY;
+
+				D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
+
+				D2D1_MATRIX_3X2_F scaleMatrix = D2D1::Matrix3x2F::Identity();
+				D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Identity();
+				D2D1_MATRIX_3X2_F transMatrix = D2D1::Matrix3x2F::Identity();
+
+
+				scaleMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleY, centerPos);
+				// 플립은 하나마나니까 생략;
+
+				rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+
+				transMatrix = D2D1::Matrix3x2F::Translation(
+					relativeCamX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
+					-relativeCamY + (float)DDANZIT_Core::height / 2.0f);
+
+				d2dcontext->SetTransform(scaleMatrix * rotMatrix * transMatrix);
+
 
 				UINT32 rgb;
 				float a;
@@ -327,12 +344,6 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				d2dbrush->SetColor(D2D1::ColorF(rgb, a));
 
-				if (cmd.angle != 0.0f)
-				{
-					D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, D2D1::Point2F(relativeCamX, relativeCamY));
-					d2dcontext->SetTransform(rotMatrix);
-				}
-				// 플립은 하나마나니까 생략;
 
 				switch (cmd.spriteIndex)
 				{
@@ -341,47 +352,25 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				case SpriteIndex::Sqaure:
 
-					relativeScaleX = cmd.scaleX;
-					relativeScaleY = cmd.scaleY;
-
-					x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f;
-					y = ((relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
-
-
-					d2dcontext->FillRectangle(D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio), d2dbrush);
+					d2dcontext->FillRectangle(D2D1::RectF(-50.0f, -50.0f, 50.0f, 50.0f), d2dbrush);
 
 					break;
 
 				case SpriteIndex::Circle:
 
-					relativeScaleX = cmd.scaleX;
-					relativeScaleY = cmd.scaleY;
-
-					x = relativeCamX * worldToScreenRatio + (float)DDANZIT_Core::width / 2.0f;
-					y = relativeCamY * worldToScreenRatio + (float)DDANZIT_Core::height / 2.0f;
-
-
-					d2dcontext->FillEllipse(
-						D2D1::Ellipse(
-							D2D1::Point2F(x, y),
-							(relativeScaleX / 2.0f) * worldToScreenRatio,
-							(relativeScaleY / 2.0f) * worldToScreenRatio),
-						d2dbrush);
+					d2dcontext->FillEllipse(D2D1::Ellipse(centerPos, 50.0f, 50.0f), d2dbrush);
 
 					break;
 
 				case SpriteIndex::Capsule:
 
-					// TODO
+					d2dcontext->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(-50.0f, -100.0f, 50.0f, 100.0f), 50.0f, 50.0f), d2dbrush);
 
 					break;
 				}
 
 
-				if (cmd.angle != 0.0f)
-				{
-					d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
-				}
+				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
 
 			}
 			else
@@ -403,8 +392,10 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeCamX = cmd.posX - camPosX;
 				float relativeCamY = cmd.posY - camPosY;
 
-				D2D1_POINT_2F centerPos = D2D1::Point2F((float)pBitmap->GetPixelSize().width, (float)pBitmap->GetPixelSize().height);
+				D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
 
+				float pixelWidth = (float)pBitmap->GetPixelSize().width;
+				float pixelHeight = (float)pBitmap->GetPixelSize().height;
 
 				// 크기
 				float relativeScaleX;
@@ -417,8 +408,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				}
 				else
 				{
-					relativeScaleX = centerPos.x * cmd.scaleX / worldToScreenRatio;
-					relativeScaleY = centerPos.y * cmd.scaleY / worldToScreenRatio;
+					relativeScaleX = cmd.scaleX / worldToScreenRatio;
+					relativeScaleY = cmd.scaleY / worldToScreenRatio;
 				}
 
 
@@ -434,15 +425,18 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				{
 					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, -relativeScaleY, centerPos);
 				}
+				else
+				{
+					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleY, centerPos);
+				}
 
 				// 회전
-				if (cmd.angle != 0.0f)
-					rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+				rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
 
 				// 이동
 				transMatrix = D2D1::Matrix3x2F::Translation(
-					(relativeCamX * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
-					(relativeCamY * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f);
+					relativeCamX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
+					-relativeCamY + (float)DDANZIT_Core::height / 2.0f);
 
 				// 적용!
 				d2dcontext->SetTransform(scaleFlipMatrix * rotMatrix * transMatrix);
@@ -481,13 +475,13 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 					srcX = 0;
 					srcY = 0;
 
-					srcWidth = pBitmap->GetPixelSize().width;
-					srcHeight = pBitmap->GetPixelSize().height;
+					srcWidth = pixelWidth;
+					srcHeight = pixelHeight;
 				}
 
 
 				// 그리기~
-				D2D1_POINT_2F localOffset = D2D1::Point2F(-centerPos.x, -centerPos.y);
+				D2D1_POINT_2F localOffset = D2D1::Point2F(pixelWidth / -2.0f, pixelHeight / -2.0f);
 				//D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
 				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 
@@ -525,11 +519,30 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 			float relativeCamX = cmd.posX - camPosX;
 			float relativeCamY = cmd.posY - camPosY;
 
-			float x;
-			float y;
+			float relativeScaleX = cmd.scaleX;
+			float relativeScaleY = cmd.scaleY;
 
-			float relativeScaleX;
-			float relativeScaleY;
+
+			D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
+
+			D2D1_MATRIX_3X2_F scaleMatrix = D2D1::Matrix3x2F::Identity();
+			D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Identity();
+			D2D1_MATRIX_3X2_F transMatrix = D2D1::Matrix3x2F::Identity();
+
+			if (cmd.debugDrawType == DebugDrawType::CircleCollider)
+				scaleMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleX, centerPos);
+			else
+				scaleMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleY, centerPos);
+			// 플립은 하나마나니까 생략;
+
+			rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+
+			transMatrix = D2D1::Matrix3x2F::Translation(
+				relativeCamX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
+				-relativeCamY + (float)DDANZIT_Core::height / 2.0f);
+
+			d2dcontext->SetTransform(scaleMatrix * rotMatrix * transMatrix);
+
 
 			UINT32 rgb;
 			float a;
@@ -538,65 +551,30 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 			d2dbrush->SetColor(D2D1::ColorF(rgb, a));
 
-			if (cmd.angle != 0.0f)
-			{
-				D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, D2D1::Point2F(relativeCamX, relativeCamY));
-				d2dcontext->SetTransform(rotMatrix);
-			}
 
-			// TODO: y축 뒤집어야되지 않나 포지션
 			switch (cmd.debugDrawType)
 			{
 			case DebugDrawType::BoxCollider:
 
-				relativeScaleX = cmd.scaleX;
-				relativeScaleY = cmd.scaleY;
-
-				x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f;
-				y = (-(relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
-
-
-				d2dcontext->DrawRectangle(
-						D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y - relativeScaleY * worldToScreenRatio),
-					d2dbrush,
-					3.0f);
+				d2dcontext->DrawRectangle(D2D1::RectF(-50.0f, -50.0f, 50.0f, 50.0f), d2dbrush);
 
 				break;
 
 			case DebugDrawType::CircleCollider:
 
-				d2dcontext->DrawEllipse(
-					D2D1::Ellipse(
-						D2D1::Point2F(cmd.posX, -cmd.posY), cmd.scaleX, cmd.scaleX),
-					d2dbrush,
-					3.0f);
+				d2dcontext->DrawEllipse(D2D1::Ellipse(centerPos, 50.0f, 50.0f), d2dbrush);
 
 				break;
 
 			case DebugDrawType::CapsuleCollider:
 
-				//relativeScaleX = cmd.scaleX;
-				//relativeScaleY = cmd.scaleY;
-
-				//x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f;
-				//y = (-(relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
-
-
-				//d2dcontext->DrawRoundedRectangle(
-				//	D2D1::RoundedRect(
-				//		D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y - relativeScaleY * worldToScreenRatio),
-				//	25.0f,		// ??
-				//	25.0f
-				//), d2dbrush, 3.0f);
+				d2dcontext->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(-50.0f, -100.0f, 50.0f, 100.0f), 50.0f, 50.0f), d2dbrush);
 
 				break;
 			}
 
 
-			if (cmd.angle != 0.0f)
-			{
-				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
-			}
+			d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
 
 		}
 	}
