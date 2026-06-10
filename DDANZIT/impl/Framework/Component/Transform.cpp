@@ -5,6 +5,7 @@
 #include "Scene.h"
 
 #include "GameObject.h"
+#include "Collider2D.h"
 
 #ifdef PROPS_MODE_2D
 #include "Draw2D.h"
@@ -50,7 +51,7 @@ void Transform::SetPosition(Vector2 newPosition)
 
 	while (par != HIERARCY_ROOT)
 	{
-		parentPosition += par->_parent->_localPosition;
+		parentPosition += par->_localPosition;
 		par = par->_parent;
 	}
 
@@ -64,26 +65,47 @@ Vector2 Transform::position() const
 
 	while (par != HIERARCY_ROOT)
 	{
-		worldPosition += par->_parent->_localPosition;
+		worldPosition += par->_localPosition;
 		par = par->_parent;
 	}
 
 	return worldPosition;
 }
 
+// 콜라이더에 전파
+void Transform::SetLocalScale(Vector2 newScale)
+{
+	_localScale = newScale;
+
+
+	vector<Collider2D*> colliders;
+	_gameObject->GetComponents<Collider2D>(colliders);
+
+	for (Collider2D* col : colliders)
+		col->SetBoundingRadius();
+}
 
 void Transform::SetScale(Vector2 newScale)
 {
-	Vector2 parentScale = Vector2(0, 0);
+	Vector2 parentScale = Vector2(1.0f, 1.0f);
 	Transform* par = _parent;
 
 	while (par != HIERARCY_ROOT)
 	{
-		parentScale += par->_parent->_localScale;
+		parentScale.x *= par->_localScale.x;
+		parentScale.y *= par->_localScale.y;
 		par = par->_parent;
 	}
 
-	_localScale = newScale - parentScale;
+	_localScale.x = newScale.x / parentScale.x;
+	_localScale.y = newScale.y / parentScale.y;
+
+
+	vector<Collider2D*> colliders;
+	_gameObject->GetComponents<Collider2D>(colliders);
+
+	for (Collider2D* col : colliders)
+		col->SetBoundingRadius();
 }
 
 Vector2 Transform::scale() const
@@ -93,7 +115,8 @@ Vector2 Transform::scale() const
 
 	while (par != HIERARCY_ROOT)
 	{
-		worldScale += par->_parent->_localScale;
+		worldScale.x *= par->_localScale.x;
+		worldScale.y *= par->_localScale.y;
 		par = par->_parent;
 	}
 
@@ -108,7 +131,7 @@ void Transform::SetDirection(Vector2 newDirection)
 
 	while (par != HIERARCY_ROOT)
 	{
-		parentDirection += par->_parent->_localDirection;
+		parentDirection += par->_localDirection;
 		par = par->_parent;
 	}
 
@@ -122,7 +145,7 @@ Vector2 Transform::direction() const
 
 	while (par != HIERARCY_ROOT)
 	{
-		worldDirection += par->_parent->_localDirection;
+		worldDirection += par->_localDirection;
 		par = par->_parent;
 	}
 
@@ -130,7 +153,7 @@ Vector2 Transform::direction() const
 }
 
 
-void Transform::SetAngle(float degree)
+void Transform::SetLocalAngle(float degree)
 { 
 	float radians = degree * DEG2RAD;
 

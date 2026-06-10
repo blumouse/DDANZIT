@@ -304,6 +304,9 @@ BoxCollider2D* GameObject::AddComponent<BoxCollider2D>()
 		}
 	}
 
+
+	DDANZIT_Core::RegisterCollider2DList(collider);
+
 	pComponentList.push_back(collider);
 
 	return collider;
@@ -332,6 +335,9 @@ CircleCollider2D* GameObject::AddComponent<CircleCollider2D>()
 		}
 	}
 
+
+	DDANZIT_Core::RegisterCollider2DList(collider);
+
 	pComponentList.push_back(collider);
 
 	return collider;
@@ -355,6 +361,9 @@ Rigidbody2D* GameObject::AddComponent<Rigidbody2D>()
 		if (collider = dynamic_cast<Collider2D*>(comp))
 			collider->attachedBody = rigidbody;			// 여러개일수
 	}
+
+
+	DDANZIT_Core::RegisterRigidbody2DList(rigidbody);
 
 	pComponentList.push_back(rigidbody);
 
@@ -575,6 +584,14 @@ void GameObject::Destroy(GameObject* gameObject)
 
 			if (b->activeOnDestroy)
 				DDANZIT_Core::onDestroyExecQueue.push(b);
+		}
+		else if (Collider2D* col = dynamic_cast<Collider2D*>(comp))
+		{
+			DDANZIT_Core::QuitCollider2DList(col);
+		}
+		else if (Rigidbody2D* rigid = dynamic_cast<Rigidbody2D*>(comp))
+		{
+			DDANZIT_Core::QuitRigidbody2DList(rigid);
 		}
 	}
 

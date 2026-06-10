@@ -21,6 +21,10 @@ class Collider2D : public Component
 public:
 	friend class DDANZIT_Core;
 	friend class GameObject;
+	friend class Transform;
+	friend class BoxCollider2D;
+	friend class CircleCollider2D;
+	friend class CapsuleCollider2D;
 	friend class Rigidbody2D;
 
 
@@ -49,7 +53,7 @@ private:
 
 #pragma region Properties
 
-private:
+protected:
 	bool _isTrigger = true;			// 일단 기본이 활성입니다
 
 public:
@@ -57,24 +61,28 @@ public:
 	const bool& isTrigger() const { return _isTrigger; }
 
 
-private:
+protected:
 	Vector2 _offset;
 public:
 	Vector2& offset() { return _offset; }
 	const Vector2& offset() const { return _offset; }
 
 	
-private:
+protected:
 	Rigidbody2D* attachedBody;
 public:
 	Rigidbody2D* attachedRigidBody() const;
 
+
+public:
+	ColliderType type;		// 대강 쓰자
+
 	// 내부용
 protected:
-	Vector2 _size;		// 살짝훑기용
-	bool hasCollided = false;	// 합치는건 생각말자
+	Vector2 _size;		// 기본값
+	float boundingRadius;
 
-	ColliderType type;
+	bool hasCollided = false;	// 합치는건 생각말자
 
 #pragma endregion
 
@@ -82,7 +90,10 @@ protected:
 
 #pragma region Methods
 
-private:
+protected:
+	void SetBoundingRadius();		// 헬퍼 본인이 부르고 트렌스폼에서 부른다
+
+protected:
 	bool IsNearby(Collider2D* other);
 	virtual bool IsCollideWith(Collider2D* other);
 
@@ -122,7 +133,7 @@ private:
 #pragma region Properties
 
 public:
-	Vector2& size() { return _size; }
+	void SetSize(Vector2 newSize);
 	const Vector2& size() const { return _size; }
 
 #pragma endregion
@@ -168,7 +179,7 @@ private:
 #pragma region Properties
 
 public:
-	float& radius() { return _size.x; }				// 엥 이게 돼?
+	void SetRadius(float newRadius);		// y값은 무시
 	const float& radius() const { return _size.x; }
 
 #pragma endregion
@@ -214,9 +225,10 @@ private:
 #pragma region Properties
 
 private:
-	Vector2 _size;
+	bool direction;		// false is Horizontal
+
 public:
-	Vector2& size() { return _size; }
+	void SetSize();
 	const Vector2& size() const { return _size; }
 
 #pragma endregion

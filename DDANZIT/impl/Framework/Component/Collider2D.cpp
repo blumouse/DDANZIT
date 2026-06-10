@@ -7,10 +7,11 @@
 
 #pragma region Constructor
 
-Collider2D::Collider2D(GameObject* pGameObject) : Component(pGameObject), _offset(Vector2(0.0f, 0.0f)), attachedBody(nullptr), _size(Vector2(1.0f, 1.0f))
+Collider2D::Collider2D(GameObject* pGameObject) 
+	: Component(pGameObject), _offset(Vector2(0.0f, 0.0f)), attachedBody(nullptr), _size(Vector2(1.0f, 1.0f))
 {
-	// 생성자에서 넣자
-	DDANZIT_Core::collider2DList.push_back(this);
+	SetBoundingRadius();
+
 }
 
 Collider2D::Collider2D(const Collider2D& other) : Component(other)
@@ -22,10 +23,6 @@ Collider2D::Collider2D(const Collider2D& other) : Component(other)
 
 Collider2D::~Collider2D()
 {
-	DDANZIT_Core::collider2DList.erase(remove(
-		DDANZIT_Core::collider2DList.begin(),
-		DDANZIT_Core::collider2DList.end(), this),
-		DDANZIT_Core::collider2DList.end());
 }
 
 #pragma endregion
@@ -64,13 +61,7 @@ bool Collider2D::IsNearby(Collider2D* other)
 	Vector2 myOffsetPos = transform()->position() + _offset;
 	Vector2 otherOffsetPos = other->transform()->position() + other->_offset;
 
-	Vector2 myScaleSize = Vector2(transform()->scale().x * _size.x, transform()->scale().y * _size.y);
-	Vector2 otherScaleSize = Vector2(other->transform()->scale().x * other->_size.x, other->transform()->scale().y * other->_size.y);
-
-	float myRadius = myScaleSize.Length() * 0.5f;			// TODO?: 이걸 캐싱하면 좋다 루트씌워서
-	float otherRadius = otherScaleSize.Length() * 0.5f;
-
-	float radiusSum = myRadius + otherRadius;
+	float radiusSum = boundingRadius + other->boundingRadius;		// 캐싱!
 
 
 	if (myOffsetPos.DistanceSquared(otherOffsetPos) <= (radiusSum * radiusSum))
@@ -96,6 +87,12 @@ bool Collider2D::IsCollideWith(Collider2D* other)
 		return true;
 
 	return false;
+}
+
+
+void Collider2D::SetBoundingRadius()
+{
+	boundingRadius = Vector2(transform()->scale().x * _size.x, transform()->scale().y * _size.y).Length() * 0.5f;
 }
 
 #pragma endregion

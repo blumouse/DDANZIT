@@ -10,6 +10,7 @@
 CircleCollider2D::CircleCollider2D(GameObject* pGameObject) : Collider2D(pGameObject)
 {
 	type = ColliderType::Circle;
+	_size.y = 0.0f;
 }
 
 CircleCollider2D::CircleCollider2D(const CircleCollider2D& other) : Collider2D(other)
@@ -32,37 +33,53 @@ Component* CircleCollider2D::Clone() const
 
 
 
+#pragma region Clone
+
+void CircleCollider2D::SetRadius(float newRadius)
+{
+	_size.x = newRadius;
+
+	SetBoundingRadius();
+}
+
+#pragma endregion
+
+
+
 #pragma region Methods
 
-bool Collider2D::IsCollideWith(Collider2D* other)
+bool CircleCollider2D::IsCollideWith(Collider2D* other)
 {
-	if (other->type == ColliderType::Circle)
-	{
-		Vector2 myOffsetPos = transform()->position() + _offset;
-		Vector2 otherOffsetPos = other->transform()->position() + other->_offset;
-
-		float myRadius = transform()->scale().x * _size.x * 0.5f;
-		float otherRadius = other->transform()->scale().x * other->_size.x * 0.5f;
-
-		float radiusSum = myRadius + otherRadius;
+	return Collider2D::IsCollideWith(other);
 
 
-		if (myOffsetPos.DistanceSquared(otherOffsetPos) <= (radiusSum * radiusSum))
-			return true;
+	//if (other->type == ColliderType::Circle)
+	//{
+	//	Vector2 myOffsetPos = transform()->position() + _offset;
+	//	Vector2 otherOffsetPos = other->transform()->position() + other->_offset;
 
-		return false;
-	}
-	else if (other->type == ColliderType::Box)
-	{
-		// ¿∏ø¢
-	}
-	else
-	{
-		// DEBUG: πÃ¡§¿«
-		return false;
-	}
+	//	float myRadius = transform()->scale().x * _size.x * 0.5f;
+	//	float otherRadius = other->transform()->scale().x * other->_size.x * 0.5f;
 
-	return false;
+	//	float radiusSum = myRadius + otherRadius;
+
+
+	//	if (myOffsetPos.DistanceSquared(otherOffsetPos) <= (radiusSum * radiusSum))
+	//		return true;
+
+	//	return false;
+	//}
+	//else if (other->type == ColliderType::Box)
+	//{
+	//	// ¿∏ø¢
+	//}
+	//else
+	//{
+	//	// DEBUG: πÃ¡§¿«
+	//	return false;
+	//}
+
+	//return false;
 }
 
 #pragma endregion

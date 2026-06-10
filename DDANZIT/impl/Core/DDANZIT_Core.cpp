@@ -235,8 +235,6 @@ queue<MonoBehavior*> DDANZIT_Core::startExecQueue;
 
 vector<MonoBehavior*> DDANZIT_Core::fixedUpdateExecList;
 
-vector<MonoBehavior*> DDANZIT_Core::onTriggerStayExecList;
-
 vector<MonoBehavior*> DDANZIT_Core::updateExecList;
 vector<MonoBehavior*> DDANZIT_Core::lateUpdateExecList;
 
@@ -304,7 +302,7 @@ void DDANZIT_Core::_OnTrigger()
 
     for (Rigidbody2D* rigid : rigidbody2DList)
     {
-        if (rigid->isKilled || !rigid->isActiveAndEnabled())
+        if (rigid->isKilled || !rigid->isActiveAndEnabled() || rigid->bodyType == RigidBodyType2D::Static)
             continue;
 
         // 1. 강체 리스트 비교, 하나 집어서 기준설정
@@ -391,6 +389,11 @@ void DDANZIT_Core::_OnTrigger()
                     rigid->prevCollideList.begin(),
                     rigid->prevCollideList.end(), prev),
                     rigid->prevCollideList.end());
+            }
+            else
+            {
+                // 충돌처리 했던녀석들은 그대로 고이 보관, 플래그 초기화
+                prev->hasCollided = false;
             }
         }
 
@@ -544,8 +547,93 @@ void DDANZIT_Core::QuitUpdateExecLists(MonoBehavior* behavior)
 #pragma region Physics
 
 vector<Collider2D*> DDANZIT_Core::collider2DList;
-
 vector<Rigidbody2D*> DDANZIT_Core::rigidbody2DList;
+
+queue<Collider2D*> DDANZIT_Core::registerCollider2DScheduledQueue;
+queue<Collider2D*> DDANZIT_Core::quitCollider2DScheduledQueue;
+
+queue<Rigidbody2D*> DDANZIT_Core::registerRigidbody2DScheduledQueue;
+queue<Rigidbody2D*> DDANZIT_Core::quitRigidbody2DScheduledQueue;
+
+
+
+void DDANZIT_Core::RegisterCollider2DScheduled()
+{
+    while (!registerCollider2DScheduledQueue.empty())
+    {
+        Collider2D* col = registerCollider2DScheduledQueue.front();
+
+        collider2DList.push_back(col);
+
+        registerUpdateScheduledQueue.pop();
+    }
+}
+
+void DDANZIT_Core::QuitCollider2DScheduled()
+{
+    while (!quitCollider2DScheduledQueue.empty())
+    {
+        Collider2D* col = quitCollider2DScheduledQueue.front();
+
+        collider2DList.erase(remove(
+            collider2DList.begin(),
+            collider2DList.end(), col),
+            collider2DList.end());
+
+        quitUpdateScheduledQueue.pop();
+    }
+}
+
+
+void DDANZIT_Core::RegisterRigidbody2DScheduled()
+{
+    while (!registerRigidbody2DScheduledQueue.empty())
+    {
+        Rigidbody2D* rigid = registerRigidbody2DScheduledQueue.front();
+
+        rigidbody2DList.push_back(rigid);
+
+        registerRigidbody2DScheduledQueue.pop();
+    }
+}
+
+void DDANZIT_Core::QuitRigidbody2DScheduled()
+{
+    while (!quitRigidbody2DScheduledQueue.empty())
+    {
+        Rigidbody2D* rigid = quitRigidbody2DScheduledQueue.front();
+
+        rigidbody2DList.erase(remove(
+            rigidbody2DList.begin(),
+            rigidbody2DList.end(), rigid),
+            rigidbody2DList.end());
+
+        quitRigidbody2DScheduledQueue.pop();
+    }
+}
+
+
+void DDANZIT_Core::RegisterCollider2DList(Collider2D* collider)
+{
+    registerCollider2DScheduledQueue.push(collider);
+}
+
+void DDANZIT_Core::QuitCollider2DList(Collider2D* collider)
+{
+    quitCollider2DScheduledQueue.push(collider);
+}
+
+
+void DDANZIT_Core::RegisterRigidbody2DList(Rigidbody2D* rigidbody)
+{
+    registerRigidbody2DScheduledQueue.push(rigidbody);
+}
+
+void DDANZIT_Core::QuitRigidbody2DList(Rigidbody2D* rigidbody)
+{
+    quitRigidbody2DScheduledQueue.push(rigidbody);
+}
+
 
 #pragma endregion
 

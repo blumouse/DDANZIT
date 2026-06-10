@@ -70,7 +70,7 @@ public:
 private:
 	Vector2 _localScale;
 public:
-	Vector2& localScale() { return _localScale; }
+	void SetLocalScale(Vector2 newScale);
 	const Vector2& localScale() const { return _localScale; }
 
 public:
@@ -92,7 +92,7 @@ public:
 
 public:
 	// 보기좋은 degree, 일단 지금은 로컬그대로 놔둠
-	void SetAngle(float degree);
+	void SetLocalAngle(float degree);
 	float angle() const;
 
 

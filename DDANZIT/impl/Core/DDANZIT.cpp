@@ -255,6 +255,9 @@ void DDANZIT_Run()
             // 라이프사이클 / 오브젝트 정보 갱신
             gameCore.RegisterUpdateScheduled();
 
+            gameCore.RegisterCollider2DScheduled();
+            gameCore.RegisterRigidbody2DScheduled();
+
 
             /* DDANZIT_Update() */
             {
@@ -330,6 +333,9 @@ void DDANZIT_Run()
 
             // 라이프사이클 / 오브젝트 정보 갱신
             gameCore.QuitUpdateScheduled();
+
+            gameCore.QuitCollider2DScheduled();
+            gameCore.QuitRigidbody2DScheduled();
 
             gameCore.DestroyScheduled();
             

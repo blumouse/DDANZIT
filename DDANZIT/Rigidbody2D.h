@@ -4,6 +4,13 @@
 
 #include "Component.h"
 
+enum class RigidBodyType2D
+{
+	Dynamic,
+	Kinematic,
+	Static,
+};
+
 
 class Rigidbody2D : public Component
 {
@@ -37,6 +44,9 @@ private:
 
 
 #pragma region Properties
+
+public:
+	RigidBodyType2D bodyType = RigidBodyType2D::Kinematic;		// 을 디폴트로
 
 private:
 	std::vector<Collider2D*> attachedColliderList;
