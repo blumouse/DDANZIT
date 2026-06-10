@@ -297,7 +297,7 @@ void DDANZIT_Run()
                 time.Tick();
 
 
-                while (time.fFrameCount >= 200.0f)
+                while (time.fFrameCount >= time.fixedDeltaTime())
                 {
                     gameCore._FixedUpdate();
 
@@ -306,7 +306,7 @@ void DDANZIT_Run()
 
                     // gameCore._WaitForFixedUpdate();
 
-                    time.fFrameCount -= 200.0f;
+                    time.fFrameCount -= time.fixedDeltaTime();
                 }
 
 

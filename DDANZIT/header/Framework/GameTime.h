@@ -14,6 +14,7 @@ public:
 private:
     static GameTimer* pGameTimer;
     static float fFrameCount;
+    static float timeScale;
 
 private:
     void Init();
@@ -22,6 +23,8 @@ private:
     void Tick();
 
 public:
+    static float unscaledDeltaTime();
     static float deltaTime();
+    static float fixedDeltaTime();
 };
 

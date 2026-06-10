@@ -138,37 +138,37 @@ void ConsoleObject::Draw()
 }
 
 
-Frame::Frame(int startX, int startY, int width, int height) : ConsoleObject(startX, startY, width, height)
+ConsoleFrame::ConsoleFrame(int startX, int startY, int width, int height) : ConsoleObject(startX, startY, width, height)
 {
 }
 
-void Frame::Draw()
+void ConsoleFrame::Draw()
 {
 	// TODO 대강 | 이런걸로 그려
 }
 
 
-Text::Text(int startX, int startY, int width, int height, std::string label) : ConsoleObject(startX, startY, width, height)
+ConsoleText::ConsoleText(int startX, int startY, int width, int height, std::string label) : ConsoleObject(startX, startY, width, height)
 {
 }
 
-void Text::Draw()
+void ConsoleText::Draw()
 {
 }
 
 
-Button::Button(int startX, int startY, int width, int height, string label) : Text(startX, startY, width, height, label)
+ConsoleButton::ConsoleButton(int startX, int startY, int width, int height, string label) : ConsoleText(startX, startY, width, height, label)
 {
 	// "[ label ]" 형태이므로 길이는 글자수 + 4
 	width = text.length() + 4;
 }
 
-bool Button::IsClicked(int clickX, int clickY)
+bool ConsoleButton::IsClicked(int clickX, int clickY)
 {
 	return (clickX >= x && clickX < x + width && clickY == y);
 }
 
-void Button::Draw()
+void ConsoleButton::Draw()
 {
 	cout << text;
 }
@@ -182,7 +182,7 @@ void Debug::InitializeDebugInfo()
 	// 이때는 직접 발로 뛰면서 다 모든정보 수집하고 콘솔오브젝트 만들기
 	for (Scene* scene : SceneManager::pLoadedSceneList)
 	{
-		ChangedHierarchyInfo(scene->hierarchy.pRootGameObjectList, scene);
+		ChangedHierarchyInfo();
 	}
 	
 }
@@ -190,49 +190,90 @@ void Debug::InitializeDebugInfo()
 
 void Debug::ChangedSceneInfo()
 {
+	isSceneChanged = true;
 }
 
-void Debug::ChangedHierarchyInfo(std::vector<GameObject*>& gameObjectRoot, Scene* scene)
+void Debug::ChangedHierarchyInfo()
 {
-	string sceneName = scene->name();
-	// TODO: 루트 개수가 0개면 씬 없어진걸로 대강 치고 지워버리기
-
-	sceneHierarchyTree[sceneName].clear();
-	sceneHierarchyTree[sceneName].push_back(Button(hierarchyOffsetX, hierarchyOffsetY, sceneName.size(), 1, sceneName));
-	sceneHierarchyTree[sceneName].back().onClick = OnSceneButtonClick;
-
-
-	int offsetY = hierarchyOffsetY + 1;
-
-	for (GameObject* go : gameObjectRoot)
-	{
-		std::stack<std::pair<Transform*, int>> s;
-		s.push({ go->_transform, 1 });
-
-		while (!s.empty()) {
-			Transform* curr = s.top().first;
-			int depth = s.top().second;
-			s.pop();
-
-
-			string name = curr->_gameObject->_name;
-
-			sceneHierarchyTree[sceneName].push_back(Button(hierarchyOffsetX + depth, offsetY, name.size(), 1, name));
-			sceneHierarchyTree[sceneName].back().onClick = OnGameObjectButtonClick;
-			offsetY++;
-
-
-			for (int i = curr->childCount() - 1; i >= 0; --i) 
-				s.push({ curr->pChildList[i], depth + 1 });
-		}
-	}
+	isHierarchyChanged = true;
 }
 
 void Debug::UpdateDebugInfo()
+{
+	if (highlightedObject == nullptr)
+		return;
+
+
+}
+
+
+void Debug::DrawSceneList()
+{
+}
+
+void Debug::DrawHierarchy()
+{
+	for (auto p : loadedSceneList)
+	{
+		Scene* scene = p.first;
+		string sceneName = scene->name();
+
+		sceneHierarchyTree[scene].clear();
+
+		sceneHierarchyTree[scene].push_back({ nullptr, ConsoleButton(hierarchyOffsetX, hierarchyOffsetY, sceneName.size(), 1, sceneName) });
+		sceneHierarchyTree[scene].back().second.onClick = &Debug::OnSceneButtonClick;
+
+
+		int offsetY = hierarchyOffsetY + 1;
+
+		for (GameObject* go : scene->GetRootGameObjects())
+		{
+			std::stack<std::pair<Transform*, int>> s;
+			s.push({ go->_transform, 1 });
+
+			while (!s.empty()) {
+				Transform* curr = s.top().first;
+				int depth = s.top().second;
+				s.pop();
+
+
+				string name = curr->_gameObject->_name;
+
+				sceneHierarchyTree[scene].push_back({ curr->gameObject(), ConsoleButton(hierarchyOffsetX + depth, offsetY, name.size(), 1, name) });
+				sceneHierarchyTree[scene].back().second.onClick = &Debug::OnGameObjectButtonClick;
+				offsetY++;
+
+
+				for (int i = curr->childCount() - 1; i >= 0; --i)
+					s.push({ curr->pChildList[i], depth + 1 });
+			}
+		}
+
+		// TODO: Draw도 호출해야지
+
+	}
+}
+
+void Debug::DrawInspector()
+{
+}
+
+void Debug::DrawConsole()
 {
 }
 
 
 void Debug::DrawDebugConsole()
 {
+	DrawInspector();
+
+	if (isHierarchyChanged)
+		DrawHierarchy();
+
+	if (isSceneChanged)
+		DrawSceneList();
+
+
+	isSceneChanged = false;
+	isHierarchyChanged = false;
 }

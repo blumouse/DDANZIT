@@ -8,6 +8,8 @@
 
 class GameObject;
 class Scene;
+class Debug;
+
 
 class DebugConsole
 {
@@ -45,31 +47,31 @@ public:
     virtual void Draw();
 };
 
-class Frame : public ConsoleObject
+class ConsoleFrame : public ConsoleObject
 {
 public:
-    Frame(int startX, int startY, int width, int height);
+    ConsoleFrame(int startX, int startY, int width, int height);
 
     void Draw() override;
 };
 
-class Text : public ConsoleObject
+class ConsoleText : public ConsoleObject
 {
 public:
     std::string text;
 
-    Text(int startX, int startY, int width, int height, std::string label);
+    ConsoleText(int startX, int startY, int width, int height, std::string label);
 
     void Draw() override;
 };
 
-class Button : public Text
+class ConsoleButton : public ConsoleText
 {
 public:
     //임시
     void (Debug::*onClick)() = nullptr;
 
-    Button(int startX, int startY, int width, int height, std::string label);
+    ConsoleButton(int startX, int startY, int width, int height, std::string label);
 
     // 마우스 좌표가 들어왔을 때 자기 영역인지 확인하는 함수
     bool IsClicked(int clickX, int clickY);
@@ -93,18 +95,19 @@ private:
 
 
 
-    bool isSceneChanged;
-    std::unordered_map<std::string, Text*> sceneList;
-    bool isLoadedSceneChanged;
-    std::unordered_map<std::string, Text*> loadedSceneList;
 
-    bool isHierarchyChanged;    // TODO: 아 알림 오면 이것만 true로 해놓고 draw때 직접 찾아가서 갱신해야겟다
+    bool isSceneChanged;
+    std::vector<std::pair<Scene*, ConsoleText>> sceneList;
+    //std::unordered_map<Scene*, ConsoleText> loadedSceneList;
+    std::vector<std::pair<Scene*, ConsoleText>> loadedSceneList;
+
+    bool isHierarchyChanged;
     const int hierarchyOffsetX = 60;
     const int hierarchyOffsetY = 3;
-    std::unordered_map<std::string, std::vector<Button>> sceneHierarchyTree;
+    std::unordered_map<Scene*, std::vector<std::pair<GameObject*, ConsoleButton>>> sceneHierarchyTree;
 
     GameObject* highlightedObject;
-    std::unordered_map<std::string, Text*> componentList;
+    std::vector<std::pair<GameObject*, ConsoleText>> componentList;
 
     // 씬 리스트                                        -> 변할때만 전파받아서 바꾸기 (씬매니저에서)
     // 하이라키 (씬 + 오브젝트 트리)                    -> 이것도 변할때만 전파받기   (하이라키에서)
@@ -115,7 +118,7 @@ private:
     void InitializeDebugInfo();
 
     void ChangedSceneInfo();        // 이건 직접 가서..주소니까 씬리스트 이름보고오는게?
-    void ChangedHierarchyInfo(std::vector<GameObject*>& gameObjectRoot, Scene* scene);    // 이것도 뭐 사실 직접 이름/자식 봐야지
+    void ChangedHierarchyInfo();    // 이것도 뭐 사실 직접 이름/자식 봐야지
     void UpdateDebugInfo();         // 저 오브젝트 컴포넌트값들 매 프레임 감시
     // 클릭된건 어느타이밍에 아는거지?
 
