@@ -1,6 +1,7 @@
 #include "MonoBehavior.h"
 
 #include "DDANZIT_Core.h"
+#include "Application.h"
 #include "GameObject.h"
 #include "Scene.h"
 
@@ -52,6 +53,10 @@ void MonoBehavior::SetActive(bool newActive)
 
 	// TODO: 이거 런타임 아니면 실행 안할듯?
 	// 런타임검사... 이런것들이 제법 지금 있을법한데
+	if (!Application::isPlaying())
+		return;
+
+
 	if (newActive /*== true*/)
 	{
 		if (activeOnEnable)
@@ -87,6 +92,9 @@ void MonoBehavior::SetParentActive(bool newActive)
 		return;
 
 	parentActive = newActive;
+
+	if (!Application::isPlaying())
+		return;
 
 
 	if (newActive /*== true*/)

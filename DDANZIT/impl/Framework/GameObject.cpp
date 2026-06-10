@@ -15,6 +15,8 @@
 #include "Transform.h"
 #include "SpriteRenderer.h"
 #include "Camera.h"
+#include "Collider2D.h"
+#include "Rigidbody2D.h"
 
 #ifdef PROPS_MODE_2D
 #include "Draw2D.h"
@@ -237,6 +239,23 @@ void GameObject::InitializeLifecycle(MonoBehavior* behavior)
 // 기본 컴포넌트 추가 시 특수동작
 
 template <>
+Camera* GameObject::AddComponent<Camera>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	Camera* camera = new Camera(this);
+
+
+	pComponentList.push_back(camera);
+
+	return camera;
+}
+
+template <>
 SpriteRenderer* GameObject::AddComponent<SpriteRenderer>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
@@ -263,7 +282,7 @@ SpriteRenderer* GameObject::AddComponent<SpriteRenderer>()
 }
 
 template <>
-Camera* GameObject::AddComponent<Camera>()
+BoxCollider2D* GameObject::AddComponent<BoxCollider2D>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
@@ -271,12 +290,84 @@ Camera* GameObject::AddComponent<Camera>()
 		return nullptr;
 	}
 
-	Camera* camera = new Camera(this);
-	
+	BoxCollider2D* collider = new BoxCollider2D(this);
 
-	pComponentList.push_back(camera);
+	Rigidbody2D* rigid = nullptr;
 
-	return camera;
+	for (Component* comp : pComponentList)
+	{
+		if (rigid = dynamic_cast<Rigidbody2D*>(comp))
+		{
+			collider->attachedBody = rigid;
+			rigid->attachedColliderList.push_back(collider);
+			break;
+		}
+	}
+
+
+	DDANZIT_Core::RegisterCollider2DList(collider);
+
+	pComponentList.push_back(collider);
+
+	return collider;
+}
+
+template <>
+CircleCollider2D* GameObject::AddComponent<CircleCollider2D>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	CircleCollider2D* collider = new CircleCollider2D(this);
+
+	Rigidbody2D* rigid = nullptr;
+
+	for (Component* comp : pComponentList)
+	{
+		if (rigid = dynamic_cast<Rigidbody2D*>(comp))
+		{
+			rigid->attachedColliderList.push_back(collider);
+			collider->attachedBody = rigid;
+			break;
+		}
+	}
+
+
+	DDANZIT_Core::RegisterCollider2DList(collider);
+
+	pComponentList.push_back(collider);
+
+	return collider;
+}
+
+template <>
+Rigidbody2D* GameObject::AddComponent<Rigidbody2D>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	Rigidbody2D* rigidbody = new Rigidbody2D(this);
+
+	Collider2D* collider = nullptr;
+
+	for (Component* comp : pComponentList)
+	{
+		if (collider = dynamic_cast<Collider2D*>(comp))
+			collider->attachedBody = rigidbody;			// 여러개일수
+	}
+
+
+	DDANZIT_Core::RegisterRigidbody2DList(rigidbody);
+
+	pComponentList.push_back(rigidbody);
+
+	return rigidbody;
 }
 
 #pragma endregion
@@ -493,6 +584,14 @@ void GameObject::Destroy(GameObject* gameObject)
 
 			if (b->activeOnDestroy)
 				DDANZIT_Core::onDestroyExecQueue.push(b);
+		}
+		else if (Collider2D* col = dynamic_cast<Collider2D*>(comp))
+		{
+			DDANZIT_Core::QuitCollider2DList(col);
+		}
+		else if (Rigidbody2D* rigid = dynamic_cast<Rigidbody2D*>(comp))
+		{
+			DDANZIT_Core::QuitRigidbody2DList(rigid);
 		}
 	}
 

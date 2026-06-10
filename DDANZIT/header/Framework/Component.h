@@ -13,6 +13,7 @@ class Transform;
 class Component
 {
 public:
+	friend class DDANZIT_Core;
 	friend class GameObject;
 	friend class Transform;
 	friend class MonoBehavior;

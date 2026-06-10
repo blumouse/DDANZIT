@@ -5,15 +5,21 @@
 #include "SceneManager.h"
 #include "Scene.h"
 
-#include "Camera.h"
-#include "IDrawable.h"
-
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
 #include "MonoBehavior.h"
 
+#include "Collider2D.h"
+#include "Rigidbody2D.h"
+
+#include "Camera.h"
+#include "IDrawable.h"
+
+#ifdef RENDER_MODE_WINGDI
 #include "RenderHelp.h"
+
+#endif // RENDER_MODE_WINGDI
 
 using namespace std;
 
@@ -228,6 +234,7 @@ queue<MonoBehavior*> DDANZIT_Core::onEnableExecQueue;
 queue<MonoBehavior*> DDANZIT_Core::startExecQueue;
 
 vector<MonoBehavior*> DDANZIT_Core::fixedUpdateExecList;
+
 vector<MonoBehavior*> DDANZIT_Core::updateExecList;
 vector<MonoBehavior*> DDANZIT_Core::lateUpdateExecList;
 
@@ -274,16 +281,148 @@ void DDANZIT_Core::_FixedUpdate()
 {
     for (MonoBehavior* b : fixedUpdateExecList)
     {
-        if (b->isActiveAndEnabled() && !b->gameObject()->isKilled)
+        if (b->isActiveAndEnabled() && !b->isKilled)
             b->FixedUpdate();
     }
 }
+
+
+void DDANZIT_Core::_OnTrigger()
+{
+    // 먼저 컴포넌트 리스트 순회돌면서 충돌한거 체크.. rigid : collider로
+    // 새로 충돌한건 Enter 호출 및 exec리스트에 추가
+    // 기존에 충돌했던거 이번에도 충돌이면 stayExec 그대로 호출
+    // 나갔으면 Exit 호출 인데..
+    // rigid가 prevCollideList같은걸 들고있어야겟다 이거랑 또 비교
+    // 
+
+    static vector<MonoBehavior*> execList;
+    static vector<Collider2D*> enteredColliderList;
+
+
+    for (Rigidbody2D* rigid : rigidbody2DList)
+    {
+        if (rigid->isKilled || !rigid->isActiveAndEnabled() || rigid->bodyType == RigidBodyType2D::Static)
+            continue;
+
+        // 1. 강체 리스트 비교, 하나 집어서 기준설정
+
+
+        // rigid에서 쓸 것들 캐싱
+        GameObject* go = rigid->_gameObject;
+
+        for (Component* comp : go->pComponentList)
+        {
+            if (MonoBehavior* targetComponent = dynamic_cast<MonoBehavior*>(comp))
+                execList.push_back(targetComponent);
+        }
+
+
+        // 2. 강체쪽의 콜라이더 집어서 비교 (여러 개일 수 있다)
+        for (Collider2D* col : rigid->attachedColliderList)
+        {
+            if (!col->_isTrigger)           // 이 경우는 collision에서 검사합니다 (추후)
+                continue;
+
+            // 3. 전체 콜라이더 순회
+            for (Collider2D* other : collider2DList)
+            {
+                if (other->isKilled || !other->isActiveAndEnabled())
+                    continue;
+
+                if (other->_gameObject == go)       // 강체 자신의 콜라이더
+                    continue;
+
+                if (!col->IsNearby(other))
+                    continue;
+
+                if (!col->IsCollideWith(other))
+                    continue;
+
+
+                // 여기까지 왔으면 충돌
+
+                bool isNew = true;        // 더티체크
+
+                // 4. 와 충돌이다! 이전 프레임의 충돌여부 검사
+                for (Collider2D* prev : rigid->prevCollideList)     // 미띤
+                {
+                    // 5.1 저번 프레임에도 충돌이었어! Stay 호출해주기
+                    if (other == prev)
+                    {
+                        for (MonoBehavior* b : execList)
+                        {
+                            if (b->activeOnTriggerStay2D && b->isActiveAndEnabled())
+                                b->OnTriggerStay2D(prev);
+                        }
+
+                        isNew = false;
+                        prev->hasCollided = true;       // 계속 충돌상태인지의 더티체크
+                    }
+                }
+
+                // 5.2 어라 새로운 놈이네 Enter 호출해주고서 기록!
+                if (isNew)
+                {
+                    for (MonoBehavior* b : execList)
+                    {
+                        if (b->activeOnTriggerEnter2D && b->isActiveAndEnabled())
+                            b->OnTriggerEnter2D(other);
+                    }
+
+                    // 잠시 여기다 보관해두자
+                    enteredColliderList.push_back(other);
+                }
+
+            }
+        }
+
+
+        // 6. 나간 놈들 찾기, 저번 프레임 리스트 중 이번에 충돌 안한거 Exit 호출하고 빼버리기
+        for (Collider2D* prev : rigid->prevCollideList)
+        {
+            if (!prev->hasCollided)
+            {
+                for (MonoBehavior* b : execList)
+                {
+                    if (b->activeOnTriggerExit2D && b->isActiveAndEnabled())
+                        b->OnTriggerExit2D(prev);
+                }
+
+                rigid->prevCollideList.erase(remove(
+                    rigid->prevCollideList.begin(),
+                    rigid->prevCollideList.end(), prev),
+                    rigid->prevCollideList.end());
+            }
+            else
+            {
+                // 충돌처리 했던녀석들은 그대로 고이 보관, 플래그 초기화
+                prev->hasCollided = false;
+            }
+        }
+
+
+        // 7. 새로 충돌한놈들 보관하기
+        // 괜찮겠지? 다썼으니께
+        rigid->prevCollideList.reserve(rigid->prevCollideList.size() + enteredColliderList.size());
+
+        rigid->prevCollideList.insert(rigid->prevCollideList.end(), enteredColliderList.begin(), enteredColliderList.end());
+    
+        
+        // 강체 하나 검사 끝;
+        execList.clear();
+        enteredColliderList.clear();
+
+    }
+
+}
+
 
 void DDANZIT_Core::_Update()
 {
     for (MonoBehavior* b : updateExecList)
     {
-        if (b->isActiveAndEnabled() && !b->gameObject()->isKilled)
+        if (b->isActiveAndEnabled() && !b->isKilled)
             b->Update();
     }
 }
@@ -292,7 +431,7 @@ void DDANZIT_Core::_LateUpdate()
 {
     for (MonoBehavior* b : lateUpdateExecList)
     {
-        if (b->isActiveAndEnabled() && !b->gameObject()->isKilled)
+        if (b->isActiveAndEnabled() && !b->isKilled)
             b->LateUpdate();
     }
 }
@@ -373,6 +512,7 @@ void DDANZIT_Core::DestroyScheduled()
         GameObject* gameObject = destroyScheduledQueue.front();
         Scene* targetScene = gameObject->_scene;
 
+        // 컴포넌트 리스트 탈퇴... 는 개별 소멸자에서 할까
 
         // 씬 / 하이라키(루트)에서 빼버리기
         targetScene->RemoveFromHierarchy(gameObject);
@@ -382,7 +522,7 @@ void DDANZIT_Core::DestroyScheduled()
 
 
         // 삭제!
-        delete destroyScheduledQueue.front();
+        delete gameObject;
         destroyScheduledQueue.pop();
     }
 }
@@ -403,6 +543,101 @@ void DDANZIT_Core::QuitUpdateExecLists(MonoBehavior* behavior)
 {
     quitUpdateScheduledQueue.push(behavior);
 }
+
+#pragma endregion
+
+
+
+#pragma region Physics
+
+vector<Collider2D*> DDANZIT_Core::collider2DList;
+vector<Rigidbody2D*> DDANZIT_Core::rigidbody2DList;
+
+queue<Collider2D*> DDANZIT_Core::registerCollider2DScheduledQueue;
+queue<Collider2D*> DDANZIT_Core::quitCollider2DScheduledQueue;
+
+queue<Rigidbody2D*> DDANZIT_Core::registerRigidbody2DScheduledQueue;
+queue<Rigidbody2D*> DDANZIT_Core::quitRigidbody2DScheduledQueue;
+
+
+
+void DDANZIT_Core::RegisterCollider2DScheduled()
+{
+    while (!registerCollider2DScheduledQueue.empty())
+    {
+        Collider2D* col = registerCollider2DScheduledQueue.front();
+
+        collider2DList.push_back(col);
+
+        registerUpdateScheduledQueue.pop();
+    }
+}
+
+void DDANZIT_Core::QuitCollider2DScheduled()
+{
+    while (!quitCollider2DScheduledQueue.empty())
+    {
+        Collider2D* col = quitCollider2DScheduledQueue.front();
+
+        collider2DList.erase(remove(
+            collider2DList.begin(),
+            collider2DList.end(), col),
+            collider2DList.end());
+
+        quitUpdateScheduledQueue.pop();
+    }
+}
+
+
+void DDANZIT_Core::RegisterRigidbody2DScheduled()
+{
+    while (!registerRigidbody2DScheduledQueue.empty())
+    {
+        Rigidbody2D* rigid = registerRigidbody2DScheduledQueue.front();
+
+        rigidbody2DList.push_back(rigid);
+
+        registerRigidbody2DScheduledQueue.pop();
+    }
+}
+
+void DDANZIT_Core::QuitRigidbody2DScheduled()
+{
+    while (!quitRigidbody2DScheduledQueue.empty())
+    {
+        Rigidbody2D* rigid = quitRigidbody2DScheduledQueue.front();
+
+        rigidbody2DList.erase(remove(
+            rigidbody2DList.begin(),
+            rigidbody2DList.end(), rigid),
+            rigidbody2DList.end());
+
+        quitRigidbody2DScheduledQueue.pop();
+    }
+}
+
+
+void DDANZIT_Core::RegisterCollider2DList(Collider2D* collider)
+{
+    registerCollider2DScheduledQueue.push(collider);
+}
+
+void DDANZIT_Core::QuitCollider2DList(Collider2D* collider)
+{
+    quitCollider2DScheduledQueue.push(collider);
+}
+
+
+void DDANZIT_Core::RegisterRigidbody2DList(Rigidbody2D* rigidbody)
+{
+    registerRigidbody2DScheduledQueue.push(rigidbody);
+}
+
+void DDANZIT_Core::QuitRigidbody2DList(Rigidbody2D* rigidbody)
+{
+    quitRigidbody2DScheduledQueue.push(rigidbody);
+}
+
 
 #pragma endregion
 

@@ -19,9 +19,12 @@ void Mycode() {
 
 	GameObject* go = scene1->hierarchy.AddGameObject<MyObject>();
 	SpriteRenderer* sp = go->AddComponent<SpriteRenderer>();
-	sp->sprite = (SpriteIndex)0;
+
+	sp->sprite = SpriteIndex::Sqaure;
 	sp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
 
+
+	go->name() = "MyObject";
 }
 
 

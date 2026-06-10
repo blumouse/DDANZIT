@@ -90,6 +90,15 @@ SpriteRenderer* GameObject::AddComponent<SpriteRenderer>();
 template <>
 Camera* GameObject::AddComponent<Camera>();
 
+template <>
+BoxCollider2D* GameObject::AddComponent<BoxCollider2D>();
+
+template <>
+CircleCollider2D* GameObject::AddComponent<CircleCollider2D>();
+
+template <>
+Rigidbody2D* GameObject::AddComponent<Rigidbody2D>();
+
 #pragma endregion
 
 

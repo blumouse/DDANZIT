@@ -22,11 +22,13 @@ using namespace std;
 // TODO 지금 하고있는것
 // 
 // 
-// 빠른 D2D적용 <- 이거
+// 콜라이더 <- 충돌처리 수학붙이기
 // 
 // 음악재생 워케함
 // 
-// 콜라이더
+// 인스턴트를 위한 컴포넌트별 복사생성자와 클론과 순서/특수처리 ...
+// 
+// 로직 잘 동작하는지 테스트 검증
 // 
 // 배열들 미리 reserve해놓기?
 
@@ -263,6 +265,9 @@ void DDANZIT_Run()
             // 라이프사이클 / 오브젝트 정보 갱신
             gameCore.RegisterUpdateScheduled();
 
+            gameCore.RegisterCollider2DScheduled();
+            gameCore.RegisterRigidbody2DScheduled();
+
 
             /* DDANZIT_Update() */
             {
@@ -273,7 +278,7 @@ void DDANZIT_Run()
                 {
                     gameCore._FixedUpdate();
 
-                    // gameCore._OnTrigger...();
+                    gameCore._OnTrigger();
                     // gameCore._OnCollision...();
 
                     // gameCore._WaitForFixedUpdate();
@@ -338,6 +343,9 @@ void DDANZIT_Run()
 
             // 라이프사이클 / 오브젝트 정보 갱신
             gameCore.QuitUpdateScheduled();
+
+            gameCore.QuitCollider2DScheduled();
+            gameCore.QuitRigidbody2DScheduled();
 
             gameCore.DestroyScheduled();
             

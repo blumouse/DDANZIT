@@ -12,6 +12,10 @@
 
 class GameObject;
 class MonoBehavior;
+
+class Collider2D;
+class Rigidbody2D;
+
 class IDrawable;
 class IRenderer;
 
@@ -67,6 +71,9 @@ public:
 	friend class Camera;
 	friend class GameObject;
 	friend class MonoBehavior;
+
+	friend class Collider2D;
+	friend class Rigidbody2D;
 
 #ifdef PROPS_MODE_2D
 
@@ -148,6 +155,9 @@ private:
 	void _Start();
 
 	void _FixedUpdate();
+
+	void _OnTrigger();
+
 	void _Update();
 	void _LateUpdate();
 
@@ -161,6 +171,7 @@ private:
 	static std::queue<MonoBehavior*> startExecQueue;
 
 	static std::vector<MonoBehavior*> fixedUpdateExecList;
+
 	static std::vector<MonoBehavior*> updateExecList;
 	static std::vector<MonoBehavior*> lateUpdateExecList;
 
@@ -187,6 +198,41 @@ private:
 
 	static void RegisterUpdateExecLists(MonoBehavior* behavior);
 	static void QuitUpdateExecLists(MonoBehavior* behavior);
+
+#pragma endregion
+
+
+
+#pragma region Physics
+
+private:
+	static std::vector<Collider2D*> collider2DList;
+	static std::vector<Rigidbody2D*> rigidbody2DList;
+
+
+	// 업데이트 훼손 방지용
+
+	static std::queue<Collider2D*> registerCollider2DScheduledQueue;
+	static std::queue<Collider2D*> quitCollider2DScheduledQueue;
+
+	static std::queue<Rigidbody2D*> registerRigidbody2DScheduledQueue;
+	static std::queue<Rigidbody2D*> quitRigidbody2DScheduledQueue;
+
+	// 이건 위에서 호출
+
+	void RegisterCollider2DScheduled();
+	void QuitCollider2DScheduled();
+
+	void RegisterRigidbody2DScheduled();
+	void QuitRigidbody2DScheduled();
+
+	// 이건 아래에서 호출
+
+	static void RegisterCollider2DList(Collider2D* collider);
+	static void QuitCollider2DList(Collider2D* collider);
+
+	static void RegisterRigidbody2DList(Rigidbody2D* rigidbody);
+	static void QuitRigidbody2DList(Rigidbody2D* rigidbody);
 
 #pragma endregion
 

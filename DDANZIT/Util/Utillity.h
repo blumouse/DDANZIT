@@ -162,3 +162,5 @@ namespace learning
     void GetScreenSize(int& width, int& height);
 
 }
+
+using Vector2 = learning::Vector2f;
