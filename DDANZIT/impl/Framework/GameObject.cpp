@@ -307,6 +307,16 @@ BoxCollider2D* GameObject::AddComponent<BoxCollider2D>()
 
 	DDANZIT_Core::RegisterCollider2DList(collider);
 
+
+#ifdef USE_DEBUG
+	Draw2D* draw = dynamic_cast<Draw2D*>(this);
+
+	if (draw)
+		draw->pColliderList.push_back(collider);
+
+#endif // USE_DEBUG
+
+
 	pComponentList.push_back(collider);
 
 	return collider;
@@ -337,6 +347,16 @@ CircleCollider2D* GameObject::AddComponent<CircleCollider2D>()
 
 
 	DDANZIT_Core::RegisterCollider2DList(collider);
+
+
+#ifdef USE_DEBUG
+	Draw2D* draw = dynamic_cast<Draw2D*>(this);
+
+	if (draw)
+		draw->pColliderList.push_back(collider);
+
+#endif // USE_DEBUG
+
 
 	pComponentList.push_back(collider);
 

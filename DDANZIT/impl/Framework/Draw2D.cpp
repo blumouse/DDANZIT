@@ -5,6 +5,11 @@
 #include "Transform.h"
 #include "SpriteRenderer.h"
 
+#ifdef USE_DEBUG
+#include "Collider2D.h"
+
+#endif // USE_DEBUG
+
 using namespace std;
 
 
@@ -78,18 +83,37 @@ void Draw2D::Draw()
 
 	for (Collider2D* col : pColliderList)
 	{
-		// TODO: 액티브 검사
+		if (!col->isActiveAndEnabled())
+			continue;
 
-		// 초록
-		int colorRGBA = 0x00ff00ff;
+
+		int colorRGBA = 0x00ff00ff;		// 초록
+		DebugDrawType type;
+
+		switch (col->type)
+		{
+		default:
+			continue;
+
+		case ColliderType::Box:
+			type = DebugDrawType::BoxCollider;	break;
+
+		case ColliderType::Circle:
+			type = DebugDrawType::CircleCollider;	break;
+
+		case ColliderType::Capsule:
+			type = DebugDrawType::CapsuleCollider;	break;
+		}
+
 
 		DDANZIT_Core::debugDrawCommandLists[layer].push_back(
 			DebugDrawCommand{
-				transform->position().x,
-				transform->position().y,
-				transform->scale().x,
-				transform->scale().y,
-				// TODO: 타입
+				transform->position().x + col->_offset.x,
+				transform->position().y + col->_offset.y,
+				transform->scale().x * col->_size.x,
+				transform->scale().y * col->_size.y,
+				transform->angle(),
+				type,
 				colorRGBA
 			});
 	}

@@ -518,18 +518,86 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 	}
 
 
-	// TODO: 콜라이더 선 그리기
 	for (int i = MAX_LAYER_NUM - 1; i >= depth(); i--)
 	{
 		for (const DebugDrawCommand& cmd : DDANZIT_Core::debugDrawCommandLists[i])
 		{
-			//d2dbrush->SetColor(D2D1::ColorF(0.0f, 1.0f, 0.0f, 0.5f));
-			//d2dcontext->DrawLine(
-			//	D2D1::Point2F(10.0f, 200.0f),
-			//	D2D1::Point2F(300.0f, 200.0f),
-			//	d2dbrush.Get(),
-			//	3.0f // 선 두께
-			//);
+			float relativeCamX = cmd.posX - camPosX;
+			float relativeCamY = cmd.posY - camPosY;
+
+			float x;
+			float y;
+
+			float relativeScaleX;
+			float relativeScaleY;
+
+			UINT32 rgb;
+			float a;
+			rgb = (cmd.colorRGBA >> 8) & 0x00ffffff;
+			a = (float)(cmd.colorRGBA & 0x000000ff) / 255.0f;
+
+			d2dbrush->SetColor(D2D1::ColorF(rgb, a));
+
+			if (cmd.angle != 0.0f)
+			{
+				D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, D2D1::Point2F(relativeCamX, relativeCamY));
+				d2dcontext->SetTransform(rotMatrix);
+			}
+
+			// TODO: y축 뒤집어야되지 않나 포지션
+			switch (cmd.debugDrawType)
+			{
+			case DebugDrawType::BoxCollider:
+
+				relativeScaleX = cmd.scaleX;
+				relativeScaleY = cmd.scaleY;
+
+				x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f;
+				y = (-(relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
+
+
+				d2dcontext->DrawRectangle(
+						D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y - relativeScaleY * worldToScreenRatio),
+					d2dbrush,
+					3.0f);
+
+				break;
+
+			case DebugDrawType::CircleCollider:
+
+				d2dcontext->DrawEllipse(
+					D2D1::Ellipse(
+						D2D1::Point2F(cmd.posX, -cmd.posY), cmd.scaleX, cmd.scaleX),
+					d2dbrush,
+					3.0f);
+
+				break;
+
+			case DebugDrawType::CapsuleCollider:
+
+				//relativeScaleX = cmd.scaleX;
+				//relativeScaleY = cmd.scaleY;
+
+				//x = ((relativeCamX - relativeScaleX / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::width / 2.0f;
+				//y = (-(relativeCamY - relativeScaleY / 2.0f) * worldToScreenRatio) + (float)DDANZIT_Core::height / 2.0f;
+
+
+				//d2dcontext->DrawRoundedRectangle(
+				//	D2D1::RoundedRect(
+				//		D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y - relativeScaleY * worldToScreenRatio),
+				//	25.0f,		// ??
+				//	25.0f
+				//), d2dbrush, 3.0f);
+
+				break;
+			}
+
+
+			if (cmd.angle != 0.0f)
+			{
+				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
+			}
+
 		}
 	}
 
