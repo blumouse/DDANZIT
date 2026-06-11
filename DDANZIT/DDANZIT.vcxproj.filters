@@ -147,10 +147,16 @@
     <ClCompile Include="impl\Framework\Component\Collider2D.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Collision2D.cpp">
+    <ClCompile Include="impl\Framework\Component\Rigidbody2D.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Rigidbody2D.cpp">
+    <ClCompile Include="impl\Framework\Component\Collision2D.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Component\CircleCollider2D.cpp">
+      <Filter>소스 파일\Framework\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\Framework\Component\BoxCollider2D.cpp">
       <Filter>소스 파일\Framework\Component</Filter>
     </ClCompile>
   </ItemGroup>
@@ -251,10 +257,10 @@
     <ClInclude Include="header\Framework\Component\Collider2D.h">
       <Filter>헤더 파일\Framework\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Collision2D.h">
+    <ClInclude Include="header\Framework\Component\Collision2D.h">
       <Filter>헤더 파일\Framework\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Rigidbody2D.h">
+    <ClInclude Include="header\Framework\Component\Rigidbody2D.h">
       <Filter>헤더 파일\Framework\Component</Filter>
     </ClInclude>
   </ItemGroup>
