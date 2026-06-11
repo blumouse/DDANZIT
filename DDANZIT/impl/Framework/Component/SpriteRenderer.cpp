@@ -6,7 +6,7 @@
 #pragma region Constructor
 
 SpriteRenderer::SpriteRenderer(GameObject* pGameObject) : 
-	Component(pGameObject), sprite(SpriteIndex::None), color(Color(1.0f, 1.0f, 1.0f, 1.0f)), flipX(false), flipY(false), useAtlas(false), currentAtlas(SpriteAtlasRect{0,0,0,0})
+	Component(pGameObject, "SpriteRenderer"), sprite(SpriteIndex::None), color(Color(1.0f, 1.0f, 1.0f, 1.0f)), flipX(false), flipY(false), useAtlas(false), currentAtlas(SpriteAtlasRect{0,0,0,0})
 {
 
 }

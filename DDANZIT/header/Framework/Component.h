@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "DefineOption.h"
@@ -26,8 +27,8 @@ public:
 protected:
 	Component() = delete;
 	Component(const Component& other) = default;
-	Component(GameObject* pGameObject);
-	Component(GameObject* pGameObject, bool active);
+	Component(GameObject* pGameObject, std::string_view typeName);
+	Component(GameObject* pGameObject, std::string_view typeName, bool active);
 
 public:
 	virtual ~Component() = default;
@@ -68,6 +69,7 @@ public:
 
 	// 내부용
 private:
+	std::string_view componentTypeName;
 	bool _active;
 	// 내 오브젝트가 어떤지, 둘 중 하나라도 false면 꺼진거임 상태 저장용이다
 	bool parentActive;

@@ -22,7 +22,7 @@ using namespace std;
 #pragma region Constructor
 
 Camera::Camera(GameObject* pGameObject) :
-	Component(pGameObject)
+	Component(pGameObject, "Camera")
 {
 	RegisterCameraList(this);
 }

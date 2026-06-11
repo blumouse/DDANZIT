@@ -8,7 +8,7 @@ using namespace std;
 
 #pragma region Constructor
 
-Rigidbody2D::Rigidbody2D(GameObject* pGameObject) : Component(pGameObject)
+Rigidbody2D::Rigidbody2D(GameObject* pGameObject) : Component(pGameObject, "Rigidbody2D")
 {
 }
 

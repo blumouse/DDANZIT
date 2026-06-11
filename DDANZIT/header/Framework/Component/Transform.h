@@ -51,7 +51,7 @@ private:
 #pragma region Properties
 
 	// TODO: 이거 따로 빼기 라이브러리같은거?
-
+public:
 	static constexpr float DEG2RAD = 3.14159265f / 180.0f;
 	static constexpr float RAD2DEG = 180.0f / 3.14159265f;
 
@@ -124,7 +124,7 @@ public:
 private:
 	std::vector<Transform*> pChildList;
 public:
-	const int& childCount() const { return pChildList.size(); }
+	int childCount() const { return pChildList.size(); }
 
 
 	// set됐을때 자동으로 연결할 방법이.. 지금 구조론 없는걸 인자로 받기

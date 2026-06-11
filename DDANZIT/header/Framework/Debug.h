@@ -5,6 +5,9 @@
 #include <list>
 #include <unordered_map>
 #include <vector>
+#include <functional>
+
+#include "DefineOption.h"
 
 class GameObject;
 class Scene;
@@ -20,6 +23,7 @@ public:
     DebugConsole();
     ~DebugConsole();
 
+    HANDLE hStdin;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     int columns, rows;
 
@@ -34,48 +38,88 @@ public:
 };
 
 
+#ifdef USE_DEBUG_TUI
+
 class ConsoleObject
 {
 public:
     int x, y, width, height;
+    ConsoleObject* parent;
 
     ConsoleObject(int startX, int startY, int width, int height);
     virtual ~ConsoleObject() = default;
 
-    // 자기 자신을 콘솔에 그리는 함수
-    virtual void Draw();
+    void SetParent(ConsoleObject* p) { parent = p; }
+
+    int GetAbsoluteX() { return parent ? parent->GetAbsoluteX() + x : x; }
+    int GetAbsoluteY() { return parent ? parent->GetAbsoluteY() + y : y; }
+
+    virtual void Draw() = 0;
+    virtual bool HandleClick(int x, int y) { return false; }
 };
 
-class Frame : public ConsoleObject
+class ConsoleFrame : public ConsoleObject
 {
 public:
-    Frame(int startX, int startY, int width, int height);
+    std::vector<ConsoleObject*> children;
+    int currentChildY;
+
+    ConsoleFrame(int startX, int startY, int width, int height);
+
+    void AddChild(ConsoleObject* child);
+    void ClearChild();
 
     void Draw() override;
+    bool HandleClick(int clickX, int clickY) override;
 };
 
-class Text : public ConsoleObject
+class ConsoleText : public ConsoleObject
 {
 public:
     std::string text;
 
-    Text(int startX, int startY, int width, int height, std::string label);
+    ConsoleText(int startX, int startY, int width, int height, std::string t);
 
     void Draw() override;
 };
 
-class Button : public Text
+class ConsoleButton : public ConsoleText
 {
 public:
-    //임시
-     void (Debug::*onClick)() = nullptr;
+    std::function<void()> onClick;
 
-    Button(int startX, int startY, int width, int height, std::string label);
+    ConsoleButton(int startX, int startY, int width, int height, std::string t, std::function<void()> callback);
 
-    // 마우스 좌표가 들어왔을 때 자기 영역인지 확인하는 함수
-    bool IsClicked(int clickX, int clickY);
-    void Draw() override;
+    bool HandleClick(int clickX, int clickY) override;
 };
+
+class ConsolePollingText : public ConsoleText
+{
+public:
+    std::function<std::string()> valueGetter; // 값을 가져오는 함수
+    std::string lastValue;                    // 이전 프레임의 캐싱된 값
+
+    ConsolePollingText(int x, int y, std::string t);
+    ConsolePollingText(int x, int y, std::function<std::string()> getter);
+
+    void Update();
+};
+
+class ConsoleInspector : public ConsoleFrame
+{
+public:
+    std::vector<ConsolePollingText*> childrenInspector;
+
+    ConsoleInspector(int startX, int startY, int width, int height);
+
+    void AddChild(ConsolePollingText* child);
+    void ClearChild();
+};
+
+
+#endif // USE_DEBUG_TUI
+
+
 
 class Debug
 {
@@ -83,30 +127,35 @@ public:
     friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
     friend void DDANZIT_Run();
     friend void DDANZIT_Finalize();
-    
+
+public:
     Debug() = default;
+private:
     Debug(const Debug&) = delete;
     Debug& operator=(const Debug&) = delete;
     Debug(Debug&&) = delete;
     Debug& operator=(Debug&&) = delete;
 
+
+    // --- TUI ---
+#ifdef USE_DEBUG_TUI
+
 private:
-    DebugConsole console;
+    DebugConsole debugConsole;
 
+    ConsoleFrame* manage;
+    static ConsoleFrame* console;      // ?
 
+    ConsoleFrame* sceneList;
+    ConsoleFrame* hierarchy;
+    ConsoleInspector* inspector;
 
-    bool isSceneChanged;
-    std::unordered_map<std::string, Text*> sceneList;
-    bool isLoadedSceneChanged;
-    std::unordered_map<std::string, Text*> loadedSceneList;
-
-    bool isHierarchyChanged;    // TODO: 아 알림 오면 이것만 true로 해놓고 draw때 직접 찾아가서 갱신해야겟다
-    const int hierarchyOffsetX = 60;
-    const int hierarchyOffsetY = 3;
-    std::unordered_map<std::string, std::vector<Button>> sceneHierarchyTree;
-
+    static bool isManageChanged;
+    static bool isConsoleChanged;
+    static bool isSceneChanged;
+    static bool isHierarchyChanged;
+public:
     GameObject* highlightedObject;
-    std::unordered_map<std::string, Text*> componentList;
 
     // 씬 리스트                                        -> 변할때만 전파받아서 바꾸기 (씬매니저에서)
     // 하이라키 (씬 + 오브젝트 트리)                    -> 이것도 변할때만 전파받기   (하이라키에서)
@@ -115,31 +164,46 @@ private:
     // 간단한 인풋 커맨드? (pause stop TimeScale .. 버튼으로 해도되고)  -> 몰라
 
     void InitializeDebugInfo();
+    void FinalizeDebugInfo();
 
-    void ChangedSceneInfo();        // 이건 직접 가서..주소니까 씬리스트 이름보고오는게?
-    void ChangedHierarchyInfo(std::vector<GameObject*>& gameObjectRoot, Scene* scene);    // 이것도 뭐 사실 직접 이름/자식 봐야지
-    void UpdateDebugInfo();         // 저 오브젝트 컴포넌트값들 매 프레임 감시
-    // 클릭된건 어느타이밍에 아는거지?
+    static void ChangedSceneInfo();        // 이건 직접 가서..주소니까 씬리스트 이름보고오는게?
+    static void ChangedHierarchyInfo();    // 이것도 뭐 사실 직접 이름/자식 봐야지
 
-    // 등등
-    void DrawSceneList();
-    void DrawHierarchy();
-    void DrawInspector();
+    static void AddConsoleLog(const std::string& message);
+
+
+public:
+    void HandleDebugConsoleInput();
+
+private:
+    void OnDebugConsoleClick(int x, int y);
+    void ExecuteCommand(std::string cmd);
+
+    void BuildManage();
+    void DrawManage();
+    void LogCommand(const std::string& message);
+    ConsoleText* log = nullptr;
+    std::string commandLine = "";
+    INPUT_RECORD ir;
+    DWORD read;
+    DWORD numEvents = 0;
+
     void DrawConsole();
+    void ClearConsole();
 
-    void DrawDebugConsole();             // 바뀐것만 다시 그려! 정보는 여기 다 있으니
+    void DrawSceneList();
+
+    void DrawHierarchy();
+
+    void BuildInspector();
+    void UpdateInspector();
 
 
-    void OnSceneButtonClick()
-    {
+public:
+    void DrawDebugConsole();             // 전체 그리기
 
-    }
 
-    void OnGameObjectButtonClick()
-    {
-
-    }
-
+#endif // USE_DEBUG_TUI
 
 
 public:
@@ -147,7 +211,7 @@ public:
 
 	static void Assert(bool condition);
 	static void Assert(bool condition, const std::string& message);
-	//static void Assert(bool condition, std::string message, Object context);
+	static void Assert(bool condition, std::string message, GameObject* context);
 
 	// static void Break(); 일단 Application Pause랑 연동
 };

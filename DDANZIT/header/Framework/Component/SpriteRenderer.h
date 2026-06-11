@@ -30,6 +30,7 @@ class SpriteRenderer : public Component
 {
 public:
 	friend class DDANZIT_Core;
+	friend class Debug;
 	friend class Scene;
 	friend class GameObject;
 	friend class Draw2D;
@@ -70,7 +71,7 @@ public:
 
 public:
 	std::unordered_map<std::string, SpriteAtlasRect> atlasRectMap;
-public:
+
 	SpriteAtlasRect currentAtlas;
 
 #pragma endregion
