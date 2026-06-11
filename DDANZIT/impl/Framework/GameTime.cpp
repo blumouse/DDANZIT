@@ -25,6 +25,16 @@ void Time::Tick()
     pGameTimer->Tick();
 }
 
+void Time::Pause()
+{
+    pGameTimer->Stop();
+}
+
+void Time::Resume()
+{
+    pGameTimer->Start();
+}
+
 
 float Time::unscaledDeltaTime()
 {

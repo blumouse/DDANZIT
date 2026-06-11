@@ -7,7 +7,7 @@
 
 #pragma region Constructor
 
-BoxCollider2D::BoxCollider2D(GameObject* pGameObject) : Collider2D(pGameObject)
+BoxCollider2D::BoxCollider2D(GameObject* pGameObject) : Collider2D(pGameObject, "BoxCollider2D")
 {
 	type = ColliderType::Box;
 }

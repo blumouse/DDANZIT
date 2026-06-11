@@ -8,7 +8,7 @@
 
 #pragma region Constructor
 
-MonoBehavior::MonoBehavior(GameObject* pGameObject) : Component(pGameObject), isInUpdateList(false)
+MonoBehavior::MonoBehavior(GameObject* pGameObject) : Component(pGameObject, "MonoBehavior"), isInUpdateList(false)
 {
 
 }

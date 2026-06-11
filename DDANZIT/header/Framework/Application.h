@@ -1,8 +1,9 @@
 #pragma once
 
-
 class Application
 {
+	friend class Debug;
+
 public:
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize);
@@ -22,5 +23,11 @@ public:
 	static void Quit() { _isQuit = true; }
 
 	// TODO: ¥Ÿ∏•∞≈ ∂« ππ¿’¡ˆ
+
+private:
+	static bool _isPause;
+public:
+	static void Pause();
+	static void Resume();
 };
 

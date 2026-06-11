@@ -7,12 +7,14 @@ using namespace std;
 
 #pragma region Constructor
 
-Component::Component(GameObject* pGameObject) : _gameObject(pGameObject), _active(true), parentActive(pGameObject->active())
+Component::Component(GameObject* pGameObject, string_view typeName) :
+	_gameObject(pGameObject), _active(true), parentActive(pGameObject->active()), componentTypeName(typeName)
 {
 	
 }
 
-Component::Component(GameObject* pGameObject, bool active) : _gameObject(pGameObject), _active(active), parentActive(pGameObject->active())
+Component::Component(GameObject* pGameObject, string_view typeName, bool active) :
+	_gameObject(pGameObject), _active(active), parentActive(pGameObject->active()), componentTypeName(typeName)
 {
 
 }

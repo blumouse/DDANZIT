@@ -20,6 +20,7 @@ class Collider2D : public Component
 {
 public:
 	friend class DDANZIT_Core;
+	friend class Debug;
 	friend class GameObject;
 	friend class Transform;
 	friend class Draw2D;
@@ -35,7 +36,7 @@ public:
 protected:
 	Collider2D() = default;
 	Collider2D(const Collider2D& other);
-	Collider2D(GameObject* pGameObject);
+	Collider2D(GameObject* pGameObject, const std::string& typeName);
 
 public:
 	virtual ~Collider2D();

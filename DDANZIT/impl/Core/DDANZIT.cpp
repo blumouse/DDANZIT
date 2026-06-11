@@ -191,6 +191,11 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     if (!gameCore.isInitialized)
         gameCore.InitGraphicSettings(g_hWnd);
 
+#ifdef USE_DEBUG_TUI
+    debug.InitializeDebugInfo();
+
+#endif // USE_DEBUG_TUI
+
 
     Application::_isPlaying = false;
     Application::_isQuit = false;
@@ -216,6 +221,11 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
         if (gameCore.LoadBitmapResource(pfilePath[i]) == -1)
             return false;
     }
+
+#ifdef USE_DEBUG_TUI
+    debug.FinalizeDebugInfo();
+
+#endif // USE_DEBUG_TUI
 
     Application::_isPlaying = false;
     Application::_isQuit = false;
@@ -273,8 +283,21 @@ void DDANZIT_Run()
         }
         else
         {
+            if (Application::_isQuit)
+                break;
+
             // 프레임 시작!
             // 유니티 라이프사이클 순서를 따름
+
+#ifdef USE_DEBUG_TUI
+
+            debug.HandleDebugConsoleInput();
+
+#endif // USE_DEBUG_TUI
+
+            if (Application::_isPause)
+                continue;
+
 
 
             gameCore._Awake();
@@ -364,6 +387,14 @@ void DDANZIT_Run()
             gameCore._OnDestroy();
 
 
+            // 여기가 안정적인걸
+#ifdef USE_DEBUG_TUI
+
+            debug.DrawDebugConsole();
+
+#endif // USE_DEBUG_TUI
+
+
             // 라이프사이클 / 오브젝트 정보 갱신
             gameCore.QuitUpdateScheduled();
 
@@ -371,11 +402,6 @@ void DDANZIT_Run()
             gameCore.QuitRigidbody2DScheduled();
 
             gameCore.DestroyScheduled();
-            
-
-
-            if (Application::_isQuit)
-                break;
 
 
             // 다음 프레임...

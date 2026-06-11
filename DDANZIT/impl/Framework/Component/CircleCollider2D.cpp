@@ -7,7 +7,7 @@
 
 #pragma region Constructor
 
-CircleCollider2D::CircleCollider2D(GameObject* pGameObject) : Collider2D(pGameObject)
+CircleCollider2D::CircleCollider2D(GameObject* pGameObject) : Collider2D(pGameObject, "CircleCollider2D")
 {
 	type = ColliderType::Circle;
 	_size.y = 0.0f;

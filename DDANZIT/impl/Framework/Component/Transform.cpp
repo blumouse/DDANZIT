@@ -18,7 +18,8 @@ using namespace std;
 #pragma region Constructor
 
 Transform::Transform(GameObject* pGameObject) : 
-	Component(pGameObject), _parent(HIERARCY_ROOT), _localPosition(Vector2(0, 0)), _localDirection(Vector2(1.0f, 0)), _localScale(Vector2(1.0f, 1.0f)), _depth(0)
+	Component(pGameObject, "Transform"), _parent(HIERARCY_ROOT),
+	_localPosition(Vector2(0, 0)), _localDirection(Vector2(1.0f, 0)), _localScale(Vector2(1.0f, 1.0f)), _depth(0)
 {
 	//RegisterTransform(this);
 }
@@ -211,7 +212,6 @@ Component* Transform::Clone() const
 
 Transform* Transform::CloneTransform() const
 {
-	// ASSERT: 사용되지 않음
 	return new Transform(*this);
 }
 

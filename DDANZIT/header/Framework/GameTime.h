@@ -5,6 +5,9 @@
 
 class Time
 {
+    friend class Application;
+    friend class Debug;
+
 public:
     friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
     friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize);
@@ -21,6 +24,9 @@ private:
     void Finalize();
 
     void Tick();
+
+    static void Pause();
+    static void Resume();
 
 public:
     static float unscaledDeltaTime();
