@@ -401,16 +401,19 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeScaleX;
 				float relativeScaleY;
 
-				if (cmd.useAtlas)
-				{
-					relativeScaleX = (float)cmd.sliceWidth * cmd.scaleX / worldToScreenRatio;	// 비트맵 픽셀좌표를 월드로 밀어넣는다
-					relativeScaleY = (float)cmd.sliceHeight * cmd.scaleY / worldToScreenRatio;
-				}
-				else
-				{
+				//수정할것
+				//if (cmd.useAtlas)
+				//{
+				//	relativeScaleX = (float)cmd.sliceWidth * cmd.scaleX / worldToScreenRatio;	// 비트맵 픽셀좌표를 월드로 밀어넣는다
+				//	relativeScaleY = (float)cmd.sliceHeight * cmd.scaleY / worldToScreenRatio;
+				//}
+				//else
+				//{
+				//	relativeScaleX = cmd.scaleX / worldToScreenRatio;
+				//	relativeScaleY = cmd.scaleY / worldToScreenRatio;
+				//}
 					relativeScaleX = cmd.scaleX / worldToScreenRatio;
 					relativeScaleY = cmd.scaleY / worldToScreenRatio;
-				}
 
 
 				// 반전이랑 스케일링이랑 동치라고 하네요
@@ -464,11 +467,15 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				if (cmd.useAtlas)
 				{
-					srcX = cmd.sliceOffsetX;
-					srcY = cmd.sliceOffsetY;
+					//수정할것
+					//이미지 지원을 위해
+					//변수명만 맞춰줬다보셈 
+					//변수명과 들어가는 내용은 여기서는 별개
+					srcX = cmd.sliceOffsetX * cmd.sliceWidth;
+					srcY = cmd.sliceOffsetY * cmd.sliceHeight;
 
-					srcWidth = cmd.sliceWidth;
-					srcHeight = cmd.sliceHeight;
+					srcWidth = (cmd.sliceOffsetX+1) * cmd.sliceWidth;
+					srcHeight = (cmd.sliceOffsetY+1) * cmd.sliceHeight;
 				}
 				else
 				{
@@ -482,8 +489,9 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				// 그리기~
 				D2D1_POINT_2F localOffset = D2D1::Point2F(srcWidth / -2.0f, srcHeight / -2.0f);
-				//D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
-				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
+				//수정할것
+				D2D1_RECT_F destRect = D2D1::RectF(-srcWidth/(2* (cmd.sliceOffsetX + 1)), -srcHeight/(2* (cmd.sliceOffsetY + 1)),srcWidth/(2* (cmd.sliceOffsetX + 1)), srcHeight/(2 * (cmd.sliceOffsetY + 1)));
+				D2D1_RECT_F srcRect = D2D1::RectF(srcX,srcY,srcWidth,srcHeight);
 
 
 				colorMatrixEffect->SetInput(0, pBitmap);
@@ -491,19 +499,21 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				colorMatrixEffect->SetValue(D2D1_COLORMATRIX_PROP_COLOR_MATRIX, colorMatrix);
 
 
-				//d2dcontext->DrawBitmap(
-				//	pBitmap,
-				//	&destRect,
-				//	a,
-				//	D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-				//	&srcRect);
 
-				d2dcontext->DrawImage(
+				//수정할것
+				d2dcontext->DrawBitmap(
+					pBitmap,
+					&destRect,
+					a,
+					D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+					&srcRect);
+
+				/*d2dcontext->DrawImage(
 					colorMatrixEffect,
 					&localOffset,
 					&srcRect,
-					D2D1_INTERPOLATION_MODE_LINEAR);
-
+					D2D1_INTERPOLATION_MODE_LINEAR);*/
+				
 
 				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
 			}

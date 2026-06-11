@@ -67,6 +67,7 @@ bool SpriteRenderer::TrySetAtlas(const std::string& name)
 		return false;
 	}
 
+	useAtlas = true;
 	currentAtlas = result->second;
 
 	return true;

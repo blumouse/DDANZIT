@@ -186,6 +186,15 @@
     <ClCompile Include="Player.cpp">
       <Filter>소스 파일\Game\Player</Filter>
     </ClCompile>
+    <ClCompile Include="gungwoo.cpp">
+      <Filter>소스 파일\Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="aria.cpp">
+      <Filter>소스 파일\Game\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="suna.cpp">
+      <Filter>소스 파일\Game\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util\Utillity.h">
@@ -297,6 +306,15 @@
       <Filter>헤더 파일\Game\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
+      <Filter>헤더 파일\Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="gungwoo.h">
+      <Filter>헤더 파일\Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="aria.h">
+      <Filter>헤더 파일\Game\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="suna.h">
       <Filter>헤더 파일\Game\Player</Filter>
     </ClInclude>
   </ItemGroup>

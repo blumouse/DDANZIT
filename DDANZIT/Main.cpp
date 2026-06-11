@@ -8,6 +8,10 @@
 #include "Utillity.h"
 
 #include "Player.h"
+#include "aria.h"
+#include "gungwoo.h"
+#include "suna.h"
+
 #include "ResourceFilePath.h"
 #include "DefineOption.h"
 #include "BeatMediaControl.h"
@@ -26,21 +30,42 @@ void GameDataRoading() {
 	GameObject* cam = hierarchy()->AddGameObject();
 	cam->AddComponent<Camera>();
 
-	//플레이어 추가 
-	GameObject* go = scene1->hierarchy.AddGameObject<Player>();
-	SpriteRenderer* sp = go->AddComponent<SpriteRenderer>();
-	go->AddComponent<CircleCollider2D>();
-	go->transform()->SetLocalAngle(10.0f);
+	//3명을 담을 Player 추가 
+	GameObject* player = scene1->hierarchy.AddGameObject<Player>();
+	player->transform()->SetPosition(Vector2f(0, -350));
+	player->transform()->SetScale(Vector2f(1.3f, 1.3f));
+	player->name() = "Player";
+	player->AddComponent<CircleCollider2D>();
 
-	sp->sprite = SpriteIndex::Player2;
-	sp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
-	go->transform()->SetPosition(Vector2f(0, -400));
-	go->transform()->SetScale(Vector2f(1.3f, 1.3f));
+	//수나 오브젝트
+	GameObject* su = scene1->hierarchy.AddGameObject<suna>();
+	SpriteRenderer* sSp = su->AddComponent<SpriteRenderer>();
+	//넣을 때  n번 프레임 시작 위치, 크기
+	sSp->sprite = SpriteIndex::Player1;
+	sSp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+	sSp->TryAddAtlasRect("wa", SpriteAtlasRect(0, 0, 396, 743));
+	sSp->TrySetAtlas("wa");
 
-	go->name() = "Player";
-	//지울것
-	BeatMediaSystem::Instance().PlayMp3(MusicIndex::zzz,true);
+	su->transform()->SetParent(player->transform());
+	su->transform()->SetLocalScale(Vector2f(0.8f, 0.8f));
+	su->transform()->SetPosition(Vector2f(-70, 0));
+
+	//궁우 오브젝트
+	GameObject* woo = scene1->hierarchy.AddGameObject<gungwoo>();
+	SpriteRenderer* wSp = woo->AddComponent<SpriteRenderer>();
+	//넣을 때  n번 프레임 시작 위치, 크기
+	wSp->sprite = SpriteIndex::Player2;
+	wSp->flipX = true;
+	wSp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+	wSp->TryAddAtlasRect("wa", SpriteAtlasRect(5, 1, 361, 640));
+	wSp->TrySetAtlas("wa");
+
+	woo->transform()->SetParent(player->transform());
+	woo->transform()->SetPosition(Vector2f(70, -10));
+
 	
+	//지울것
+	BeatMediaSystem::Instance().PlayMp3(MusicIndex::kanden,true);	
 }
 
 

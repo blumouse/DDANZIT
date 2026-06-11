@@ -225,6 +225,7 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
     return true;
 }
+//수정할것
 bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** spritefilePath, unsigned int spriteCount, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount) {
     const wchar_t* className = L"DDANZIT";
 
@@ -275,8 +276,6 @@ void DDANZIT_Run()
             else if (msg.message == WM_LBUTTONDOWN)
             {
                 input._OnKeyDown(KeyCode::Mouse0);
-                //지울것
-                BeatMediaSystem::Instance().PlayMp4(VideoIndex::Suna, true);
             }
             else if (msg.message == WM_LBUTTONUP)
             {
@@ -285,8 +284,6 @@ void DDANZIT_Run()
             else if (msg.message == WM_RBUTTONDOWN)
             {
                 input._OnKeyDown(KeyCode::Mouse1);
-                //지울것
-                BeatMediaSystem::Instance().PlaySfx(SFXIndex::hit, true);
             }
             else if (msg.message == WM_RBUTTONUP)
             {
