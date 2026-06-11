@@ -58,7 +58,7 @@ void GameDataRoading() {
 	suObj->name() = "Suna";
 	sSp->sprite = SpriteIndex::suna;
 	sSp->color = Color(1.0f, 1.0f, 1.0f, 1.0f);
-	sSp->TryAddAtlasRect("idle", SpriteAtlasRect(0, 0, 396, 743));
+	sSp->TryAddAtlasRect("idle", SpriteAtlasRect(0, 0, 300, 750));
 	sSp->TrySetAtlas("idle");
 
 	suObj->transform()->SetParent(player->transform());
