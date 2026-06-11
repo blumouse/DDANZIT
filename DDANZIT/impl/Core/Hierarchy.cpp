@@ -43,6 +43,11 @@ Hierarchy& Hierarchy::operator+=(GameObject* go)
 	if (go->_transform->parent() == HIERARCY_ROOT)
 		pRootGameObjectList.push_back(go);
 
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedHierarchyInfo();
+
+#endif // USE_DEBUG_TUI
+
 
 	return *this;
 }
@@ -75,6 +80,11 @@ Hierarchy& Hierarchy::operator-=(GameObject* go)
 			pRootGameObjectList.end(), go),
 			pRootGameObjectList.end());
 
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedHierarchyInfo();
+
+#endif // USE_DEBUG_TUI
+
 
 	return *this;
 }
@@ -90,12 +100,10 @@ GameObject* Hierarchy::AddGameObject()
 
 	GameObject* go = new GameObject(scene);
 
+	go->isInitialized = true;
 
-	pGameObjectList.push_back(go);
-	go->ownerHierarchy = this;
 
-	if (go->transform()->parent() == HIERARCY_ROOT)
-		pRootGameObjectList.push_back(go);
+	*this += go;
 
 	return go;
 }

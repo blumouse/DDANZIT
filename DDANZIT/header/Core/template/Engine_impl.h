@@ -186,6 +186,9 @@ T* Hierarchy::AddGameObject()
 
 	go->isInitialized = true;
 
+
+	*this += go;
+
 	return go;
 }
 

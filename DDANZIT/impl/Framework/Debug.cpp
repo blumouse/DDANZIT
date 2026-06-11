@@ -129,12 +129,14 @@ DebugConsole::DebugConsole()
 
 	hStdin = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleScreenBufferInfo(hStdin, &csbi);
-	SetConsoleMode(hStdin, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
 
-	COORD size = { 140, 40 };
-	SMALL_RECT rect = { 0, 0, 140, 40 };
-	SetConsoleScreenBufferSize(hStdin, size);
-	SetConsoleWindowInfo(hStdin, TRUE, &rect);
+	SetConsoleMode(hStdin, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS & ~ENABLE_QUICK_EDIT_MODE);
+
+	//COORD size = { 140, 40 };
+	//SMALL_RECT rect = { 0, 0, 140, 50 };
+	//SetConsoleScreenBufferSize(debugConsole.hStdin, size);
+	//SetConsoleWindowInfo(debugConsole.hStdin, TRUE, &rect);
+	cout << "\x1b[8;40;140t";
 	hideCursor();
 
 	// 현재 보여지는 창의 가로(칸)와 세로(줄) 크기 계산
@@ -252,7 +254,7 @@ void ConsoleFrame::Draw()
 		DebugConsole::gotoxy(GetAbsoluteX(), GetAbsoluteY() + i);
 		cout << "|";
 
-		DebugConsole::gotoxy(GetAbsoluteX() + width, GetAbsoluteY() + i);
+		DebugConsole::gotoxy(GetAbsoluteX() + width - 1, GetAbsoluteY() + i);
 		cout << "|";
 	}
 
@@ -386,12 +388,12 @@ void Debug::InitializeDebugInfo()
 {
 	// 140, 40
 
-	manage = new ConsoleFrame(0, 0, 52, 23);
-	sceneList = new ConsoleFrame(52, 0, 20, 23);
-	console = new ConsoleFrame(0, 23, 74, 14);
+	manage = new ConsoleFrame(0, 0, 50, 23);
+	sceneList = new ConsoleFrame(50, 0, 24, 23);
+	console = new ConsoleFrame(0, 23, 74, 16);
 
-	hierarchy = new ConsoleFrame(75, 0, 23, 39);
-	inspector = new ConsoleInspector(99, 0, 39, 39);
+	hierarchy = new ConsoleFrame(74, 0, 24, 39);
+	inspector = new ConsoleInspector(98, 0, 40, 39);
 
 	// Run 직전..시작시에 최초 호출
 	// 이때는 직접 발로 뛰면서 다 모든정보 수집하고 콘솔오브젝트 만들기
@@ -450,7 +452,7 @@ void Debug::HandleDebugConsoleInput()
 		if (ir.EventType == MOUSE_EVENT)
 		{
 			// TODO
-			if (ir.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED)
+			if (ir.Event.MouseEvent.dwEventFlags == 0 && ir.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED)
 			{
 				COORD mousePos = ir.Event.MouseEvent.dwMousePosition;
 				OnDebugConsoleClick(mousePos.X, mousePos.Y);
@@ -520,7 +522,7 @@ void Debug::BuildManage()
 	// timescale pause consoleclear
 	// 19 20번 줄은 커맨드 입력 / 백로그 칸
 
-	manage->AddChild(new ConsoleButton(20, 1, 14, 1, "[Pause/Resume]", [&]() {
+	manage->AddChild(new ConsoleButton(30, 1, 14, 1, "[Pause/Resume]", [&]() {
 		if (!Application::_isPause)
 			Application::Pause();
 		else
@@ -529,7 +531,7 @@ void Debug::BuildManage()
 	manage->AddChild(new ConsoleButton(1, 21, 7, 1, "[Clear]", [&]() {
 		ClearConsole();
 		}));
-	manage->AddChild(new ConsoleText(3, 18, 9, 1, "== CMD =="));
+	manage->AddChild(new ConsoleText(4, 17, 11, 1, "=== CMD ==="));
 
 	isManageChanged = true;
 }
@@ -541,7 +543,7 @@ void Debug::DrawManage()
 
 void Debug::LogCommand(const std::string& message)
 {
-	if (log = nullptr)
+	if (log == nullptr)
 	{
 		log = new ConsoleText(1, 19, message.size(), 1, message);
 		manage->AddChild(log);
@@ -812,6 +814,7 @@ void Debug::DrawDebugConsole()
 		isSceneChanged = false;
 	}
 
+	DebugConsole::gotoxy(139, 39);
 }
 
 #pragma endregion

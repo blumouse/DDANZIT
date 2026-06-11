@@ -1,6 +1,7 @@
 #include "Transform.h"
 
 #include "DefineOption.h"
+#include "Debug.h"
 
 #include "Scene.h"
 
@@ -263,7 +264,12 @@ void Transform::SetParent(Transform* parent)
 		_parent->RemoveChild(this);
 
 	parent->AddChild(this);
-	
+
+
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedHierarchyInfo();
+
+#endif // USE_DEBUG_TUI
 
 	_parent = parent;
 }

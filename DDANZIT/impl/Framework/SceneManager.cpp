@@ -5,6 +5,9 @@
 #include "Scene.h"
 #include "GameObject.h"
 
+#include "Debug.h"
+
+
 using namespace std;
 
 
@@ -121,6 +124,12 @@ void SceneManager::LoadScene(Scene* scene)
 
 	pLoadedSceneList.push_back(scene);
 	scene->isLoaded = true;
+
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedSceneInfo();
+
+#endif // USE_DEBUG_TUI
+
 }
 
 void SceneManager::LoadScene(Scene* scene, LoadSceneMode mode)
@@ -135,6 +144,11 @@ void SceneManager::LoadScene(Scene* scene, LoadSceneMode mode)
 
 		pLoadedSceneList.push_back(scene);
 		mainScene->isLoaded = true;
+
+#ifdef USE_DEBUG_TUI
+		Debug::ChangedSceneInfo();
+
+#endif // USE_DEBUG_TUI
 	}
 }
 
@@ -194,6 +208,11 @@ bool SceneManager::UnloadScene(Scene* scene)
 		pLoadedSceneList.end());
 
 	scene->isLoaded = false;
+
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedSceneInfo();
+
+#endif // USE_DEBUG_TUI
 
 	return true;
 }
