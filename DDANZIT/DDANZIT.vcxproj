@@ -76,6 +76,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,6 +93,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,6 +109,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +126,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)header;$(ProjectDir)header\Core;$(ProjectDir)header\Core\template;$(ProjectDir)header\Framework;$(ProjectDir)header\Framework\Component;$(ProjectDir)impl;$(ProjectDir)impl\Core;$(ProjectDir)impl\Framework;$(ProjectDir)impl\Framework\Component;$(ProjectDir)Service;$(ProjectDir)Util</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,26 +135,81 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="DDANZIT.cpp" />
+    <ClCompile Include="BeatMediaControl.cpp" />
+    <ClCompile Include="impl\CodeEdit.cpp" />
+    <ClCompile Include="impl\Core\D2DRenderer.cpp" />
+    <ClCompile Include="impl\Core\DDANZIT.cpp" />
+    <ClCompile Include="impl\Core\DDANZIT_Core.cpp" />
+    <ClCompile Include="impl\Core\GameObjectDesciptor.cpp" />
+    <ClCompile Include="impl\Core\Hierarchy.cpp" />
+    <ClCompile Include="impl\Core\IDrawable.cpp" />
+    <ClCompile Include="impl\Core\Lifecycle.cpp" />
+    <ClCompile Include="impl\Framework\Application.cpp" />
+    <ClCompile Include="impl\Framework\Component.cpp" />
+    <ClCompile Include="impl\Framework\Component\BoxCollider2D.cpp" />
+    <ClCompile Include="impl\Framework\Component\Camera.cpp" />
+    <ClCompile Include="impl\Framework\Component\CircleCollider2D.cpp" />
+    <ClCompile Include="impl\Framework\Component\Collider2D.cpp" />
+    <ClCompile Include="impl\Framework\Component\Collision2D.cpp" />
+    <ClCompile Include="impl\Framework\Component\Rigidbody2D.cpp" />
+    <ClCompile Include="impl\Framework\Component\SpriteRenderer.cpp" />
+    <ClCompile Include="impl\Framework\Component\Transform.cpp" />
+    <ClCompile Include="impl\Framework\Debug.cpp" />
+    <ClCompile Include="impl\Framework\Draw2D.cpp" />
+    <ClCompile Include="impl\Framework\GameObject.cpp" />
+    <ClCompile Include="impl\Framework\Input.cpp" />
+    <ClCompile Include="impl\Framework\MonoBehavior.cpp" />
+    <ClCompile Include="impl\Framework\Scene.cpp" />
+    <ClCompile Include="impl\Framework\SceneManager.cpp" />
+    <ClCompile Include="impl\Framework\GameTime.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MngObject.cpp" />
-    <ClCompile Include="NewObject.cpp" />
-    <ClCompile Include="NewVisual.cpp" />
-    <ClCompile Include="ObjectData.cpp" />
-    <ClCompile Include="ObjectLogic.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="ObjectVisual.cpp" />
-    <ClCompile Include="Pipeline.cpp" />
+    <ClCompile Include="MyObject.cpp" />
+    <ClCompile Include="MyObject.h" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Script.cpp" />
+    <ClCompile Include="Script.h" />
+    <ClCompile Include="Util\GameTimer.cpp" />
+    <ClCompile Include="Util\RenderHelp.cpp" />
+    <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="DDANZIT.h" />
-    <ClInclude Include="ObjectData.h" />
-    <ClInclude Include="ObjectLogic.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="ObjectVisual.h" />
-    <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="BeatMediaControl.h" />
+    <ClInclude Include="header\Core\D2DRenderer.h" />
+    <ClInclude Include="header\Core\DDANZIT_Core.h" />
+    <ClInclude Include="header\Core\GameObjectDesciptor.h" />
+    <ClInclude Include="header\Core\Hierarchy.h" />
+    <ClInclude Include="header\Core\IDrawable.h" />
+    <ClInclude Include="header\Core\IRenderer.h" />
+    <ClInclude Include="header\Core\Lifecycle.h" />
+    <ClInclude Include="header\Core\template\Engine_impl.h" />
+    <ClInclude Include="header\Framework\Application.h" />
+    <ClInclude Include="header\Framework\Component.h" />
+    <ClInclude Include="header\Framework\Component\Camera.h" />
+    <ClInclude Include="header\Framework\Component\Collider2D.h" />
+    <ClInclude Include="header\Framework\Component\Collision2D.h" />
+    <ClInclude Include="header\Framework\Component\Rigidbody2D.h" />
+    <ClInclude Include="header\Framework\Component\SpriteRenderer.h" />
+    <ClInclude Include="header\Framework\Component\Transform.h" />
+    <ClInclude Include="header\Framework\Debug.h" />
+    <ClInclude Include="header\Framework\Draw2D.h" />
+    <ClInclude Include="header\Framework\GameObject.h" />
+    <ClInclude Include="header\Framework\Input.h" />
+    <ClInclude Include="header\Framework\MonoBehavior.h" />
+    <ClInclude Include="header\Framework\Scene.h" />
+    <ClInclude Include="header\Framework\SceneManager.h" />
+    <ClInclude Include="header\Framework\GameTime.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="ResourceFilePath.h" />
+    <ClInclude Include="Service\CodeEdit.h" />
+    <ClInclude Include="Service\DDANZIT.h" />
+    <ClInclude Include="Service\DDANZITEngine.h" />
+    <ClInclude Include="Service\DefineOption.h" />
+    <ClInclude Include="Service\SceneManagement.h" />
+    <ClInclude Include="Util\Color.h" />
+    <ClInclude Include="Util\GameTimer.h" />
+    <ClInclude Include="Util\INC_Windows.h" />
+    <ClInclude Include="Util\RenderHelp.h" />
+    <ClInclude Include="Util\Utillity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
