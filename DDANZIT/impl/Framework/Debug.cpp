@@ -126,12 +126,16 @@ DebugConsole::DebugConsole()
 	freopen_s(&stream, "CONOUT$", "w", stdout);
 	freopen_s(&stream, "CONIN$", "r", stdin);
 
-	hideCursor();
-	system("mode con cols=140 lines=40");	// ?
 
 	hStdin = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleScreenBufferInfo(hStdin, &csbi);
 	SetConsoleMode(hStdin, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
+
+	COORD size = { 140, 40 };
+	SMALL_RECT rect = { 0, 0, 140, 40 };
+	SetConsoleScreenBufferSize(hStdin, size);
+	SetConsoleWindowInfo(hStdin, TRUE, &rect);
+	hideCursor();
 
 	// 현재 보여지는 창의 가로(칸)와 세로(줄) 크기 계산
 	columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
