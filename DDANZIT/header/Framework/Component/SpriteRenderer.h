@@ -70,7 +70,7 @@ public:
 
 public:
 	std::unordered_map<std::string, SpriteAtlasRect> atlasRectMap;
-private:
+public:
 	SpriteAtlasRect currentAtlas;
 
 #pragma endregion

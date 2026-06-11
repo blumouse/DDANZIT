@@ -18,8 +18,10 @@ typedef enum class SpriteIndex
 	Capsule = -4,
 	// 스프라이트 리소스는 0번부터 (인덱스)
 
-	Player1 = 0,
-	Player2 = 1
+	suna = 0,
+	gung = 1,
+	aria = 2,
+	
 } Sprite;
 
 

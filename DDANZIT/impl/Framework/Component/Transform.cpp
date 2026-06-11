@@ -47,17 +47,13 @@ Transform::Transform(const Transform& other) :
 void Transform::SetPosition(Vector2 newPosition)
 {
 	Vector2 parentPosition = Vector2(0,0);
-	
-	//수정할것
-	//set에서 부모 포지션을 더할 지 
-	////position에서 부모 포지션을 더할지 정해야 함
-	////Transform* par = _parent;
+	Transform* par = _parent;
 
-	////while (par != HIERARCY_ROOT)
-	////{
-	////	parentPosition += par->_localPosition;
-	////	par = par->_parent;
-	////}
+	while (par != HIERARCY_ROOT)
+	{
+		parentPosition += par->_localPosition;
+		par = par->_parent;
+	}
 
 	_localPosition = newPosition - parentPosition;
 }

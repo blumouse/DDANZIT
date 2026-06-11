@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="aria.cpp" />
     <ClCompile Include="BeatMediaControl.cpp" />
+    <ClCompile Include="characterAnimation.cpp" />
     <ClCompile Include="gungwoo.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\D2DRenderer.cpp" />
@@ -178,6 +179,7 @@
   <ItemGroup>
     <ClInclude Include="aria.h" />
     <ClInclude Include="BeatMediaControl.h" />
+    <ClInclude Include="characterAnimation.h" />
     <ClInclude Include="gungwoo.h" />
     <ClInclude Include="header\Core\D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />

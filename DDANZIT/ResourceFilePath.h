@@ -5,6 +5,7 @@
 const wchar_t* filePath[] = {
     L"..\\Resource\\img\\Player1.png",
     L"..\\Resource\\img\\Player2.png",
+    L"..\\Resource\\img\\Player3.png",
 };
 
 const wchar_t* Mp3FilePath[] =
