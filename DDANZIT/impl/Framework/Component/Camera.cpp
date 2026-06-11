@@ -401,17 +401,19 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeScaleX;
 				float relativeScaleY;
 
-				if (cmd.useAtlas)
-				{
-					relativeScaleX = (float)cmd.sliceWidth * cmd.scaleX / worldToScreenRatio;	// 비트맵 픽셀좌표를 월드로 밀어넣는다
-					relativeScaleY = (float)cmd.sliceHeight * cmd.scaleY / worldToScreenRatio;
-				}
-				else
-				{
-					relativeScaleX = cmd.scaleX / worldToScreenRatio;
-					relativeScaleY = cmd.scaleY / worldToScreenRatio;
-				}
+				//if (cmd.useAtlas)
+				//{
+				//	relativeScaleX = (float)cmd.sliceWidth * cmd.scaleX / worldToScreenRatio;	// 비트맵 픽셀좌표를 월드로 밀어넣는다
+				//	relativeScaleY = (float)cmd.sliceHeight * cmd.scaleY / worldToScreenRatio;
+				//}
+				//else
+				//{
+				//	relativeScaleX = cmd.scaleX / worldToScreenRatio;
+				//	relativeScaleY = cmd.scaleY / worldToScreenRatio;
+				//}
 
+				relativeScaleX = cmd.scaleX / worldToScreenRatio;
+				relativeScaleY = cmd.scaleY / worldToScreenRatio;
 
 				// 반전이랑 스케일링이랑 동치라고 하네요
 				if (cmd.flipX)
@@ -481,7 +483,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 
 				// 그리기~
-				D2D1_POINT_2F localOffset = D2D1::Point2F(srcWidth / -2.0f, srcHeight / -2.0f);
+				D2D1_POINT_2F localOffset = D2D1::Point2F(srcWidth / -2.0f - srcX, srcHeight / -2.0f - srcY);
 				//D2D1_RECT_F destRect = D2D1::RectF(x, y, x + relativeScaleX * worldToScreenRatio, y + relativeScaleY * worldToScreenRatio);
 				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 

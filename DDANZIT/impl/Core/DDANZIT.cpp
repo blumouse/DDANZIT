@@ -206,6 +206,38 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     return true;
 }
 
+bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** spritefilePath, unsigned int spriteCount, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount) {
+    const wchar_t* className = L"DDANZIT";
+
+    if (!Create(className, windowName, width, height))
+        return false;
+
+    time.Init();
+
+
+    if (!gameCore.isInitialized)
+        gameCore.InitGraphicSettings(g_hWnd);
+
+
+    for (unsigned int i = 0; i < spriteCount; i++)
+    {
+        if (gameCore.LoadBitmapResource(spritefilePath[i]) == -1)
+            return false;
+    }
+
+    if (!BeatMediaSystem::Instance().Initialize(g_hWnd, mp3filePath, mp3Count, mp4filePath, mp4Count, sfxfilePath, sfxCount))
+    {
+        HRESULT error = BeatMediaSystem::Instance().LastError();
+
+        return false;
+    }
+
+    Application::_isPlaying = false;
+    Application::_isQuit = false;
+
+    return true;
+}
+
 void DDANZIT_Run() 
 {
     Application::_isPlaying = true;

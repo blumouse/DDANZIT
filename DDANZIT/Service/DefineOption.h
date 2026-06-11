@@ -21,6 +21,35 @@ typedef enum class SpriteIndex
 } Sprite;
 
 
+typedef enum class MusicIndex
+{
+	None = -1,
+	// 리소스는 0번부터 (인덱스)
+	zzz = 0,
+	kanden = 1,
+
+} Music;
+
+typedef enum class VideoIndex
+{
+	None = -1,
+	//리소스는 0번부터 (인덱스)
+	Aria = 0,
+	GungWoo = 1,
+	Suna = 2,
+
+} Video;
+
+
+typedef enum class SFXIndex
+{
+	None = -1,
+	//리소스는 0번부터 (인덱스)
+	hit = 0,
+
+} SFX;
+
+
 
 //
 //
