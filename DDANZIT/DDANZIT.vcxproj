@@ -135,7 +135,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BeatMediaControl.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\D2DRenderer.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
@@ -153,6 +152,7 @@
     <ClCompile Include="impl\Framework\Component\Collision2D.cpp" />
     <ClCompile Include="impl\Framework\Component\Rigidbody2D.cpp" />
     <ClCompile Include="impl\Framework\Component\SpriteRenderer.cpp" />
+    <ClCompile Include="impl\Framework\Component\Text.cpp" />
     <ClCompile Include="impl\Framework\Component\Transform.cpp" />
     <ClCompile Include="impl\Framework\Debug.cpp" />
     <ClCompile Include="impl\Framework\Draw2D.cpp" />
@@ -167,13 +167,12 @@
     <ClCompile Include="MyObject.h" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Script.h" />
-    <ClCompile Include="Text.cpp" />
+    <ClCompile Include="Util\BeatMediaControl.cpp" />
     <ClCompile Include="Util\GameTimer.cpp" />
     <ClCompile Include="Util\RenderHelp.cpp" />
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BeatMediaControl.h" />
     <ClInclude Include="header\Core\D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
@@ -189,6 +188,7 @@
     <ClInclude Include="header\Framework\Component\Collision2D.h" />
     <ClInclude Include="header\Framework\Component\Rigidbody2D.h" />
     <ClInclude Include="header\Framework\Component\SpriteRenderer.h" />
+    <ClInclude Include="header\Framework\Component\Text.h" />
     <ClInclude Include="header\Framework\Component\Transform.h" />
     <ClInclude Include="header\Framework\Debug.h" />
     <ClInclude Include="header\Framework\Draw2D.h" />
@@ -203,7 +203,7 @@
     <ClInclude Include="Service\DDANZITEngine.h" />
     <ClInclude Include="Service\DefineOption.h" />
     <ClInclude Include="Service\SceneManagement.h" />
-    <ClInclude Include="Text.h" />
+    <ClInclude Include="Util\BeatMediaControl.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\GameTimer.h" />
     <ClInclude Include="Util\INC_Windows.h" />
