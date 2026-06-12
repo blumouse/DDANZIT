@@ -19,10 +19,6 @@ public:
 	friend class GameObject;
 	friend class Camera;
 
-	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
-	friend void DDANZIT_Run();
-	friend void DDANZIT_Finalize();
-
 #pragma region Constructor
 
 private:
@@ -95,6 +91,9 @@ public:
 public:
 	// 보기좋은 degree, 일단 지금은 로컬그대로 놔둠
 	void SetLocalAngle(float degree);
+	float localAngle() const;
+
+	void SetAngle(float degree);
 	float angle() const;
 
 

@@ -173,9 +173,29 @@ void Transform::SetLocalAngle(float degree)
 	_localDirection.y = sin(radians);
 }
 
-float Transform::angle() const 
+float Transform::localAngle() const 
 { 
 	float radians = atan2(_localDirection.y, _localDirection.x);
+
+	return radians * RAD2DEG;
+}
+
+
+void Transform::SetAngle(float degree)
+{
+	Vector2 dir = direction();
+	float parRadians = atan2(dir.x, dir.y);
+
+	float radians = degree * DEG2RAD;
+
+	_localDirection.x = cos(radians - parRadians);
+	_localDirection.y = sin(radians - parRadians);
+}
+
+float Transform::angle() const
+{
+	Vector2 dir = direction();
+	float radians = atan2(dir.y, dir.x);
 
 	return radians * RAD2DEG;
 }

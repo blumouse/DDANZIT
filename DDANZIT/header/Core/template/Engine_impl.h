@@ -99,6 +99,9 @@ CircleCollider2D* GameObject::AddComponent<CircleCollider2D>();
 template <>
 Rigidbody2D* GameObject::AddComponent<Rigidbody2D>();
 
+template <>
+Text* GameObject::AddComponent<Text>();
+
 #pragma endregion
 
 

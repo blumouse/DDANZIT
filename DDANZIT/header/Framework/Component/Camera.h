@@ -100,7 +100,7 @@ private:
 #endif
 
 #ifdef RENDER_MODE_DIRECT2D
-	void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect) override;
+	void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect, IDWriteFactory5* writeFactory) override;
 
 #endif
 
