@@ -49,6 +49,8 @@ typedef enum class SpriteIndex
 #define MAX_COMPONENT_NUM				20
 
 
+#define FRAME_LATE						60
+
 
 //
 //

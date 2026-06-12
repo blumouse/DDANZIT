@@ -24,7 +24,8 @@ public:
     DebugConsole();
     ~DebugConsole();
 
-    HANDLE hStdin;
+    static HANDLE hStdin;
+    static HANDLE hStdout;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     int columns, rows;
 
@@ -114,6 +115,8 @@ public:
 
     void AddChild(ConsolePollingText* child);
     void ClearChild();
+
+    void Draw() override;
 };
 
 

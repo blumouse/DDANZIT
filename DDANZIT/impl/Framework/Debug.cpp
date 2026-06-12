@@ -43,7 +43,7 @@ void Debug::Log(const std::string& message)
 
 #endif // USE_DEBUG_TUI
 
-	cout << message << endl;
+	std::cout << message << endl;
 
 #endif // USE_DEBUG
 
@@ -118,6 +118,10 @@ void Debug::Assert(bool condition, std::string message, GameObject* context)
 
 #pragma region Console
 
+HANDLE DebugConsole::hStdin = nullptr; 
+HANDLE DebugConsole::hStdout = nullptr;
+
+
 DebugConsole::DebugConsole()
 {
 	AllocConsole();
@@ -127,16 +131,24 @@ DebugConsole::DebugConsole()
 	freopen_s(&stream, "CONIN$", "r", stdin);
 
 
-	hStdin = GetStdHandle(STD_OUTPUT_HANDLE);
+	hStdin = CreateFile(TEXT("CONIN$"), GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING, 0, NULL);
 	GetConsoleScreenBufferInfo(hStdin, &csbi);
 
-	SetConsoleMode(hStdin, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS & ~ENABLE_QUICK_EDIT_MODE);
+	DWORD targetMode = ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
+
+	if (!SetConsoleMode(hStdin, targetMode))
+		std::cout << "failed " << GetLastError();
 
 	//COORD size = { 140, 40 };
 	//SMALL_RECT rect = { 0, 0, 140, 50 };
 	//SetConsoleScreenBufferSize(debugConsole.hStdin, size);
 	//SetConsoleWindowInfo(debugConsole.hStdin, TRUE, &rect);
-	cout << "\x1b[8;40;140t";
+	std::cout << "\x1b[8;40;140t";
+
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+
 	hideCursor();
 
 	// 현재 보여지는 창의 가로(칸)와 세로(줄) 크기 계산
@@ -190,7 +202,8 @@ void DebugConsole::ToggleShow()
 void DebugConsole::gotoxy(int x, int y)
 {
 	COORD pos = { (SHORT)x, (SHORT)y };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+	//SetConsoleCursorPosition(hStdin, pos);
+	SetConsoleCursorPosition(hStdout, pos);
 }
 
 void DebugConsole::hideCursor()
@@ -198,7 +211,7 @@ void DebugConsole::hideCursor()
 	CONSOLE_CURSOR_INFO cursorInfo;
 	cursorInfo.bVisible = 0; // false로 설정하여 커서 숨김
 	cursorInfo.dwSize = 1;
-	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+	SetConsoleCursorInfo(hStdout, &cursorInfo);
 }
 
 #pragma endregion
@@ -297,6 +310,37 @@ void ConsoleInspector::AddChild(ConsolePollingText* child)
 	child->SetParent(this);
 	childrenInspector.push_back(child);
 	currentChildY++;
+}
+
+void ConsoleInspector::Draw()
+{
+	DebugConsole::gotoxy(GetAbsoluteX(), GetAbsoluteY());
+
+	// 상단
+	cout << "+";
+	for (int i = 1; i < width - 1; i++)
+		cout << "-";
+	cout << "+";
+
+	for (int i = 1; i < height - 1; i++)
+	{
+		DebugConsole::gotoxy(GetAbsoluteX(), GetAbsoluteY() + i);
+		cout << "|";
+
+		DebugConsole::gotoxy(GetAbsoluteX() + width - 1, GetAbsoluteY() + i);
+		cout << "|";
+	}
+
+	DebugConsole::gotoxy(GetAbsoluteX(), GetAbsoluteY() + height - 1);
+	// 하단
+	cout << "+";
+	for (int i = 1; i < width - 1; i++)
+		cout << "-";
+	cout << "+";
+
+
+	for (auto* child : childrenInspector)
+		child->Draw();
 }
 
 void ConsoleInspector::ClearChild()
@@ -436,6 +480,7 @@ void Debug::ChangedHierarchyInfo()
 
 void Debug::AddConsoleLog(const std::string& message)
 {
+	// TODO: 이거 스택이 있어야되네
 	console->AddChild(new ConsoleText(1, console->height - console->currentChildY - 1, message.size(), 1, message));
 	isConsoleChanged = true;
 }
@@ -484,12 +529,11 @@ void Debug::HandleDebugConsoleInput()
 					// [일반 문자] 스페이스바(32)부터 물결표(126)까지의 출력 가능한 문자만 추가
 					commandLine += key;
 				}
-
-				COORD cmdPos = { 2, 22 };
-				SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), cmdPos);
-				cout << "Cmd > " << commandLine << "               ";
 			}
 		}
+
+		DebugConsole::gotoxy(2, 20);
+		cout << "Cmd > " << commandLine << "               ";
 	}
 }
 
@@ -616,7 +660,7 @@ void Debug::DrawHierarchy()
 
 				string name = curr->_gameObject->_name.substr(0, hierarchy->width - 2 - depth);
 
-				hierarchy->AddChild(new ConsoleButton(depth, hierarchy->currentChildY, name.size(), 1, name, [&]() {
+				hierarchy->AddChild(new ConsoleButton(depth, hierarchy->currentChildY, name.size(), 1, name, [=]() {
 					highlightedObject = curr->_gameObject;
 					BuildInspector();
 					}));
@@ -653,31 +697,30 @@ void Debug::BuildInspector()
 
 		// 먼저 오브젝트 정보 액티브 이름
 		if (!highlightedObject->_active || !highlightedObject->parentActive)
-			name = "== ○ " + highlightedObject->_name.substr(0, inspector->width - 8);
+			name = " == ○ " + highlightedObject->_name.substr(0, inspector->width - 4) + " ==";
 		else
-			name = "== ● " + highlightedObject->_name.substr(0, inspector->width - 8);
+			name = " == ● " + highlightedObject->_name.substr(0, inspector->width - 4) + " ==";
 
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, name));
 		inspector->currentChildY++;		// 한줄 띄우기
 
-
 		// 트랜스폼 따로
 		Transform* tr = highlightedObject->_transform;
 
-		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, "   Transform"));
+		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, "=   Transform ="));
 
 		// 넓이계산 포기; 차피 버튼 아님
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Position\t\tX {}  Y {}", tr->_localPosition.x, tr->_localPosition.y);
+			return format("Position\t    X {}  Y {}", tr->_localPosition.x, tr->_localPosition.y);
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Angle\t\t{}", tr->angle());
+			return format("Angle\t    {}", tr->angle());
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Scale\t\tX {}  Y {}", tr->_localScale.x, tr->_localScale.y);
+			return format("Scale\t    X {}  Y {}", tr->_localScale.x, tr->_localScale.y);
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Depth\t\t{}", tr->_depth);
+			return format("Depth\t    {}", tr->_depth);
 			}));
 
 
@@ -688,11 +731,11 @@ void Debug::BuildInspector()
 			name = type;
 
 			if (!comp->_active || !comp->parentActive)
-				active = " ○ ";
+				active = "= ○ ";
 			else
-				active = " ● ";
+				active = "= ● ";
 
-			inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, active + name));
+			inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, active + name + " ="));
 
 			if (type == "MonoBehavior")
 			{
@@ -703,19 +746,19 @@ void Debug::BuildInspector()
 				SpriteRenderer* sp = static_cast<SpriteRenderer*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [sp]() {
-					return format("SpriteIndex\t\t{}", (int)sp->sprite);
+					return format("SpriteIndex\t    {}", (int)sp->sprite);
 					}));
 				if (sp->useAtlas)
 				{
 					inspector->AddChild(new ConsolePollingText(2, inspector->currentChildY, [sp]() {
-						return format("Atlas\t\tX {}  Y {}  W {}  H {}", sp->currentAtlas.pixel_OffsetX, sp->currentAtlas.pixel_OffsetY, sp->currentAtlas.pixel_Width, sp->currentAtlas.pixel_Height);
+						return format("Atlas\t    X {}  Y {}  W {}  H {}", sp->currentAtlas.pixel_OffsetX, sp->currentAtlas.pixel_OffsetY, sp->currentAtlas.pixel_Width, sp->currentAtlas.pixel_Height);
 						}));
 				}
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [sp]() {
-					return format("Color\t\tR {}  G {}  B {}  A {}", sp->color.r, sp->color.g, sp->color.b, sp->color.a);
+					return format("Color\t    R {}  G {}  B {}  A {}", sp->color.r, sp->color.g, sp->color.b, sp->color.a);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [sp]() {
-					return format("Flip\t\t{} X  {} Y", sp->flipX ? 'O' : 'X', sp->flipY ? 'O' : 'X');
+					return format("Flip\t\t    {} X  {} Y", sp->flipX ? 'O' : 'X', sp->flipY ? 'O' : 'X');
 					}));
 			}
 			else if (type == "Rigidbody2D")
@@ -723,7 +766,7 @@ void Debug::BuildInspector()
 				Rigidbody2D* rigid = static_cast<Rigidbody2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [rigid]() {
-					return format("Body Type\t\t{}", rigid->bodyType == RigidBodyType2D::Kinematic ? "Kinematic" : (rigid->bodyType == RigidBodyType2D::Static ? "Static" : "Dynamic"));
+					return format("Body Type\t    {}", rigid->bodyType == RigidBodyType2D::Kinematic ? "Kinematic" : (rigid->bodyType == RigidBodyType2D::Static ? "Static" : "Dynamic"));
 					}));
 			}
 			else if (type == "BoxCollider2D")
@@ -731,13 +774,13 @@ void Debug::BuildInspector()
 				BoxCollider2D* col = static_cast<BoxCollider2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Is Trigger\t\t{}", col->_isTrigger ? 'O' : 'X');
+					return format("Is Trigger\t    {}", col->_isTrigger ? 'O' : 'X');
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Offset\t\tX {}  Y {}", col->_offset.x, col->_offset.y);
+					return format("Offset\t    X {}  Y {}", col->_offset.x, col->_offset.y);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Size\t\tX {}  Y {}", col->_size.x, col->_size.y);
+					return format("Size\t\t    X {}  Y {}", col->_size.x, col->_size.y);
 					}));
 			}
 			else if (type == "CircleCollider2D")
@@ -745,13 +788,13 @@ void Debug::BuildInspector()
 				CircleCollider2D* col = static_cast<CircleCollider2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Is Trigger\t\t{}", col->_isTrigger ? 'O' : 'X');
+					return format("Is Trigger\t    {}", col->_isTrigger ? 'O' : 'X');
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Offset\t\tX {}  Y {}", col->_offset.x, col->_offset.y);
+					return format("Offset\t    X {}  Y {}", col->_offset.x, col->_offset.y);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Radius\t\t{}", col->_size.x);
+					return format("Radius\t    {}", col->_size.x);
 					}));
 			}
 			else if (type == "Camera")
@@ -759,7 +802,7 @@ void Debug::BuildInspector()
 				Camera* cam = static_cast<Camera*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-					return format("Depth\t\t{}", tr->_depth);
+					return format("Depth\t    {}", tr->_depth);
 					}));
 			}
 		}

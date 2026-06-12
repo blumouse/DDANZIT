@@ -16,6 +16,7 @@ public:
 
 private:
     static GameTimer* pGameTimer;
+    static float frameCount;
     static float fFrameCount;
     static float timeScale;
 
@@ -30,7 +31,7 @@ private:
 
 public:
     static float unscaledDeltaTime();
-    static float deltaTime();
+    static float deltaTime();   // 밀리초니까 1000.0f 나눠서 쓰는게 좋을지도
     static float fixedDeltaTime();
 };
 

@@ -7,7 +7,7 @@
 
 #pragma region Constructor
 
-Collider2D::Collider2D(GameObject* pGameObject, const std::string& typeName)
+Collider2D::Collider2D(GameObject* pGameObject, std::string_view typeName)
 	: Component(pGameObject, typeName), _offset(Vector2(0.0f, 0.0f)), attachedBody(nullptr), _size(Vector2(1.0f, 1.0f))
 {
 	SetBoundingRadius();

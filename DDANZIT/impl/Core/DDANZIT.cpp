@@ -295,11 +295,6 @@ void DDANZIT_Run()
 
 #endif // USE_DEBUG_TUI
 
-            if (Application::_isPause)
-                continue;
-
-
-
             gameCore._Awake();
 
             // 생성 시에만 큐에서 호출
@@ -319,6 +314,9 @@ void DDANZIT_Run()
             {
                 time.Tick();
 
+                if (Application::_isPause)
+                    continue;
+
 
                 while (time.fFrameCount >= time.fixedDeltaTime())
                 {
@@ -331,50 +329,56 @@ void DDANZIT_Run()
 
                     time.fFrameCount -= time.fixedDeltaTime();
                 }
-
-
-                // gameCore._OnMouse...();
-
-
-                gameCore._Update();
-
-                // gameCore._WaitForSeconds();
-                // gameCore._StartCoroutine();
-
-                gameCore._LateUpdate();
-
-
                 time.fFrameCount += time.deltaTime();
 
-                input.Tick();
-            }
+                if (time.frameCount >= 1000.0f / (float)FRAME_LATE)
+                {
+                    // gameCore._OnMouse...();
 
 
-            /* DDANZIT_Render() */
-            {
-                // 0. 초기화
-                gameCore._InitDraw();
-                
-                // 1. 드로우 커맨드로 스케치
-                gameCore._Sketch();
+                    gameCore._Update();
 
-                // TODO_LATER: 레이어 별로 리소스순 정렬?
-                
+                    // gameCore._WaitForSeconds();
+                    // gameCore._StartCoroutine();
 
-                // 2. 렌더러로 디바이스 드로우콜
-                gameCore._Render();
-
-                // TODO_LATER: 영상 후처리
-                // gameCore._PostProcess();
+                    gameCore._LateUpdate();
 
 
-                // 3. 프레젠트
-                gameCore._Present();
+                    input.Tick();
 
 
-                // 4. 커맨드 클리어 후처리
-                gameCore._Clear();
+                    /* DDANZIT_Render() */      // 여기로 와버렸다
+                    {
+                        // 0. 초기화
+                        gameCore._InitDraw();
 
+                        // 1. 드로우 커맨드로 스케치
+                        gameCore._Sketch();
+
+                        // TODO_LATER: 레이어 별로 리소스순 정렬?
+
+
+                        // 2. 렌더러로 디바이스 드로우콜
+                        gameCore._Render();
+
+                        // TODO_LATER: 영상 후처리
+                        // gameCore._PostProcess();
+
+
+                        // 3. 프레젠트
+                        gameCore._Present();
+
+
+                        // 4. 커맨드 클리어 후처리
+                        gameCore._Clear();
+
+                    }
+
+
+                    while (time.frameCount >= 1000.0f / (float)FRAME_LATE)
+                        time.frameCount -= 1000.0f / (float)FRAME_LATE;
+                }
+                time.frameCount += time.unscaledDeltaTime();
             }
 
 
@@ -405,7 +409,7 @@ void DDANZIT_Run()
 
 
             // 다음 프레임...
-            
+
         }
     }
 
