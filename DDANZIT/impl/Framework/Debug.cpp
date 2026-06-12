@@ -662,7 +662,7 @@ void Debug::DrawHierarchy()
 
 	for (Scene* scene : SceneManager::pLoadedSceneList)
 	{
-		string name = scene->name().substr(0, hierarchy->width - 2);
+		string name = " = " + scene->name().substr(0, hierarchy->width - 5);
 
 		hierarchy->AddChild(new ConsoleText(1, hierarchy->currentChildY, name.size(), 1, name));
 
@@ -795,7 +795,7 @@ void Debug::BuildInspector()
 				BoxCollider2D* col = static_cast<BoxCollider2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Is Trigger\t    {}  ", col->_isTrigger ? 'o' : 'x');
+					return format("Is Trigger\t\t    {}  ", col->_isTrigger ? 'o' : 'x');
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
 					return format("Offset\t    X:{}  Y:{}    ", col->_offset.x, col->_offset.y);
