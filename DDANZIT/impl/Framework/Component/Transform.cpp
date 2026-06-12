@@ -280,6 +280,12 @@ void Transform::SetParent(Transform* parent)
 		return;
 	}
 
+	if (_parent == HIERARCY_ROOT)
+		_gameObject->ownerHierarchy->pRootGameObjectList.erase(remove(
+			_gameObject->ownerHierarchy->pRootGameObjectList.begin(),
+			_gameObject->ownerHierarchy->pRootGameObjectList.end(), _gameObject),
+			_gameObject->ownerHierarchy->pRootGameObjectList.end());
+
 	if (_parent != HIERARCY_ROOT)
 		_parent->RemoveChild(this);
 

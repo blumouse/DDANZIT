@@ -35,6 +35,7 @@ public:
     static void ToggleShow();
 
     static void gotoxy(int x, int y);
+    static void clearArea(int startX, int startY, int width, int height);
     static void hideCursor();
 };
 
