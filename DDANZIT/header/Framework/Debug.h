@@ -13,6 +13,7 @@ class GameObject;
 class Scene;
 class Debug;
 
+
 class DebugConsole
 {
     DebugConsole(const DebugConsole&) = delete;
@@ -23,7 +24,8 @@ public:
     DebugConsole();
     ~DebugConsole();
 
-    HANDLE hStdin;
+    static HANDLE hStdin;
+    static HANDLE hStdout;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     int columns, rows;
 
@@ -34,7 +36,6 @@ public:
 
     static void gotoxy(int x, int y);
     static void hideCursor();
-
 };
 
 
@@ -114,6 +115,8 @@ public:
 
     void AddChild(ConsolePollingText* child);
     void ClearChild();
+
+    void Draw() override;
 };
 
 
@@ -124,6 +127,10 @@ public:
 class Debug
 {
 public:
+    friend class SceneManager;
+    friend class Hierarchy;
+    friend class Transform;
+
     friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
     friend void DDANZIT_Run();
     friend void DDANZIT_Finalize();
@@ -157,12 +164,8 @@ private:
 public:
     GameObject* highlightedObject;
 
-    // 씬 리스트                                        -> 변할때만 전파받아서 바꾸기 (씬매니저에서)
-    // 하이라키 (씬 + 오브젝트 트리)                    -> 이것도 변할때만 전파받기   (하이라키에서)
-    // 인스펙터 (컴포넌트 이름정도만 인젝션해놓을까)    -> 현재 띄워진 오브젝트 지정해서 그 값만 계속 감시
-    // 로그 콘솔                                        -> 뭐 똑같지만.. 전파받기지 뭐
-    // 간단한 인풋 커맨드? (pause stop TimeScale .. 버튼으로 해도되고)  -> 몰라
 
+private:
     void InitializeDebugInfo();
     void FinalizeDebugInfo();
 
@@ -172,10 +175,8 @@ public:
     static void AddConsoleLog(const std::string& message);
 
 
-public:
     void HandleDebugConsoleInput();
 
-private:
     void OnDebugConsoleClick(int x, int y);
     void ExecuteCommand(std::string cmd);
 
@@ -199,7 +200,6 @@ private:
     void UpdateInspector();
 
 
-public:
     void DrawDebugConsole();             // 전체 그리기
 
 

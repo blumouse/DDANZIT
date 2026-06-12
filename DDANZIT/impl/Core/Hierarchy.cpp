@@ -26,13 +26,13 @@ Hierarchy& Hierarchy::operator+=(GameObject* go)
 {
 	if (go == nullptr) 
 	{
-		// DEBUG: nullptr
+		Debug::Assert(false, "Hierarchy: 오브젝트가 nullptr입니다.");
 		return *this;
 	}
 
 	if (go->ownerHierarchy == this)
 	{
-		// DEBUG: 리스트 안에 이미 주소가 있으면 안돼
+		Debug::Log("Hierarchy: 이미 존재하는 오브젝트입니다. : " + go->_name);
 		return *this;
 	}
 
@@ -43,6 +43,11 @@ Hierarchy& Hierarchy::operator+=(GameObject* go)
 	if (go->_transform->parent() == HIERARCY_ROOT)
 		pRootGameObjectList.push_back(go);
 
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedHierarchyInfo();
+
+#endif // USE_DEBUG_TUI
+
 
 	return *this;
 }
@@ -51,13 +56,13 @@ Hierarchy& Hierarchy::operator-=(GameObject* go)
 {
 	if (go == nullptr)
 	{
-		// DEBUG: nullptr
+		Debug::Assert(false, "Hierarchy: 오브젝트가 nullptr입니다.");
 		return *this;
 	}
 
 	if (go->ownerHierarchy != this)
 	{
-		// DEBUG: 리스트 안에 주소가 없으면 안돼
+		Debug::Log("Hierarchy: 하이라키에 존재하지 않는 오브젝트입니다. : " + go->_name);
 		return *this;
 	}
 
@@ -75,6 +80,11 @@ Hierarchy& Hierarchy::operator-=(GameObject* go)
 			pRootGameObjectList.end(), go),
 			pRootGameObjectList.end());
 
+#ifdef USE_DEBUG_TUI
+	Debug::ChangedHierarchyInfo();
+
+#endif // USE_DEBUG_TUI
+
 
 	return *this;
 }
@@ -84,18 +94,36 @@ GameObject* Hierarchy::AddGameObject()
 {
 	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddGameObject: 오브젝트 수가 최대입니다.");
 		return nullptr;
 	}
 
 	GameObject* go = new GameObject(scene);
 
+	go->isInitialized = true;
 
-	pGameObjectList.push_back(go);
-	go->ownerHierarchy = this;
 
-	if (go->transform()->parent() == HIERARCY_ROOT)
-		pRootGameObjectList.push_back(go);
+	*this += go;
+
+	return go;
+}
+
+
+GameObject* Hierarchy::AddGameObject(const string& name)
+{
+	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
+	{
+		Debug::Log("AddGameObject: 오브젝트 수가 최대입니다.");
+		return nullptr;
+	}
+
+	GameObject* go = new GameObject(scene);
+	go->_name = name;
+
+	go->isInitialized = true;
+
+
+	*this += go;
 
 	return go;
 }

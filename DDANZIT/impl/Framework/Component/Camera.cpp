@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include "Debug.h"
+
 #include "DefineOption.h"
 #include "DDANZIT_Core.h"
 
@@ -291,12 +293,14 @@ void Camera::Render(HDC hdc)
 
 #ifdef RENDER_MODE_DIRECT2D
 
-void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect)
+void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect, IDWriteFactory5* writeFactory)
 {
 	// 카메라 단 오브젝트의 뎁스부터 컬링
 #ifdef PROPS_MODE_2D
 
 	Vector2 camPos = transform()->position();
+	float camAngle = transform()->angle();
+
 	float camPosX = camPos.x;
 	float camPosY = camPos.y;
 
@@ -317,6 +321,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeScaleX = cmd.scaleX;
 				float relativeScaleY = cmd.scaleY;
 
+				float relativeAngle = cmd.angle - camAngle;
+
 
 				D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
 
@@ -328,7 +334,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				scaleMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleY, centerPos);
 				// 플립은 하나마나니까 생략;
 
-				rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+				rotMatrix = D2D1::Matrix3x2F::Rotation(relativeAngle, centerPos);
 
 				transMatrix = D2D1::Matrix3x2F::Translation(
 					relativeCamX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
@@ -379,7 +385,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				if (pBitmap == nullptr)
 				{
-					// DEBUG
+					Debug::Log("Render: 비트맵 설정이 잘못되었습니다.");
 					continue;
 				}
 
@@ -401,7 +407,6 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				float relativeScaleX;
 				float relativeScaleY;
 
-				//수정할것
 				//if (cmd.useAtlas)
 				//{
 				//	relativeScaleX = (float)cmd.sliceWidth * cmd.scaleX / worldToScreenRatio;	// 비트맵 픽셀좌표를 월드로 밀어넣는다
@@ -412,8 +417,11 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				//	relativeScaleX = cmd.scaleX / worldToScreenRatio;
 				//	relativeScaleY = cmd.scaleY / worldToScreenRatio;
 				//}
-					relativeScaleX = cmd.scaleX / worldToScreenRatio;
-					relativeScaleY = cmd.scaleY / worldToScreenRatio;
+
+				relativeScaleX = cmd.scaleX / worldToScreenRatio;
+				relativeScaleY = cmd.scaleY / worldToScreenRatio;
+
+				float relativeAngle = cmd.angle - camAngle;
 
 
 				// 반전이랑 스케일링이랑 동치라고 하네요
@@ -434,7 +442,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				}
 
 				// 회전
-				rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+				rotMatrix = D2D1::Matrix3x2F::Rotation(relativeAngle, centerPos);
 
 				// 이동
 				transMatrix = D2D1::Matrix3x2F::Translation(
@@ -466,16 +474,14 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				int srcY;	int srcHeight;
 
 				if (cmd.useAtlas)
-				{
-					//수정할것
-					//이미지 지원을 위해
+				{	//이미지 지원을 위해
 					//변수명만 맞춰줬다보셈 
 					//변수명과 들어가는 내용은 여기서는 별개
 					srcX = cmd.sliceOffsetX * cmd.sliceWidth;
 					srcY = cmd.sliceOffsetY * cmd.sliceHeight;
 
-					srcWidth = (cmd.sliceOffsetX+1) * cmd.sliceWidth;
-					srcHeight = (cmd.sliceOffsetY+1) * cmd.sliceHeight;
+					srcWidth = (cmd.sliceOffsetX + 1) * cmd.sliceWidth;
+					srcHeight = (cmd.sliceOffsetY + 1) * cmd.sliceHeight;
 				}
 				else
 				{
@@ -488,32 +494,31 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 
 				// 그리기~
-				D2D1_POINT_2F localOffset = D2D1::Point2F(srcWidth / -2.0f, srcHeight / -2.0f);
-				//수정할것
-				D2D1_RECT_F destRect = D2D1::RectF(-srcWidth/(2* (cmd.sliceOffsetX + 1)), -srcHeight/(2* (cmd.sliceOffsetY + 1)),srcWidth/(2* (cmd.sliceOffsetX + 1)), srcHeight/(2 * (cmd.sliceOffsetY + 1)));
-				D2D1_RECT_F srcRect = D2D1::RectF(srcX,srcY,srcWidth,srcHeight);
+				D2D1_POINT_2F localOffset = D2D1::Point2F(srcWidth / -2.0f - srcX, srcHeight / -2.0f - srcY);
+				D2D1_RECT_F destRect = D2D1::RectF(-srcWidth / (2 * (cmd.sliceOffsetX + 1)), -srcHeight / (2 * (cmd.sliceOffsetY + 1)), srcWidth / (2 * (cmd.sliceOffsetX + 1)), srcHeight / (2 * (cmd.sliceOffsetY + 1)));
+				D2D1_RECT_F srcRect = D2D1::RectF(srcX, srcY, srcWidth, srcHeight);
 
 
 				colorMatrixEffect->SetInput(0, pBitmap);
 
 				colorMatrixEffect->SetValue(D2D1_COLORMATRIX_PROP_COLOR_MATRIX, colorMatrix);
 
+				if (cmd.useAtlas) {
+					d2dcontext->DrawBitmap(
+						pBitmap,
+						&destRect,
+						a,
+						D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+						&srcRect);
+				}
+				else {
+					d2dcontext->DrawImage(
+						colorMatrixEffect,
+						&localOffset,
+						&srcRect,
+						D2D1_INTERPOLATION_MODE_LINEAR);
+				}
 
-
-				//수정할것
-				d2dcontext->DrawBitmap(
-					pBitmap,
-					&destRect,
-					a,
-					D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-					&srcRect);
-
-				/*d2dcontext->DrawImage(
-					colorMatrixEffect,
-					&localOffset,
-					&srcRect,
-					D2D1_INTERPOLATION_MODE_LINEAR);*/
-				
 
 				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
 			}
@@ -532,6 +537,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 			float relativeScaleX = cmd.scaleX;
 			float relativeScaleY = cmd.scaleY;
 
+			float relativeAngle = cmd.angle - camAngle;
+
 
 			D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
 
@@ -545,7 +552,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 				scaleMatrix = D2D1::Matrix3x2F::Scale(relativeScaleX, relativeScaleY, centerPos);
 			// 플립은 하나마나니까 생략;
 
-			rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+			rotMatrix = D2D1::Matrix3x2F::Rotation(relativeAngle, centerPos);
 
 			transMatrix = D2D1::Matrix3x2F::Translation(
 				relativeCamX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
@@ -591,6 +598,112 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 #endif // PROPS_MODE_2D
 
+
+	// UI는 언제나 화면 가장 위 카메라 뎁스같은거 업서
+
+	for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
+	{
+		for (const UIDrawCommand& cmd : DDANZIT_Core::UIDrawCommandLists[i])
+		{
+			if (cmd.uiDrawType == UIDrawType::Image)
+			{
+				// TODO 아직 미지원... 이지만 뭐 스프라이트 그리는거랑 같다는거
+			}
+			else if (cmd.uiDrawType == UIDrawType::Text)
+			{
+				IDWriteTextFormat* pFont = DDANZIT_Core::fontResourceList[(int)cmd.fontIndex][cmd.fontSizeIndex].Get();
+
+				if (pFont == nullptr)
+				{
+					Debug::Log("Render: 폰트 설정이 잘못되었습니다.");
+					continue;
+				}
+
+				IDWriteTextLayout* pTextLayout = nullptr;
+
+				writeFactory->CreateTextLayout(
+					cmd.text.data(),
+					cmd.text.length(),
+					pFont,
+					cmd.scaleX, // TODO 이거 맞나?
+					cmd.scaleY,  // 가상의 박스 높이(Height)
+					&pTextLayout
+				);
+
+				if (pTextLayout == nullptr)
+				{
+					Debug::Log("Render: 텍스트 생성에 실패했습니다.");
+					continue;
+				}
+
+
+				pTextLayout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+				pTextLayout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+				// TODO 기본 정렬 / 오버플로우 / 행간 자간 설정
+
+
+				D2D1_MATRIX_3X2_F scaleFlipMatrix = D2D1::Matrix3x2F::Identity();
+				D2D1_MATRIX_3X2_F rotMatrix = D2D1::Matrix3x2F::Identity();
+				D2D1_MATRIX_3X2_F transMatrix = D2D1::Matrix3x2F::Identity();
+
+
+				D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
+
+
+				if (cmd.flipX)
+				{
+					if (cmd.flipY)
+						scaleFlipMatrix = D2D1::Matrix3x2F::Scale(-1.0f, -1.0f, centerPos);
+					else
+						scaleFlipMatrix = D2D1::Matrix3x2F::Scale(-1.0f, 1.0f, centerPos);
+				}
+				else if (cmd.flipY)
+				{
+					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(1.0f, -1.0f, centerPos);
+				}
+				else
+				{
+					scaleFlipMatrix = D2D1::Matrix3x2F::Scale(1.0f, 1.0f, centerPos);
+				}
+
+				// 회전
+				rotMatrix = D2D1::Matrix3x2F::Rotation(cmd.angle, centerPos);
+
+				// 이동
+				transMatrix = D2D1::Matrix3x2F::Translation(
+					cmd.posX + (float)DDANZIT_Core::width / 2.0f,		// 월드 (0,0)기준으로
+					-cmd.posY + (float)DDANZIT_Core::height / 2.0f);
+
+				// 적용!
+				d2dcontext->SetTransform(scaleFlipMatrix * rotMatrix * transMatrix);
+
+
+				UINT32 rgb;
+				float a;
+				rgb = (cmd.colorRGBA >> 8) & 0x00ffffff;
+				a = (float)(cmd.colorRGBA & 0x000000ff) / 255.0f;
+
+				d2dbrush->SetColor(D2D1::ColorF(rgb, a));
+
+
+				// 그리기~
+				D2D1_POINT_2F localOffset = D2D1::Point2F(cmd.scaleX / -2.0f, cmd.scaleY / -2.0f);
+
+				d2dcontext->DrawTextLayout(
+					localOffset,
+					pTextLayout,
+					d2dbrush
+				);
+
+				pTextLayout->Release();
+
+				d2dcontext->SetTransform(D2D1::Matrix3x2F::Identity());
+			}
+		}
+	}
+
+
 }
 
 #endif // RENDER_MODE_DIRECT2D
@@ -618,7 +731,7 @@ void Camera::SetupCurrent(Camera* cur)
 {
 	if (cur == nullptr)
 	{
-		// DEBUG
+		Debug::Log("SetupCurrent: 컴포넌트가 nullptr입니다.");
 		return;
 	}
 

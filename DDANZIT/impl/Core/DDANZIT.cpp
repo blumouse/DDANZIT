@@ -18,7 +18,6 @@
 
 #include "INC_Windows.h"
 #include "Utillity.h"
-
 #include "BeatMediaControl.h"
 
 #ifdef RENDER_MODE_WINGDI
@@ -121,8 +120,8 @@ namespace
     unsigned int g_width = 0;
     unsigned int g_height = 0;
 
-    //BeatMediaControl에 include 된 것들 중 하나와 겹쳐 변경
-    Time m_time;
+
+    Time gameTime;
 
     Input input;
 
@@ -188,10 +187,10 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     if (!Create(className, windowName, width, height))
         return false;
 
-    m_time.Init();
+    gameTime.Init();
 
-    if (!gameCore.isInitialized)
-        gameCore.InitGraphicSettings(g_hWnd);
+    if (!gameCore.InitGraphicSettings(g_hWnd))
+        return false;
 
 #ifdef USE_DEBUG_TUI
     debug.InitializeDebugInfo();
@@ -205,68 +204,91 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     return true;
 }
 
-bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize)
+
+bool DDANZIT_LoadResources(ResourceType type, const wchar_t** pFilePath, unsigned int size)
 {
-    const wchar_t* className = L"DDANZIT";
-
-    if (!Create(className, windowName, width, height))
-        return false;
-    
-    m_time.Init();
-    
-
     if (!gameCore.isInitialized)
-        gameCore.InitGraphicSettings(g_hWnd);
-    
-
-    for (unsigned int i = 0; i < resourceSize; i++)
     {
-        if (gameCore.LoadBitmapResource(pfilePath[i]) == -1)
-            return false;
+        Debug::Assert(false, "LoadResources: 초기화되지 않았습니다.");
+        return false;
     }
 
-#ifdef USE_DEBUG_TUI
-    debug.FinalizeDebugInfo();
+    if (type == ResourceType::Sprite)
+    {
+        for (unsigned int i = 0; i < size; i++)
+        {
+            if (gameCore.LoadBitmapResource(pFilePath[i]) == -1)
+                return false;
+        }
+    }
+    else if (type == ResourceType::Font)
+    {
+#ifdef RENDER_MODE_WINGDI
+        Debug::Log("LoadResources: 현재 설정에서 지원하지 않는 동작입니다.");
+        return false;
 
-#endif // USE_DEBUG_TUI
+#endif // RENDER_MODE_WINGDI
 
-    Application::_isPlaying = false;
-    Application::_isQuit = false;
+#ifdef RENDER_MODE_DIRECT2D
+        for (unsigned int i = 0; i < size; i++)
+        {
+            if (!gameCore.LoadFontResource(pFilePath[i]))
+                return false;
+        }
+
+#endif // RENDER_MODE_DIRECT2D
+
+    }
+    else if (type == ResourceType::Media)
+    {
+        Debug::Log("LoadResources: 함수 인자가 부족합니다.");
+        return false;
+    }
+    else
+    {
+        // DEBUG: 뭐야
+        return false;
+    }
 
     return true;
 }
-//수정할것
-bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** spritefilePath, unsigned int spriteCount, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount) {
-    const wchar_t* className = L"DDANZIT";
 
-    if (!Create(className, windowName, width, height))
-        return false;
-
-    m_time.Init();
-
-
+bool DDANZIT_LoadResources(ResourceType type, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount)
+{
     if (!gameCore.isInitialized)
-        gameCore.InitGraphicSettings(g_hWnd);
-
-
-    for (unsigned int i = 0; i < spriteCount; i++)
     {
-        if (gameCore.LoadBitmapResource(spritefilePath[i]) == -1)
-            return false;
-    }
-   
-    if (!BeatMediaSystem::Instance().Initialize(g_hWnd, mp3filePath, mp3Count, mp4filePath, mp4Count, sfxfilePath, sfxCount))
-    {
-        HRESULT error = BeatMediaSystem::Instance().LastError();
-
+        Debug::Assert(false, "LoadResources: 초기화되지 않았습니다.");
         return false;
     }
 
-    Application::_isPlaying = false;
-    Application::_isQuit = false;
+    if (type == ResourceType::Sprite)
+    {
+        Debug::Log("LoadResources: 함수 인자가 너무 많습니다.");
+        return false;
+    }
+    else if (type == ResourceType::Font)
+    {
+        Debug::Log("LoadResources: 함수 인자가 너무 많습니다.");
+        return false;
+    }
+    else if (type == ResourceType::Media)
+    {
+        if (!BeatMediaSystem::Instance().Initialize(g_hWnd, mp3filePath, mp3Count, mp4filePath, mp4Count, sfxfilePath, sfxCount))
+        {
+            HRESULT error = BeatMediaSystem::Instance().LastError();
+
+            return false;
+        }
+    }
+    else
+    {
+        Debug::Assert(false, "LoadResources: 정의되지 않은 동작입니다.");
+        return false;
+    }
 
     return true;
 }
+
 
 void DDANZIT_Run() 
 {
@@ -318,8 +340,9 @@ void DDANZIT_Run()
         }
         else
         {
- if (Application::_isQuit)
+            if (Application::_isQuit)
                 break;
+
             // 프레임 시작!
             // 유니티 라이프사이클 순서를 따름
 
@@ -328,9 +351,6 @@ void DDANZIT_Run()
             debug.HandleDebugConsoleInput();
 
 #endif // USE_DEBUG_TUI
-
-            if (Application::_isPause)
-                continue;
 
             gameCore._Awake();
 
@@ -349,10 +369,13 @@ void DDANZIT_Run()
 
             /* DDANZIT_Update() */
             {
-                m_time.Tick();
+                gameTime.Tick();
+
+                if (Application::_isPause)
+                    continue;
 
 
-                while (m_time.fFrameCount >= m_time.fixedDeltaTime())
+                while (gameTime.fFrameCount >= gameTime.fixedDeltaTime())
                 {
                     gameCore._FixedUpdate();
 
@@ -361,52 +384,58 @@ void DDANZIT_Run()
 
                     // gameCore._WaitForFixedUpdate();
 
-                    m_time.fFrameCount -=  m_time.fixedDeltaTime();
+                    gameTime.fFrameCount -= gameTime.fixedDeltaTime();
                 }
+                gameTime.fFrameCount += gameTime.deltaTime();
+
+                if (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
+                {
+                    // gameCore._OnMouse...();
 
 
-                // gameCore._OnMouse...();
+                    gameCore._Update();
+
+                    // gameCore._WaitForSeconds();
+                    // gameCore._StartCoroutine();
+
+                    gameCore._LateUpdate();
 
 
-                gameCore._Update();
-
-                // gameCore._WaitForSeconds();
-                // gameCore._StartCoroutine();
-
-                gameCore._LateUpdate();
+                    input.Tick();
 
 
-                m_time.fFrameCount += m_time.deltaTime();
+                    /* DDANZIT_Render() */      // 여기로 와버렸다
+                    {
+                        // 0. 초기화
+                        gameCore._InitDraw();
 
-                input.Tick();
-            }
+                        // 1. 드로우 커맨드로 스케치
+                        gameCore._Sketch();
 
-
-            /* DDANZIT_Render() */
-            {
-                // 0. 초기화
-                gameCore._InitDraw();
-                
-                // 1. 드로우 커맨드로 스케치
-                gameCore._Sketch();
-
-                // TODO_LATER: 레이어 별로 리소스순 정렬?
-                
-
-                // 2. 렌더러로 디바이스 드로우콜
-                gameCore._Render();
-
-                // TODO_LATER: 영상 후처리
-                // gameCore._PostProcess();
+                        // TODO_LATER: 레이어 별로 리소스순 정렬?
 
 
-                // 3. 프레젠트
-                gameCore._Present();
+                        // 2. 렌더러로 디바이스 드로우콜
+                        gameCore._Render();
+
+                        // TODO_LATER: 영상 후처리
+                        // gameCore._PostProcess();
 
 
-                // 4. 커맨드 클리어 후처리
-                gameCore._Clear();
+                        // 3. 프레젠트
+                        gameCore._Present();
 
+
+                        // 4. 커맨드 클리어 후처리
+                        gameCore._Clear();
+
+                    }
+
+
+                    while (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
+                        gameTime.frameCount -= 1000.0f / (float)FRAME_LATE;
+                }
+                gameTime.frameCount += gameTime.unscaledDeltaTime();
             }
 
 
@@ -426,6 +455,7 @@ void DDANZIT_Run()
 
 #endif // USE_DEBUG_TUI
 
+
             // 라이프사이클 / 오브젝트 정보 갱신
             gameCore.QuitUpdateScheduled();
 
@@ -433,15 +463,10 @@ void DDANZIT_Run()
             gameCore.QuitRigidbody2DScheduled();
 
             gameCore.DestroyScheduled();
-            
-
-
-            if (Application::_isQuit)
-                break;
 
 
             // 다음 프레임...
-            
+
         }
     }
 
@@ -452,7 +477,7 @@ void DDANZIT_Run()
 
 void DDANZIT_Finalize() 
 {
-    m_time.Finalize();
+    gameTime.Finalize();
 
     SceneManager::mainScene = nullptr;
 
@@ -476,8 +501,11 @@ void DDANZIT_Finalize()
     if (gameCore.isInitialized)
         gameCore.FinalizeGraphicSettings();
 
-    //미디어 처리
-    BeatMediaSystem::Instance().Shutdown();
+#ifdef USE_DEBUG_TUI
+    debug.FinalizeDebugInfo();
+
+#endif // USE_DEBUG_TUI
+
 
     DestroyWnd();
 }

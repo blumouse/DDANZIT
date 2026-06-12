@@ -9,6 +9,13 @@ enum class Tag
 	Background,
 };
 
+
+typedef enum class FontIndex
+{
+	None = -1,
+
+} Font;
+
 // 이따구로 써도 될까..?
 typedef enum class SpriteIndex
 {
@@ -80,6 +87,8 @@ typedef enum class SFXIndex
 
 #define MAX_COMPONENT_NUM				20
 
+
+#define FRAME_LATE						60
 
 
 //

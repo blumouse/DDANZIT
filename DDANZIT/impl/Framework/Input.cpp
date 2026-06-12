@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "DDANZIT_Core.h"
 
+#include "Debug.h"
+
 using namespace std;
 
 
@@ -99,7 +101,7 @@ Vector2 Input::GetAxis(const std::string& axisName)
 	}
 	else
 	{
-		// DEBUG: 그없
+		Debug::Log("GetAxis: 존재하지 않는 Axis 이름입니다.");
 		return Vector2(0.0f, 0.0f);
 	}
 }
@@ -132,7 +134,7 @@ Vector2 Input::GetAxisRaw(const std::string& axisName)
 	}
 	else
 	{
-		// DEBUG: 그없
+		Debug::Log("GetAxis: 존재하지 않는 Axis 이름입니다.");
 		return Vector2(0.0f, 0.0f);
 	}
 }

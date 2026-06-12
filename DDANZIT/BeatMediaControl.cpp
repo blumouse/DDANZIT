@@ -1,4 +1,3 @@
-//수정할것
 #include "BeatMediaControl.h"
 
 #include <propvarutil.h>

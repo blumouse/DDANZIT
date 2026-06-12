@@ -23,11 +23,11 @@ void characterAnimation::Update()
 {	
 	elapsedTime += Time::deltaTime();
 
-	if (elapsedTime >= 100.f/*frameDuration */ )
+	if (elapsedTime >=0.5f/*frameDuration */ )
 	{
 		elapsedTime = 0.0f;
 		spRender->currentAtlas.pixel_OffsetX++;
-		if (spRender->currentAtlas.pixel_OffsetX % 8 == 0) {
+		if (spRender->currentAtlas.pixel_OffsetX % 9 == 0) {
 			spRender->currentAtlas.pixel_OffsetY++;
 			spRender->currentAtlas.pixel_OffsetX = 0;
 		}

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string>
 #include <vector>
 #include <queue>
 #include "INC_Windows.h"
 #include "DefineOption.h"
+#include "DDANZIT.h"
 
 #ifdef RENDER_MODE_DIRECT2D
 #include "D2DRenderer.h"
@@ -38,6 +40,29 @@ struct DrawCommand
 	int sliceOffsetY;
 	int sliceWidth;
 	int sliceHeight;
+};
+
+enum class UIDrawType
+{
+	Text,
+	Image,
+};
+
+struct UIDrawCommand
+{
+	float posX;
+	float posY;
+	float scaleX;
+	float scaleY;
+	float angle;
+	UIDrawType uiDrawType;
+	int colorRGBA;
+	bool flipX;
+	bool flipY;
+	std::wstring_view text;
+	FontIndex fontIndex;
+	int fontSizeIndex;
+	SpriteIndex spriteIndex;
 };
 
 #ifdef USE_DEBUG
@@ -90,9 +115,13 @@ public:
 #endif // PROPS_MODE_2D
 
 	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
-	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize);
-	//수정할것
-	friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** spritefilePath, unsigned int spriteCount, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount);
+	
+	friend bool DDANZIT_LoadResources(ResourceType type, const wchar_t** pFilePath, unsigned int size);
+	friend bool DDANZIT_LoadResources(ResourceType type,
+		const wchar_t** mp3filePath, unsigned int mp3Count,
+		const wchar_t** mp4filePath, unsigned int mp4Count,
+		const wchar_t** sfxfilePath, unsigned int sfxCount);
+
 	friend void DDANZIT_Run();
 	friend void DDANZIT_Finalize();
 
@@ -126,9 +155,11 @@ private:
 	ComPtr<IWICImagingFactory> wicFactory;
 	static std::vector<ComPtr<ID2D1Bitmap>> bitmapResourceList;
 
-#endif // RENDER_MODE_DIRECT2D
+	ComPtr<IDWriteFactory5> writeFactory;
+	static std::vector<std::vector<ComPtr<IDWriteTextFormat>>> fontResourceList;
+	// 이중 벡터로 폰트 사이즈 별 지정 및 보관
 
-	// TODO: 소리파일용 리소스도 확보
+#endif // RENDER_MODE_DIRECT2D
 
 #pragma endregion
 
@@ -137,7 +168,7 @@ private:
 #pragma region Methods
 
 private:
-	void InitGraphicSettings(HWND hWnd);
+	bool InitGraphicSettings(HWND hWnd);
 	void FinalizeGraphicSettings();
 
 	void _OnResize(int width, int height);
@@ -147,9 +178,16 @@ public:
 	int LoadBitmapResource(const wchar_t* filePath);
 
 #ifdef RENDER_MODE_DIRECT2D
+public:
+	bool LoadFontResource(const wchar_t* filePath);
+
 	// 내부용
 private:
+	const float fontSizes[12] = { 12.0f, 14.0f, 16.0f, 18.0f, 20.0f, 24.0f, 28.0f, 32.0f, 36.0f, 40.0f, 48.0f, 60.0f };
+
 	HRESULT LoadBitmapFromFile(ID2D1DeviceContext* pContext, LPCWSTR filePath, ID2D1Bitmap** ppOutBitmap);
+	HRESULT LoadFontFromFile(IDWriteFactory5* pWriteFactory5, LPCWSTR filePath, 
+		IDWriteFontCollection1** ppCollection, std::wstring& outFamilyName);
 
 #endif // RENDER_MODE_DIRECT2D
 
@@ -253,9 +291,9 @@ private:
 private:
 	static std::vector<IDrawable*> drawableList;
 	static std::vector<DrawCommand> drawCommandLists[MAX_LAYER_NUM];	// 배칭을 어케 할수잇을까
+	static std::vector<UIDrawCommand> UIDrawCommandLists[MAX_LAYER_NUM];
 
 #ifdef USE_DEBUG
-
 	static std::vector<DebugDrawCommand> debugDrawCommandLists[MAX_LAYER_NUM];
 
 #endif // USE_DEBUG

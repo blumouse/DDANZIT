@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "SpriteRenderer.h"
+#include "Text.h"
 
 #ifdef USE_DEBUG
 #include "Collider2D.h"
@@ -37,11 +38,6 @@ Draw2D::~Draw2D()
 
 void Draw2D::Draw() 
 {
-	// TODO: 그리는 컴포넌트들 AddComponent 탬플릿 명시적 인스턴스 및 구현
-	// 트랜스폼에서 뎁스 바뀌면 바로 이거 바꿔주기
-
-	// TODO: 콜라이더 만든후 디버그 드로우
-
 	if (!gameObject->_active || !gameObject->parentActive || gameObject->isKilled)
 		return;
 
@@ -50,7 +46,7 @@ void Draw2D::Draw()
 
 	if (spriteRenderer && spriteRenderer->isActiveAndEnabled())
 	{
-		const Color& c = spriteRenderer->color;
+		Color& c = spriteRenderer->color;
 
 		int colorRGBA =
 			((int)(c.r * 255.0f) << 24) |
@@ -101,8 +97,40 @@ void Draw2D::Draw()
 		}
 
 	}
+	else if (text && text->isActiveAndEnabled())
+	{
+		Color& c = text->color;
 
-	// TODO: 아틀라스를 만들어야하나 유니티에 어케돼있지?
+		static wstring_view prevText;
+
+		if (prevText != text->text)
+			prevText = text->text;
+
+		int colorRGBA =
+			((int)(c.r * 255.0f) << 24) |
+			((int)(c.g * 255.0f) << 16) |
+			((int)(c.b * 255.0f) << 8) |
+			((int)(c.a * 255.0f));
+
+		DDANZIT_Core::UIDrawCommandLists[layer].push_back(
+			UIDrawCommand{
+				transform->position().x,
+				transform->position().y,
+				transform->scale().x,
+				transform->scale().y,
+				transform->angle(),
+				UIDrawType::Text,
+				colorRGBA,
+				spriteRenderer->flipX,
+				spriteRenderer->flipY,
+				text->text,
+				text->font,
+				(int)text->fontSize,
+				SpriteIndex::None
+			});
+	}
+
+
 
 #ifdef USE_DEBUG
 

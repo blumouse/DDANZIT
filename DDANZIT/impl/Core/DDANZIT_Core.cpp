@@ -1,5 +1,7 @@
 #include "DDANZIT_Core.h"
 
+#include "Debug.h"
+
 #include "Color.h"
 
 #include "SceneManager.h"
@@ -41,6 +43,8 @@ vector<BitmapInfo*> DDANZIT_Core::bitmapResourceList;
 
 vector<ComPtr<ID2D1Bitmap>> DDANZIT_Core::bitmapResourceList;
 
+vector<vector<ComPtr<IDWriteTextFormat>>> DDANZIT_Core::fontResourceList;
+
 #endif // RENDER_MODE_DIRECT2D
 
 #pragma endregion
@@ -49,7 +53,7 @@ vector<ComPtr<ID2D1Bitmap>> DDANZIT_Core::bitmapResourceList;
 
 #pragma region Methods
 
-void DDANZIT_Core::InitGraphicSettings(HWND hWnd)
+bool DDANZIT_Core::InitGraphicSettings(HWND hWnd)
 {
     this->hWnd = hWnd;
 
@@ -72,19 +76,34 @@ void DDANZIT_Core::InitGraphicSettings(HWND hWnd)
 
     d2dRenderer = new D2DRenderer(width, height);
 
-    d2dRenderer->D2DRenderInitialize(hWnd);
+    if (!d2dRenderer->D2DRenderInitialize(hWnd))
+        return false;
 
-    CoCreateInstance(
+    HRESULT hr = CoCreateInstance(
         CLSID_WICImagingFactory,
         nullptr,
         CLSCTX_INPROC_SERVER,
         IID_PPV_ARGS(&wicFactory)
     );
+    if (FAILED(hr)) return false;
+
+    
+    // 폰트용
+    ComPtr<IDWriteFactory> writeFactory;
+    DWriteCreateFactory(
+        DWRITE_FACTORY_TYPE_SHARED,
+        __uuidof(IDWriteFactory),
+        reinterpret_cast<IUnknown**>(writeFactory.GetAddressOf())
+    );
+
+    ComPtr<IDWriteFactory5> writeFactory5;
+    hr = writeFactory.As(&writeFactory5);
+    if (FAILED(hr)) return false;
 
 #endif // RENDER_MODE_DIRECT2D
 
     isInitialized = true;
-
+    return true;
 }
 
 void DDANZIT_Core::FinalizeGraphicSettings()
@@ -161,7 +180,7 @@ int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
 
     if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
     {
-        // DEBUG: 꽉찻어
+        Debug::Assert(false, "LoadBitmapResource: 이미지 수가 최대입니다.");
         return -1;
     }
 
@@ -175,7 +194,7 @@ int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
 
     if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
     {
-        // DEBUG: 꽉찻어
+        Debug::Assert(false, "LoadBitmapResource: 이미지 수가 최대입니다.");
         return -1;
     }
 
@@ -189,6 +208,55 @@ int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
 #endif // RENDER_MODE_DIRECT2D
 
 }
+
+#ifdef RENDER_MODE_DIRECT2D
+bool DDANZIT_Core::LoadFontResource(const wchar_t* filePath)
+{
+    if (!writeFactory) return false;
+
+    ComPtr<IDWriteFontCollection1> customCollection;
+    std::wstring familyName;
+
+    // 1. 폰트 파일 로드 및 컬렉션/패밀리 이름 추출
+    HRESULT hr = LoadFontFromFile(writeFactory.Get(), filePath, customCollection.GetAddressOf(), familyName);
+    if (FAILED(hr)) return false;
+
+    // 2. 생성된 포맷들을 담을 내부 벡터
+    std::vector<ComPtr<IDWriteTextFormat>> sizeFormats;
+    sizeFormats.reserve(std::size(fontSizes));
+
+    // 3. 배열에 정의된 각 사이즈별로 TextFormat 생성
+    for (float size : fontSizes)
+    {
+        ComPtr<IDWriteTextFormat> textFormat;
+        hr = writeFactory->CreateTextFormat(
+            familyName.c_str(),
+            customCollection.Get(),
+            DWRITE_FONT_WEIGHT_NORMAL,
+            DWRITE_FONT_STYLE_NORMAL,
+            DWRITE_FONT_STRETCH_NORMAL,
+            size,
+            L"ko-KR",
+            textFormat.GetAddressOf()
+        );
+
+        if (SUCCEEDED(hr))
+        {
+            sizeFormats.push_back(textFormat);
+        }
+    }
+
+    // 4. static 이중 벡터에 최종 적재 (성공한 폰트 세트만 추가)
+    if (!sizeFormats.empty())
+    {
+        fontResourceList.push_back(sizeFormats);
+        return true;
+    }
+
+    return false;
+}
+
+#endif // RENDER_MODE_DIRECT2D
 
 
 HRESULT DDANZIT_Core::LoadBitmapFromFile(ID2D1DeviceContext* pContext, LPCWSTR filePath, ID2D1Bitmap** ppOutBitmap)
@@ -222,6 +290,53 @@ HRESULT DDANZIT_Core::LoadBitmapFromFile(ID2D1DeviceContext* pContext, LPCWSTR f
 
     return hr;
 }
+
+#ifdef RENDER_MODE_DIRECT2D
+
+HRESULT DDANZIT_Core::LoadFontFromFile(IDWriteFactory5* pWriteFactory5, LPCWSTR filePath, IDWriteFontCollection1** ppCollection, std::wstring& outFamilyName)
+{
+    ComPtr<IDWriteFontSetBuilder1> fontSetBuilder;
+    HRESULT hr = pWriteFactory5->CreateFontSetBuilder(fontSetBuilder.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    ComPtr<IDWriteFontFile> fontFile;
+    hr = pWriteFactory5->CreateFontFileReference(filePath, nullptr, fontFile.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    hr = fontSetBuilder->AddFontFile(fontFile.Get());
+    if (FAILED(hr)) return hr;
+
+    ComPtr<IDWriteFontSet> fontSet;
+    hr = fontSetBuilder->CreateFontSet(fontSet.GetAddressOf());
+    if (FAILED(hr)) return hr;
+
+    hr = pWriteFactory5->CreateFontCollectionFromFontSet(fontSet.Get(), ppCollection);
+    if (FAILED(hr)) return hr;
+
+    // [핵심] 파일명만으로는 TextFormat을 만들 수 없으므로, 로드된 컬렉션에서 폰트 패밀리 이름을 직접 추출
+    ComPtr<IDWriteFontFamily> fontFamily;
+    hr = (*ppCollection)->GetFontFamily(0, fontFamily.GetAddressOf());
+    if (SUCCEEDED(hr))
+    {
+        ComPtr<IDWriteLocalizedStrings> familyNames;
+        hr = fontFamily->GetFamilyNames(familyNames.GetAddressOf());
+        if (SUCCEEDED(hr))
+        {
+            UINT32 length = 0;
+            familyNames->GetStringLength(0, &length);
+
+            std::wstring name(length + 1, L'\0');
+            familyNames->GetString(0, &name[0], length + 1);
+            name.resize(length); // 널 문자('\0') 제거
+
+            outFamilyName = name;
+        }
+    }
+
+    return hr;
+}
+
+#endif // RENDER_MODE_DIRECT2D
 
 #pragma endregion
 
@@ -648,7 +763,11 @@ void DDANZIT_Core::QuitRigidbody2DList(Rigidbody2D* rigidbody)
 vector<IDrawable*> DDANZIT_Core::drawableList;
 
 vector<DrawCommand> DDANZIT_Core::drawCommandLists[MAX_LAYER_NUM];
+vector<UIDrawCommand> DDANZIT_Core::UIDrawCommandLists[MAX_LAYER_NUM];
+#ifdef USE_DEBUG
 vector<DebugDrawCommand> DDANZIT_Core::debugDrawCommandLists[MAX_LAYER_NUM];
+
+#endif // USE_DEBUG
 
 
 void DDANZIT_Core::RegisterDrawable(IDrawable* drawable) 
@@ -716,7 +835,7 @@ void DDANZIT_Core::_Render()
 
 #ifdef RENDER_MODE_DIRECT2D
 
-    Camera::currentCamera->Render(d2dRenderer->D2DGetContext().Get(), d2dRenderer->D2DGetBrush().Get(), d2dRenderer->D2DGetEffect().Get());
+    Camera::currentCamera->Render(d2dRenderer->D2DGetContext().Get(), d2dRenderer->D2DGetBrush().Get(), d2dRenderer->D2DGetEffect().Get(), writeFactory.Get());
 
 #endif // RENDER_MODE_DIRECT2D
 

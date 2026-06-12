@@ -70,6 +70,7 @@ public:
 	// 내부용
 private:
 	std::string_view componentTypeName;
+
 	bool _active;
 	// 내 오브젝트가 어떤지, 둘 중 하나라도 false면 꺼진거임 상태 저장용이다
 	bool parentActive;

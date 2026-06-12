@@ -30,7 +30,7 @@ public:
 #endif
 
 #ifdef RENDER_MODE_DIRECT2D
-	virtual void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect) = 0;
+	virtual void Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbrush, ID2D1Effect* colorMatrixEffect, IDWriteFactory5* writeFactory) = 0;
 
 #endif
 

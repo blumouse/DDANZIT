@@ -1,5 +1,7 @@
 #include "SpriteRenderer.h"
 
+#include "Debug.h"
+
 #include "GameObject.h"
 
 
@@ -41,7 +43,7 @@ bool SpriteRenderer::TryAddAtlasRect(const std::string& name, SpriteAtlasRect sl
 	if (result.second /*== true*/)
 		return true;
 
-	// DEBUG: 이미 잇음
+	Debug::Log("TryAddAtlasRect: 이미 존재하는 이름입니다.");
 	return false;
 }
 
@@ -52,7 +54,7 @@ bool SpriteRenderer::TryAddAtlasRect(const std::string& name, int offsetX, int o
 	if (result.second /*== true*/)
 		return true;
 
-	// DEBUG: 이미 잇음
+	Debug::Log("TryAddAtlasRect: 이미 존재하는 이름입니다.");
 	return false;
 }
 
@@ -63,11 +65,10 @@ bool SpriteRenderer::TrySetAtlas(const std::string& name)
 
 	if (result == atlasRectMap.end())
 	{
-		// DEBUG: 없음
+		Debug::Log("TrySetAtlas: 존재하지 않는 이름입니다.");
 		return false;
 	}
 
-	useAtlas = true;
 	currentAtlas = result->second;
 
 	return true;
