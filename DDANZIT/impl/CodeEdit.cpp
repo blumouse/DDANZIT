@@ -18,7 +18,7 @@ namespace CodeEdit
 	{
 		if (SceneManager::GetActiveScene() == nullptr)
 		{
-			Debug::Assert(false, string("메인 씬이 없음"));
+			Debug::Assert(false, "Hierarchy: 메인 씬이 없습니다.");
 			return nullptr;
 		}
 

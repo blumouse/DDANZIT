@@ -1,5 +1,7 @@
 #include "DDANZIT_Core.h"
 
+#include "Debug.h"
+
 #include "Color.h"
 
 #include "SceneManager.h"
@@ -178,7 +180,7 @@ int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
 
     if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
     {
-        // DEBUG: 꽉찻어
+        Debug::Assert(false, "LoadBitmapResource: 이미지 수가 최대입니다.");
         return -1;
     }
 
@@ -192,7 +194,7 @@ int DDANZIT_Core::LoadBitmapResource(const wchar_t* filePath)
 
     if (bitmapResourceList.size() == MAX_RESOURCE_NUM)
     {
-        // DEBUG: 꽉찻어
+        Debug::Assert(false, "LoadBitmapResource: 이미지 수가 최대입니다.");
         return -1;
     }
 

@@ -209,7 +209,7 @@ bool DDANZIT_LoadResources(ResourceType type, const wchar_t** pFilePath, unsigne
 {
     if (!gameCore.isInitialized)
     {
-        // DEBUG: 초기화먼저 하세
+        Debug::Assert(false, "LoadResources: 초기화되지 않았습니다.");
         return false;
     }
 
@@ -224,7 +224,7 @@ bool DDANZIT_LoadResources(ResourceType type, const wchar_t** pFilePath, unsigne
     else if (type == ResourceType::Font)
     {
 #ifdef RENDER_MODE_WINGDI
-        // DEBUG: 지원하지 않는 사양
+        Debug::Log("LoadResources: 현재 설정에서 지원하지 않는 동작입니다.");
         return false;
 
 #endif // RENDER_MODE_WINGDI
@@ -241,7 +241,7 @@ bool DDANZIT_LoadResources(ResourceType type, const wchar_t** pFilePath, unsigne
     }
     else if (type == ResourceType::Media)
     {
-        // DEBUG: 인자가 부족함
+        Debug::Log("LoadResources: 함수 인자가 부족합니다.");
         return false;
     }
     else
@@ -257,18 +257,18 @@ bool DDANZIT_LoadResources(ResourceType type, const wchar_t** mp3filePath, unsig
 {
     if (!gameCore.isInitialized)
     {
-        // DEBUG: 초기화먼저 하세
+        Debug::Assert(false, "LoadResources: 초기화되지 않았습니다.");
         return false;
     }
 
     if (type == ResourceType::Sprite)
     {
-        // DEBUG: 인자가 너무 많음
+        Debug::Log("LoadResources: 함수 인자가 너무 많습니다.");
         return false;
     }
     else if (type == ResourceType::Font)
     {
-        // DEBUG: 인자가 너무 많음
+        Debug::Log("LoadResources: 함수 인자가 너무 많습니다.");
         return false;
     }
     else if (type == ResourceType::Media)
@@ -282,12 +282,9 @@ bool DDANZIT_LoadResources(ResourceType type, const wchar_t** mp3filePath, unsig
     }
     else
     {
-        // DEBUG: 뭐야
+        Debug::Assert(false, "LoadResources: 정의되지 않은 동작입니다.");
         return false;
     }
-
-    Application::_isPlaying = false;
-    Application::_isQuit = false;
 
     return true;
 }

@@ -47,7 +47,7 @@ Scene* SceneManager::CreateScene(const string& name)
 {
 	if (GetSceneByName(name))
 	{
-		// DEBUG: 씬 이름은 중복불가에용
+		Debug::Log("CreateScene: 이미 존재하는 씬 이름입니다.");
 		return nullptr;
 	}
 
@@ -64,7 +64,7 @@ Scene* SceneManager::CreateScene(const string& name, LoadSceneMode mode)
 {
 	if (GetSceneByName(name))
 	{
-		// DEBUG: 씬 이름은 중복불가에용
+		Debug::Log("CreateScene: 이미 존재하는 씬 이름입니다.");
 		return nullptr;
 	}
 
@@ -158,7 +158,7 @@ void SceneManager::LoadScene(const string& name)
 
 	if (scene == nullptr)
 	{
-		// DEBUG: 그없
+		Debug::Assert(false, "LoadScene: 존재하지 않는 씬 이름입니다.");
 		return;
 	}
 
@@ -171,7 +171,7 @@ void SceneManager::LoadScene(const string& name, LoadSceneMode mode)
 
 	if (scene == nullptr)
 	{
-		// DEBUG: 그없
+		Debug::Assert(false, "LoadScene: 존재하지 않는 씬 이름입니다.");
 		return;
 	}
 
@@ -189,7 +189,7 @@ bool SceneManager::UnloadScene(Scene* scene)
 {
 	if (scene == nullptr)
 	{
-		// DEBUG: 
+		Debug::Assert(false, "UnloadScene: 씬이 nullptr입니다.");
 		return false;
 	}
 
@@ -223,7 +223,7 @@ bool SceneManager::UnloadScene(const string& name)
 
 	if (scene == nullptr)
 	{
-		// DEBUG: 그없
+		Debug::Assert(false, "UnloadScene: 씬이 nullptr입니다.");
 		return false;
 	}
 
@@ -240,10 +240,24 @@ bool SceneManager::UnloadScene(const string& name)
 
 void SceneManager::MoveGameObjectToScene(GameObject* go, Scene* scene)
 {
-	// DEBUG: 이거 로드 안된 씬이면.. 그냥 에러를 뿜고 중단하나보군
-	go->_scene->RemoveFromHierarchy(go);
+	if (scene == nullptr)
+	{
+		Debug::Assert(false, "UnloadScene: 씬이 nullptr입니다.");
+		return;
+	}
 
-	scene->AddToHierarchy(go, HIERARCY_ROOT);
+	for (Scene* ldScene : pLoadedSceneList)
+	{
+		if (ldScene == scene)
+		{
+			go->_scene->RemoveFromHierarchy(go);
+
+			scene->AddToHierarchy(go, HIERARCY_ROOT);
+		}
+	}
+
+
+	Debug::Assert(false, "UnloadScene: 로드되지 않았거나 존재하지 않는 씬입니다.");
 }
 
 
@@ -256,7 +270,7 @@ void SceneManager::DontDestroyOnLoad(GameObject* go)
 {
 	if (go == nullptr || go->isKilled)
 	{
-		// DEBUG: 그없
+		Debug::Log("DontDestroyOnLoad: 파괴되었거나 존재하지 않는 오브젝트입니다.");
 		return;
 	}
 
