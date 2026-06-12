@@ -224,7 +224,7 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     }
 
 #ifdef USE_DEBUG_TUI
-    debug.FinalizeDebugInfo();
+    debug.InitializeDebugInfo();
 
 #endif // USE_DEBUG_TUI
 
@@ -259,6 +259,11 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
         return false;
     }
+
+#ifdef USE_DEBUG_TUI
+    debug.InitializeDebugInfo();
+
+#endif // USE_DEBUG_TUI
 
     Application::_isPlaying = false;
     Application::_isQuit = false;
@@ -476,6 +481,11 @@ void DDANZIT_Finalize()
 
     if (gameCore.isInitialized)
         gameCore.FinalizeGraphicSettings();
+
+#ifdef USE_DEBUG_TUI
+    debug.FinalizeDebugInfo();
+
+#endif // USE_DEBUG_TUI
 
 
     DestroyWnd();
