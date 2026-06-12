@@ -189,8 +189,8 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
 
     gameTime.Init();
 
-    if (!gameCore.isInitialized)
-        gameCore.InitGraphicSettings(g_hWnd);
+    if (!gameCore.InitGraphicSettings(g_hWnd))
+        return false;
 
 #ifdef USE_DEBUG_TUI
     debug.InitializeDebugInfo();
@@ -204,67 +204,91 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     return true;
 }
 
-bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize)
+
+bool DDANZIT_LoadResources(ResourceType type, const wchar_t** pFilePath, unsigned int size)
 {
-    const wchar_t* className = L"DDANZIT";
-
-    if (!Create(className, windowName, width, height))
-        return false;
-
-    gameTime.Init();
-
     if (!gameCore.isInitialized)
-        gameCore.InitGraphicSettings(g_hWnd);
-
-
-    for (unsigned int i = 0; i < resourceSize; i++)
     {
-        if (gameCore.LoadBitmapResource(pfilePath[i]) == -1)
-            return false;
+        // DEBUG: 초기화먼저 하세
+        return false;
     }
 
-#ifdef USE_DEBUG_TUI
-    debug.FinalizeDebugInfo();
+    if (type == ResourceType::Sprite)
+    {
+        for (unsigned int i = 0; i < size; i++)
+        {
+            if (gameCore.LoadBitmapResource(pFilePath[i]) == -1)
+                return false;
+        }
+    }
+    else if (type == ResourceType::Font)
+    {
+#ifdef RENDER_MODE_WINGDI
+        // DEBUG: 지원하지 않는 사양
+        return false;
 
-#endif // USE_DEBUG_TUI
+#endif // RENDER_MODE_WINGDI
 
-    Application::_isPlaying = false;
-    Application::_isQuit = false;
+#ifdef RENDER_MODE_DIRECT2D
+        for (unsigned int i = 0; i < size; i++)
+        {
+            if (!gameCore.LoadFontResource(pFilePath[i]))
+                return false;
+        }
+
+#endif // RENDER_MODE_DIRECT2D
+
+    }
+    else if (type == ResourceType::Media)
+    {
+        // DEBUG: 인자가 부족함
+        return false;
+    }
+    else
+    {
+        // DEBUG: 뭐야
+        return false;
+    }
 
     return true;
 }
 
-bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** spritefilePath, unsigned int spriteCount, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount) {
-    const wchar_t* className = L"DDANZIT";
-
-    if (!Create(className, windowName, width, height))
-        return false;
-
-    gameTime.Init();
-
-
+bool DDANZIT_LoadResources(ResourceType type, const wchar_t** mp3filePath, unsigned int mp3Count, const wchar_t** mp4filePath, unsigned int mp4Count, const wchar_t** sfxfilePath, unsigned int sfxCount)
+{
     if (!gameCore.isInitialized)
-        gameCore.InitGraphicSettings(g_hWnd);
-
-
-    for (unsigned int i = 0; i < spriteCount; i++)
     {
-        if (gameCore.LoadBitmapResource(spritefilePath[i]) == -1)
-            return false;
-    }
-
-    if (!BeatMediaSystem::Instance().Initialize(g_hWnd, mp3filePath, mp3Count, mp4filePath, mp4Count, sfxfilePath, sfxCount))
-    {
-        HRESULT error = BeatMediaSystem::Instance().LastError();
-
+        // DEBUG: 초기화먼저 하세
         return false;
     }
 
-    Application::_isPlaying = false;
-    Application::_isQuit = false;
+    if (type == ResourceType::Sprite)
+    {
+        // DEBUG: 인자가 너무 많음
+        return false;
+    }
+    else if (type == ResourceType::Font)
+    {
+        // DEBUG: 인자가 너무 많음
+        return false;
+    }
+    else if (type == ResourceType::Media)
+    {
+        if (!BeatMediaSystem::Instance().Initialize(g_hWnd, mp3filePath, mp3Count, mp4filePath, mp4Count, sfxfilePath, sfxCount))
+        {
+            HRESULT error = BeatMediaSystem::Instance().LastError();
+
+            return false;
+        }
+    }
+    else
+    {
+        // DEBUG: 뭐야
+        return false;
+    }
 
     return true;
 }
+
 
 void DDANZIT_Run() 
 {

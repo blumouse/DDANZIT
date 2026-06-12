@@ -18,6 +18,7 @@
 #include "Rigidbody2D.h"
 #include "Collider2D.h"
 #include "Camera.h"
+#include "Text.h"
 
 #include "Application.h"
 
@@ -714,7 +715,7 @@ void Debug::BuildInspector()
 			return format("Position\t    X {}  Y {}", tr->_localPosition.x, tr->_localPosition.y);
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Angle\t    {}", tr->angle());
+			return format("Angle\t    {}", tr->localAngle());
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
 			return format("Scale\t    X {}  Y {}", tr->_localScale.x, tr->_localScale.y);
@@ -803,6 +804,58 @@ void Debug::BuildInspector()
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
 					return format("Depth\t    {}", tr->_depth);
+					}));
+			}
+			else if (type == "Text")
+			{
+				Text* t = static_cast<Text*>(comp);
+
+				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
+					return format("Text\t\t    {}", "wchar¶ó °ï¶õ");
+					}));
+				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
+					return format("Font(Index)\t    {}", (int)t->font);
+					}));
+				
+				int size = 0;
+				switch (t->fontSize)
+				{
+				default:
+					break;
+				case FontSize::_12:
+					size = 12;	break;
+				case FontSize::_14:
+					size = 14;	break;
+				case FontSize::_16:
+					size = 16;	break;
+				case FontSize::_18:
+					size = 18;	break;
+				case FontSize::_20:
+					size = 20;	break;
+				case FontSize::_24:
+					size = 24;	break;
+				case FontSize::_28:
+					size = 28;	break;
+				case FontSize::_32:
+					size = 32;	break;
+				case FontSize::_36:
+					size = 36;	break;
+				case FontSize::_40:
+					size = 40;	break;
+				case FontSize::_48:
+					size = 48;	break;
+				case FontSize::_60:
+					size = 60;	break;
+				}
+
+				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t, size]() {
+					return format("FontSize\t    {}", size);
+					}));
+				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
+					return format("Color\t    R {}  G {}  B {}  A {}", t->color.r, t->color.g, t->color.b, t->color.a);
+					}));
+				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
+					return format("Flip\t\t    {} X  {} Y", t->flipX ? 'O' : 'X', t->flipY ? 'O' : 'X');
 					}));
 			}
 		}

@@ -17,6 +17,7 @@
 #include "Camera.h"
 #include "Collider2D.h"
 #include "Rigidbody2D.h"
+#include "Text.h"
 
 #ifdef PROPS_MODE_2D
 #include "Draw2D.h"
@@ -388,6 +389,32 @@ Rigidbody2D* GameObject::AddComponent<Rigidbody2D>()
 	pComponentList.push_back(rigidbody);
 
 	return rigidbody;
+}
+
+template <>
+Text* GameObject::AddComponent<Text>()
+{
+	if (pComponentList.size() == MAX_COMPONENT_NUM)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+	Draw2D* draw = dynamic_cast<Draw2D*>(this);
+
+	if (draw == nullptr)
+	{
+		// DEBUG: 디버그 메세지
+		return nullptr;
+	}
+
+
+	Text* text = new Text(this);
+	draw->text = text;
+
+	pComponentList.push_back(text);
+
+	return text;
 }
 
 #pragma endregion

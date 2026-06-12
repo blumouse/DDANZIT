@@ -9,6 +9,13 @@ enum class Tag
 	Background,
 };
 
+
+typedef enum class FontIndex
+{
+	None = -1,
+
+} Font;
+
 // 이따구로 써도 될까..?
 typedef enum class SpriteIndex
 {
@@ -19,7 +26,6 @@ typedef enum class SpriteIndex
 	// 스프라이트 리소스는 0번부터 (인덱스)
 
 } Sprite;
-
 
 typedef enum class MusicIndex
 {

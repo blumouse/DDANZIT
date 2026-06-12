@@ -167,6 +167,7 @@
     <ClCompile Include="MyObject.h" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Script.h" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Util\GameTimer.cpp" />
     <ClCompile Include="Util\RenderHelp.cpp" />
     <ClCompile Include="Util\Utillity.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="Service\DDANZITEngine.h" />
     <ClInclude Include="Service\DefineOption.h" />
     <ClInclude Include="Service\SceneManagement.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\GameTimer.h" />
     <ClInclude Include="Util\INC_Windows.h" />
