@@ -18,6 +18,7 @@
 
 #include "INC_Windows.h"
 #include "Utillity.h"
+#include "BeatMediaControl.h"
 
 #ifdef RENDER_MODE_WINGDI
 #include "RenderHelp.h"
