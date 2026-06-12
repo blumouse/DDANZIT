@@ -286,9 +286,6 @@ bool DDANZIT_LoadResources(ResourceType type, const wchar_t** mp3filePath, unsig
         return false;
     }
 
-    Application::_isPlaying = false;
-    Application::_isQuit = false;
-
     return true;
 }
 
