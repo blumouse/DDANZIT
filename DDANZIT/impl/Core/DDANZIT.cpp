@@ -121,7 +121,7 @@ namespace
     unsigned int g_height = 0;
 
 
-    Time time;
+    Time gameTime;
 
     Input input;
 
@@ -187,7 +187,7 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     if (!Create(className, windowName, width, height))
         return false;
 
-    time.Init();
+    gameTime.Init();
 
     if (!gameCore.isInitialized)
         gameCore.InitGraphicSettings(g_hWnd);
@@ -211,7 +211,7 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     if (!Create(className, windowName, width, height))
         return false;
 
-    time.Init();
+    gameTime.Init();
 
     if (!gameCore.isInitialized)
         gameCore.InitGraphicSettings(g_hWnd);
@@ -240,7 +240,7 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     if (!Create(className, windowName, width, height))
         return false;
 
-    time.Init();
+    gameTime.Init();
 
 
     if (!gameCore.isInitialized)
@@ -345,13 +345,13 @@ void DDANZIT_Run()
 
             /* DDANZIT_Update() */
             {
-                time.Tick();
+                gameTime.Tick();
 
                 if (Application::_isPause)
                     continue;
 
 
-                while (time.fFrameCount >= time.fixedDeltaTime())
+                while (gameTime.fFrameCount >= gameTime.fixedDeltaTime())
                 {
                     gameCore._FixedUpdate();
 
@@ -360,11 +360,11 @@ void DDANZIT_Run()
 
                     // gameCore._WaitForFixedUpdate();
 
-                    time.fFrameCount -= time.fixedDeltaTime();
+                    gameTime.fFrameCount -= gameTime.fixedDeltaTime();
                 }
-                time.fFrameCount += time.deltaTime();
+                gameTime.fFrameCount += gameTime.deltaTime();
 
-                if (time.frameCount >= 1000.0f / (float)FRAME_LATE)
+                if (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
                 {
                     // gameCore._OnMouse...();
 
@@ -408,10 +408,10 @@ void DDANZIT_Run()
                     }
 
 
-                    while (time.frameCount >= 1000.0f / (float)FRAME_LATE)
-                        time.frameCount -= 1000.0f / (float)FRAME_LATE;
+                    while (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
+                        gameTime.frameCount -= 1000.0f / (float)FRAME_LATE;
                 }
-                time.frameCount += time.unscaledDeltaTime();
+                gameTime.frameCount += gameTime.unscaledDeltaTime();
             }
 
 
@@ -453,7 +453,7 @@ void DDANZIT_Run()
 
 void DDANZIT_Finalize() 
 {
-    time.Finalize();
+    gameTime.Finalize();
 
     SceneManager::mainScene = nullptr;
 
