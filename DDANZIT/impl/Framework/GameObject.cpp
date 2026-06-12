@@ -1,6 +1,7 @@
 #include "GameObject.h"
 
 #include "DefineOption.h"
+#include "Debug.h"
 
 #include "DDANZIT.h"
 #include "DDANZIT_Core.h"
@@ -36,7 +37,7 @@ GameObject::GameObject() :
 		_scene = SceneManager::mainScene;
 	else 
 	{
-		// DEBUG: 굉장한 오류
+		Debug::Assert(false, "GameObject: 메인 씬이 세팅되지 않았습니다.");
 		return;
 	}
 
@@ -50,7 +51,7 @@ GameObject::GameObject(Scene* scene) :
 		_scene = scene;
 	else
 	{
-		// DEBUG: 오류
+		Debug::Assert(false, "GameObject: 씬이 세팅되지 않았습니다.");
 		return;
 	}
 
@@ -64,7 +65,7 @@ GameObject::GameObject(Scene* scene, bool parentActive) :
 		_scene = scene;
 	else
 	{
-		// DEBUG: 오류
+		Debug::Assert(false, "GameObject: 씬이 세팅되지 않았습니다.");
 		return;
 	}
 
@@ -130,7 +131,7 @@ Transform* const GameObject::transform()
 {
 	if (isKilled)		// TODO?: 이거 킬체크 한번쯤 생각은 해야하는데;
 	{
-		// DEBUG: 죽엇어!
+		Debug::Assert(false, "transform: 파괴된 오브젝트입니다.");
 		return nullptr;
 	}
 
@@ -244,7 +245,7 @@ Camera* GameObject::AddComponent<Camera>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -261,7 +262,7 @@ SpriteRenderer* GameObject::AddComponent<SpriteRenderer>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -269,7 +270,7 @@ SpriteRenderer* GameObject::AddComponent<SpriteRenderer>()
 
 	if (draw == nullptr)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: SpriteRenderer의 부모 오브젝트는 Draw2D를 상속해야 합니다.");
 		return nullptr;
 	}
 
@@ -287,7 +288,7 @@ BoxCollider2D* GameObject::AddComponent<BoxCollider2D>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -328,7 +329,7 @@ CircleCollider2D* GameObject::AddComponent<CircleCollider2D>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -369,7 +370,7 @@ Rigidbody2D* GameObject::AddComponent<Rigidbody2D>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -396,7 +397,7 @@ Text* GameObject::AddComponent<Text>()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -404,7 +405,7 @@ Text* GameObject::AddComponent<Text>()
 
 	if (draw == nullptr)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: Text의 부모 오브젝트는 Draw2D를 상속해야 합니다.");
 		return nullptr;
 	}
 

@@ -205,7 +205,7 @@ void Transform::SetDepth(int depth)
 {
 	if (depth < 0 || depth >= MAX_LAYER_NUM)
 	{
-		// DEBUG: 레이어 범위 밖
+		Debug::Log("SetDepth: 레이어 깊이 범위 밖입니다.");
 		return;
 	}
 
@@ -227,7 +227,7 @@ void Transform::SetDepth(int depth)
 
 Component* Transform::Clone() const
 {
-	// ASSERT: 사용되지 않음
+	Debug::Assert(false, "Transform::Clone: 사용되지 않는 동작입니다.");
 	return nullptr;
 }
 
@@ -276,7 +276,7 @@ void Transform::SetParent(Transform* parent)
 
 	if (_gameObject->_scene != parent->_gameObject->_scene)
 	{
-		// DEBUG: 다른 씬의 오브젝트임
+		Debug::Log("SetParent: 부모가 다른 씬의 오브젝트입니다.");
 		return;
 	}
 

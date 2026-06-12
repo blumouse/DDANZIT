@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include "Debug.h"
+
 #include "DefineOption.h"
 #include "DDANZIT_Core.h"
 
@@ -383,7 +385,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				if (pBitmap == nullptr)
 				{
-					// DEBUG
+					Debug::Log("Render: 비트맵 설정이 잘못되었습니다.");
 					continue;
 				}
 
@@ -609,7 +611,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				if (pFont == nullptr)
 				{
-					// ASSERT 이상한값 넣지 마세요
+					Debug::Log("Render: 폰트 설정이 잘못되었습니다.");
 					continue;
 				}
 
@@ -626,7 +628,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				if (pTextLayout == nullptr)
 				{
-					// ASSERT 실패...
+					Debug::Log("Render: 텍스트 생성에 실패했습니다.");
 					continue;
 				}
 
@@ -725,7 +727,7 @@ void Camera::SetupCurrent(Camera* cur)
 {
 	if (cur == nullptr)
 	{
-		// DEBUG
+		Debug::Log("SetupCurrent: 컴포넌트가 nullptr입니다.");
 		return;
 	}
 
