@@ -625,8 +625,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 					cmd.text.data(),
 					cmd.text.length(),
 					pFont,
-					cmd.scaleX, // TODO 이거 맞나?
-					cmd.scaleY,  // 가상의 박스 높이(Height)
+					cmd.scaleX,
+					cmd.scaleY,
 					&pTextLayout
 				);
 
