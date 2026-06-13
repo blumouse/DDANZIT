@@ -400,8 +400,8 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 				D2D1_POINT_2F centerPos = D2D1::Point2F(0.0f, 0.0f);
 
-				float pixelWidth = (float)pBitmap->GetPixelSize().width;
-				float pixelHeight = (float)pBitmap->GetPixelSize().height;
+				int pixelWidth = pBitmap->GetPixelSize().width;
+				int pixelHeight = pBitmap->GetPixelSize().height;
 
 				// Å©±â
 				float relativeScaleX;
@@ -523,6 +523,7 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 	}
 
 
+#ifdef USE_DEBUG
 	for (int i = MAX_LAYER_NUM - 1; i >= depth(); i--)
 	{
 		for (const DebugDrawCommand& cmd : DDANZIT_Core::debugDrawCommandLists[i])
@@ -591,6 +592,9 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 
 		}
 	}
+
+#endif // USE_DEBUG
+
 
 #endif // PROPS_MODE_2D
 

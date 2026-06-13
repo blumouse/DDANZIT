@@ -1,16 +1,21 @@
 #pragma once
 
-#include "INC_Windows.h"
+#include "DefineOption.h"
+
 #include <string>
-#include <list>
-#include <unordered_map>
+
+#ifdef USE_DEBUG
+
+#ifdef USE_DEBUG_TUI
+#include "INC_Windows.h"
 #include <vector>
 #include <functional>
 
-#include "DefineOption.h"
+#endif
+
+#endif // USE_DEBUG
 
 class GameObject;
-class Scene;
 class Debug;
 
 
@@ -24,19 +29,22 @@ public:
     DebugConsole();
     ~DebugConsole();
 
-    static HANDLE hStdin;
-    static HANDLE hStdout;
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    int columns, rows;
-
     static void Show();
     static void Hide();
     static void SetTitle(const wchar_t* title);
     static void ToggleShow();
 
+#ifdef USE_DEBUG_TUI
+    static HANDLE hStdin;
+    static HANDLE hStdout;
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    int columns, rows;
+
     static void gotoxy(int x, int y);
     static void clearArea(int startX, int startY, int width, int height);
     static void hideCursor();
+
+#endif
 };
 
 

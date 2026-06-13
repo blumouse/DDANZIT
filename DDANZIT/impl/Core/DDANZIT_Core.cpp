@@ -863,7 +863,11 @@ void DDANZIT_Core::_Clear()
     for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
     {
         drawCommandLists[i].clear();
+#ifdef USE_DEBUG
         debugDrawCommandLists[i].clear();
+
+#endif // USE_DEBUG
+
     }
 }
 

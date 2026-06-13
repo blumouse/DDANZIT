@@ -5,11 +5,7 @@
 #include "Application.h"
 #include "GameTime.h"
 #include "Input.h"
-
-#ifdef USE_DEBUG
 #include "Debug.h"
-
-#endif // USE_DEBUG
 
 
 #include "DDANZIT_Core.h"
@@ -196,6 +192,10 @@ bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned 
     debug.InitializeDebugInfo();
 
 #endif // USE_DEBUG_TUI
+#ifndef USE_DEBUG
+    DebugConsole::Hide();
+
+#endif // !USE_DEBUG
 
 
     Application::_isPlaying = false;
@@ -347,7 +347,6 @@ void DDANZIT_Run()
             // 유니티 라이프사이클 순서를 따름
 
 #ifdef USE_DEBUG_TUI
-
             debug.HandleDebugConsoleInput();
 
 #endif // USE_DEBUG_TUI
@@ -450,7 +449,6 @@ void DDANZIT_Run()
 
             // 여기가 안정적인걸
 #ifdef USE_DEBUG_TUI
-
             debug.DrawDebugConsole();
 
 #endif // USE_DEBUG_TUI

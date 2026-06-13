@@ -1,10 +1,10 @@
 #include "Debug.h"
+#include "INC_Windows.h"
 
 #ifdef USE_DEBUG
 #include <iostream>
 #include <format>
 #include <assert.h>
-#include "INC_Windows.h"
 #include "GameObject.h"
 
 #ifdef USE_DEBUG_TUI
@@ -119,8 +119,11 @@ void Debug::Assert(bool condition, std::string message, GameObject* context)
 
 #pragma region Console
 
+#ifdef USE_DEBUG_TUI
 HANDLE DebugConsole::hStdin = nullptr; 
 HANDLE DebugConsole::hStdout = nullptr;
+
+#endif
 
 
 DebugConsole::DebugConsole()
@@ -131,10 +134,10 @@ DebugConsole::DebugConsole()
 	freopen_s(&stream, "CONOUT$", "w", stdout);
 	freopen_s(&stream, "CONIN$", "r", stdin);
 
-
+#ifdef USE_DEBUG_TUI
 	hStdin = CreateFile(TEXT("CONIN$"), GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL, OPEN_EXISTING, 0, NULL);
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, OPEN_EXISTING, 0, NULL);
 	GetConsoleScreenBufferInfo(hStdin, &csbi);
 
 	DWORD targetMode = ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
@@ -155,6 +158,9 @@ DebugConsole::DebugConsole()
 	// 현재 보여지는 창의 가로(칸)와 세로(줄) 크기 계산
 	columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+#endif // USE_DEBUG_TUI
+
 }
 
 DebugConsole::~DebugConsole()
@@ -200,6 +206,8 @@ void DebugConsole::ToggleShow()
 	}
 }
 
+#ifdef USE_DEBUG_TUI
+
 void DebugConsole::gotoxy(int x, int y)
 {
 	COORD pos = { (SHORT)x, (SHORT)y };
@@ -228,6 +236,8 @@ void DebugConsole::hideCursor()
 	cursorInfo.dwSize = 1;
 	SetConsoleCursorInfo(hStdout, &cursorInfo);
 }
+
+#endif // USE_DEBUG_TUI
 
 #pragma endregion
 

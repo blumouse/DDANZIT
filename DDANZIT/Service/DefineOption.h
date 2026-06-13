@@ -63,8 +63,8 @@ typedef enum class SFXIndex
 
 
 
-#define USE_DEBUG
-#define USE_DEBUG_TUI
+//#define USE_DEBUG
+//#define USE_DEBUG_TUI
 //#define USE_EDITOR
 
 
