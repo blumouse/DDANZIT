@@ -207,6 +207,20 @@ void DebugConsole::gotoxy(int x, int y)
 	SetConsoleCursorPosition(hStdout, pos);
 }
 
+void DebugConsole::clearArea(int startX, int startY, int width, int height)
+{
+	// width 칸수만큼의 공백(Space)으로 꽉 찬 문자열을 한 번에 만듭니다.
+	std::string emptyLine(width, ' ');
+
+	// height 줄수만큼 아래로 내려가면서 공백 문자열을 덮어씌웁니다.
+	for (int i = 0; i < height; ++i)
+	{
+		COORD pos = { (SHORT)startX, (SHORT)(startY + i) };
+		SetConsoleCursorPosition(hStdout, pos);
+		std::cout << emptyLine;
+	}
+}
+
 void DebugConsole::hideCursor()
 {
 	CONSOLE_CURSOR_INFO cursorInfo;
@@ -255,6 +269,10 @@ void ConsoleFrame::ClearChild()
 
 void ConsoleFrame::Draw()
 {
+	for (auto* child : children)
+		child->Draw();
+
+
 	DebugConsole::gotoxy(GetAbsoluteX(), GetAbsoluteY());
 
 	// 상단
@@ -278,10 +296,6 @@ void ConsoleFrame::Draw()
 	for (int i = 1; i < width - 1; i++)
 		cout << "-";
 	cout << "+";
-
-
-	for (auto* child : children)
-		child->Draw();
 }
 
 bool ConsoleFrame::HandleClick(int clickX, int clickY)
@@ -315,6 +329,10 @@ void ConsoleInspector::AddChild(ConsolePollingText* child)
 
 void ConsoleInspector::Draw()
 {
+	for (auto* child : childrenInspector)
+		child->Draw();
+
+
 	DebugConsole::gotoxy(GetAbsoluteX(), GetAbsoluteY());
 
 	// 상단
@@ -338,10 +356,6 @@ void ConsoleInspector::Draw()
 	for (int i = 1; i < width - 1; i++)
 		cout << "-";
 	cout << "+";
-
-
-	for (auto* child : childrenInspector)
-		child->Draw();
 }
 
 void ConsoleInspector::ClearChild()
@@ -583,6 +597,7 @@ void Debug::BuildManage()
 
 void Debug::DrawManage()
 {
+	DebugConsole::clearArea(manage->x + 1, manage->y + 1, manage->width - 2, manage->height - 2);
 	manage->Draw();
 }
 
@@ -604,12 +619,14 @@ void Debug::LogCommand(const std::string& message)
 
 void Debug::DrawConsole()
 {
+	DebugConsole::clearArea(console->x + 1, console->y + 1, console->width - 2, console->height - 2);
 	console->Draw();
 }
 
 void Debug::ClearConsole()
 {
 	console->ClearChild();
+	DebugConsole::clearArea(console->x + 1, console->y + 1, console->width - 2, console->height - 2);
 }
 
 
@@ -617,6 +634,7 @@ void Debug::DrawSceneList()
 {
 	// 이 시점에서 정보 찾고 콘솔오브젝트 갱신 후 바로 그리기
 	sceneList->ClearChild();
+	DebugConsole::clearArea(sceneList->x + 1, sceneList->y + 1, sceneList->width - 2, sceneList->height - 2);
 
 	for (Scene* scene : SceneManager::pSceneList)
 	{
@@ -640,10 +658,11 @@ void Debug::DrawHierarchy()
 {
 	// 이 시점에서 정보 찾고 콘솔오브젝트 갱신 후 바로 그리기
 	hierarchy->ClearChild();
+	DebugConsole::clearArea(hierarchy->x + 1, hierarchy->y + 1, hierarchy->width - 2, hierarchy->height - 2);
 
 	for (Scene* scene : SceneManager::pLoadedSceneList)
 	{
-		string name = scene->name().substr(0, hierarchy->width - 2);
+		string name = " = " + scene->name().substr(0, hierarchy->width - 5);
 
 		hierarchy->AddChild(new ConsoleText(1, hierarchy->currentChildY, name.size(), 1, name));
 
@@ -679,6 +698,7 @@ void Debug::DrawHierarchy()
 void Debug::BuildInspector()
 {
 	inspector->ClearChild();
+	DebugConsole::clearArea(inspector->x + 1, inspector->y + 1, inspector->width - 2, inspector->height - 2);
 
 	// 추적하고 있다가 오브젝트 날라가면 어카지?
 	// 이거 draw타이밍이 렌더 타이밍이니까.. iskilled 체크할수 있겠네
@@ -712,16 +732,16 @@ void Debug::BuildInspector()
 
 		// 넓이계산 포기; 차피 버튼 아님
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Position\t    X {}  Y {}", tr->_localPosition.x, tr->_localPosition.y);
+			return format("Position\t    X {}  Y {}      ", tr->_localPosition.x, tr->_localPosition.y);
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Angle\t    {}", tr->localAngle());
+			return format("Angle\t    {}    ", tr->localAngle());
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Scale\t    X {}  Y {}", tr->_localScale.x, tr->_localScale.y);
+			return format("Scale\t    X {}  Y {}      ", tr->_localScale.x, tr->_localScale.y);
 			}));
 		inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-			return format("Depth\t    {}", tr->_depth);
+			return format("Depth\t    {}    ", tr->_depth);
 			}));
 
 
@@ -747,19 +767,19 @@ void Debug::BuildInspector()
 				SpriteRenderer* sp = static_cast<SpriteRenderer*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [sp]() {
-					return format("SpriteIndex\t    {}", (int)sp->sprite);
+					return format("SpriteIndex\t    {}    ", (int)sp->sprite);
 					}));
 				if (sp->useAtlas)
 				{
 					inspector->AddChild(new ConsolePollingText(2, inspector->currentChildY, [sp]() {
-						return format("Atlas\t    X {}  Y {}  W {}  H {}", sp->currentAtlas.pixel_OffsetX, sp->currentAtlas.pixel_OffsetY, sp->currentAtlas.pixel_Width, sp->currentAtlas.pixel_Height);
+						return format("Atlas\t    X:{} Y:{} W:{} H:{}      ", sp->currentAtlas.pixel_OffsetX, sp->currentAtlas.pixel_OffsetY, sp->currentAtlas.pixel_Width, sp->currentAtlas.pixel_Height);
 						}));
 				}
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [sp]() {
-					return format("Color\t    R {}  G {}  B {}  A {}", sp->color.r, sp->color.g, sp->color.b, sp->color.a);
+					return format("Color\t    R:{} G:{} B:{} A:{}      ", sp->color.r, sp->color.g, sp->color.b, sp->color.a);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [sp]() {
-					return format("Flip\t\t    {} X  {} Y", sp->flipX ? 'O' : 'X', sp->flipY ? 'O' : 'X');
+					return format("Flip\t\t    X:{}  Y:{}    ", sp->flipX ? 'o' : 'x', sp->flipY ? 'o' : 'x');
 					}));
 			}
 			else if (type == "Rigidbody2D")
@@ -767,7 +787,7 @@ void Debug::BuildInspector()
 				Rigidbody2D* rigid = static_cast<Rigidbody2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [rigid]() {
-					return format("Body Type\t    {}", rigid->bodyType == RigidBodyType2D::Kinematic ? "Kinematic" : (rigid->bodyType == RigidBodyType2D::Static ? "Static" : "Dynamic"));
+					return format("Body Type\t    {}    ", rigid->bodyType == RigidBodyType2D::Kinematic ? "Kinematic" : (rigid->bodyType == RigidBodyType2D::Static ? "Static" : "Dynamic"));
 					}));
 			}
 			else if (type == "BoxCollider2D")
@@ -775,13 +795,13 @@ void Debug::BuildInspector()
 				BoxCollider2D* col = static_cast<BoxCollider2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Is Trigger\t    {}", col->_isTrigger ? 'O' : 'X');
+					return format("Is Trigger\t\t    {}  ", col->_isTrigger ? 'o' : 'x');
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Offset\t    X {}  Y {}", col->_offset.x, col->_offset.y);
+					return format("Offset\t    X:{}  Y:{}    ", col->_offset.x, col->_offset.y);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Size\t\t    X {}  Y {}", col->_size.x, col->_size.y);
+					return format("Size\t\t    X:{}  Y:{}    ", col->_size.x, col->_size.y);
 					}));
 			}
 			else if (type == "CircleCollider2D")
@@ -789,13 +809,13 @@ void Debug::BuildInspector()
 				CircleCollider2D* col = static_cast<CircleCollider2D*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Is Trigger\t    {}", col->_isTrigger ? 'O' : 'X');
+					return format("Is Trigger\t    {}  ", col->_isTrigger ? 'o' : 'x');
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Offset\t    X {}  Y {}", col->_offset.x, col->_offset.y);
+					return format("Offset\t    X:{}  Y:{}    ", col->_offset.x, col->_offset.y);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [col]() {
-					return format("Radius\t    {}", col->_size.x);
+					return format("Radius\t    {}    ", col->_size.x);
 					}));
 			}
 			else if (type == "Camera")
@@ -803,7 +823,7 @@ void Debug::BuildInspector()
 				Camera* cam = static_cast<Camera*>(comp);
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [tr]() {
-					return format("Depth\t    {}", tr->_depth);
+					return format("Depth\t    {}    ", tr->_depth);
 					}));
 			}
 			else if (type == "Text")
@@ -814,7 +834,7 @@ void Debug::BuildInspector()
 					return format("Text\t\t    {}", "wchar라 곤란");
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
-					return format("Font(Index)\t    {}", (int)t->font);
+					return format("Font(Index)\t    {}    ", (int)t->font);
 					}));
 				
 				int size = 0;
@@ -849,13 +869,13 @@ void Debug::BuildInspector()
 				}
 
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t, size]() {
-					return format("FontSize\t    {}", size);
+					return format("FontSize\t    {}  ", size);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
-					return format("Color\t    R {}  G {}  B {}  A {}", t->color.r, t->color.g, t->color.b, t->color.a);
+					return format("Color\t    R:{} G:{} B:{} A:{}      ", t->color.r, t->color.g, t->color.b, t->color.a);
 					}));
 				inspector->AddChild(new ConsolePollingText(1, inspector->currentChildY, [t]() {
-					return format("Flip\t\t    {} X  {} Y", t->flipX ? 'O' : 'X', t->flipY ? 'O' : 'X');
+					return format("Flip\t\t    X:{}  Y:{}  ", t->flipX ? 'o' : 'x', t->flipY ? 'o' : 'x');
 					}));
 			}
 		}

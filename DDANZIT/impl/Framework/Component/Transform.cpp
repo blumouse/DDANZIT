@@ -269,6 +269,9 @@ void Transform::SetParent(Transform* parent)
 	{
 		_gameObject->_scene->hierarchy.pRootGameObjectList.push_back(_gameObject);
 
+		if (_parent != HIERARCY_ROOT)
+			_parent->RemoveChild(this);
+
 		_parent = parent;
 		return;
 	}
@@ -280,7 +283,12 @@ void Transform::SetParent(Transform* parent)
 		return;
 	}
 
-	if (_parent != HIERARCY_ROOT)
+	if (_parent == HIERARCY_ROOT)
+		_gameObject->ownerHierarchy->pRootGameObjectList.erase(remove(
+			_gameObject->ownerHierarchy->pRootGameObjectList.begin(),
+			_gameObject->ownerHierarchy->pRootGameObjectList.end(), _gameObject),
+			_gameObject->ownerHierarchy->pRootGameObjectList.end());
+	else /*(_parent != HIERARCY_ROOT)*/
 		_parent->RemoveChild(this);
 
 	parent->AddChild(this);
