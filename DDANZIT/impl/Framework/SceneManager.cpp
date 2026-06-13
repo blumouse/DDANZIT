@@ -195,6 +195,14 @@ bool SceneManager::UnloadScene(Scene* scene)
 
 	// TODO: 로드되지 않은 씬이면 리턴
 
+	for (Scene* ldScene : pLoadedSceneList)
+	{
+		if (ldScene == scene)
+			break;
+
+		return false;
+	}
+
 	// 하이라키의 모든 오브젝트를 파괴한다!
 	// 루트만 지우면 재귀적으로 다 없어짐
 	for (GameObject* go : scene->GetRootGameObjects())
@@ -242,7 +250,7 @@ void SceneManager::MoveGameObjectToScene(GameObject* go, Scene* scene)
 {
 	if (scene == nullptr)
 	{
-		Debug::Assert(false, "UnloadScene: 씬이 nullptr입니다.");
+		Debug::Assert(false, "MoveGameObjectToScene: 씬이 nullptr입니다.");
 		return;
 	}
 
@@ -257,7 +265,7 @@ void SceneManager::MoveGameObjectToScene(GameObject* go, Scene* scene)
 	}
 
 
-	Debug::Assert(false, "UnloadScene: 로드되지 않았거나 존재하지 않는 씬입니다.");
+	Debug::Assert(false, "MoveGameObjectToScene: 로드되지 않았거나 존재하지 않는 씬입니다.");
 }
 
 

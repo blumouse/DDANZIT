@@ -579,6 +579,8 @@ void Debug::OnDebugConsoleClick(int x, int y)
 	// 외에는 버튼이 없어서 볼것도 없다
 
 	highlightedObject = nullptr;
+	inspector->ClearChild();
+	inspector->Draw();
 }
 
 
