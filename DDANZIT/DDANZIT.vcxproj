@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BeatMediaControl.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\D2DRenderer.cpp" />
     <ClCompile Include="impl\Core\DDANZIT.cpp" />
@@ -166,11 +167,13 @@
     <ClCompile Include="MyObject.h" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Script.h" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="Util\GameTimer.cpp" />
     <ClCompile Include="Util\RenderHelp.cpp" />
     <ClCompile Include="Util\Utillity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BeatMediaControl.h" />
     <ClInclude Include="header\Core\D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />
     <ClInclude Include="header\Core\GameObjectDesciptor.h" />
@@ -200,6 +203,7 @@
     <ClInclude Include="Service\DDANZITEngine.h" />
     <ClInclude Include="Service\DefineOption.h" />
     <ClInclude Include="Service\SceneManagement.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\GameTimer.h" />
     <ClInclude Include="Util\INC_Windows.h" />

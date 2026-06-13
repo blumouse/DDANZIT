@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Debug.h"
+
 // 탬플릿 구현부
 
 
@@ -33,7 +35,7 @@ T* GameObject::GetComponent() const
 			return targetComponent;
 	}
 
-	// DEBUG: 그런 컴포넌트 없음 메세지
+	Debug::Log("GetComponent: 컴포넌트를 찾지 못했습니다.");
 	return nullptr;
 }
 
@@ -61,7 +63,7 @@ T* GameObject::AddComponent()
 {
 	if (pComponentList.size() == MAX_COMPONENT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddComponent: 컴포넌트 수가 최대입니다.");
 		return nullptr;
 	}
 
@@ -99,6 +101,9 @@ CircleCollider2D* GameObject::AddComponent<CircleCollider2D>();
 template <>
 Rigidbody2D* GameObject::AddComponent<Rigidbody2D>();
 
+template <>
+Text* GameObject::AddComponent<Text>();
+
 #pragma endregion
 
 
@@ -132,6 +137,7 @@ T* Component::GetComponent() const
 			return targetComponent;
 	}
 
+	Debug::Log("GetComponent: 컴포넌트를 찾지 못했습니다.");
 	return nullptr;
 }
 
@@ -163,18 +169,41 @@ T* Hierarchy::AddGameObject()
 {
 	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
 	{
-		// DEBUG: 디버그 메세지
+		Debug::Log("AddGameObject: 오브젝트 수가 최대입니다.");
 		return nullptr;
 	}
 
 	T* go = new T(scene);		// 여기서 유저설정한 컴포넌트들 일단 붙어서 나옴
 
 
-	pGameObjectList.push_back(go);
-	go->ownerHierarchy = this;
+	for (Component* comp : go->pComponentList)
+	{
+		if (MonoBehavior* b = dynamic_cast<MonoBehavior*>(comp))
+		{
+			go->InitializeLifecycle(b);
+		}
+	}
 
-	if (go->transform()->parent() == HIERARCY_ROOT)
-		pRootGameObjectList.push_back(go);
+	go->isInitialized = true;
+
+
+	*this += go;
+
+	return go;
+}
+
+template <std::derived_from<GameObject> T>
+T* Hierarchy::AddGameObject(const std::string& name)
+{
+	if (pGameObjectList.size() == MAX_SCENE_GAME_OBJECT_NUM)
+	{
+		Debug::Log("AddGameObject: 오브젝트 수가 최대입니다.");
+		return nullptr;
+	}
+
+	T* go = new T(scene);
+	go->_name = name;
+
 
 	for (Component* comp : go->pComponentList)
 	{

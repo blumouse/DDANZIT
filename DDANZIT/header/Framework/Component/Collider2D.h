@@ -36,7 +36,7 @@ public:
 protected:
 	Collider2D() = default;
 	Collider2D(const Collider2D& other);
-	Collider2D(GameObject* pGameObject, const std::string& typeName);
+	Collider2D(GameObject* pGameObject, std::string_view typeName);
 
 public:
 	virtual ~Collider2D();

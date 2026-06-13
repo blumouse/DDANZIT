@@ -173,9 +173,29 @@ void Transform::SetLocalAngle(float degree)
 	_localDirection.y = sin(radians);
 }
 
-float Transform::angle() const 
+float Transform::localAngle() const 
 { 
 	float radians = atan2(_localDirection.y, _localDirection.x);
+
+	return radians * RAD2DEG;
+}
+
+
+void Transform::SetAngle(float degree)
+{
+	Vector2 dir = direction();
+	float parRadians = atan2(dir.x, dir.y);
+
+	float radians = degree * DEG2RAD;
+
+	_localDirection.x = cos(radians - parRadians);
+	_localDirection.y = sin(radians - parRadians);
+}
+
+float Transform::angle() const
+{
+	Vector2 dir = direction();
+	float radians = atan2(dir.y, dir.x);
 
 	return radians * RAD2DEG;
 }
@@ -185,7 +205,7 @@ void Transform::SetDepth(int depth)
 {
 	if (depth < 0 || depth >= MAX_LAYER_NUM)
 	{
-		// DEBUG: 레이어 범위 밖
+		Debug::Log("SetDepth: 레이어 깊이 범위 밖입니다.");
 		return;
 	}
 
@@ -207,7 +227,7 @@ void Transform::SetDepth(int depth)
 
 Component* Transform::Clone() const
 {
-	// ASSERT: 사용되지 않음
+	Debug::Assert(false, "Transform::Clone: 사용되지 않는 동작입니다.");
 	return nullptr;
 }
 
@@ -256,7 +276,7 @@ void Transform::SetParent(Transform* parent)
 
 	if (_gameObject->_scene != parent->_gameObject->_scene)
 	{
-		// DEBUG: 다른 씬의 오브젝트임
+		Debug::Log("SetParent: 부모가 다른 씬의 오브젝트입니다.");
 		return;
 	}
 

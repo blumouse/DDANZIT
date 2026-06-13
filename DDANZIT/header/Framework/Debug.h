@@ -24,7 +24,8 @@ public:
     DebugConsole();
     ~DebugConsole();
 
-    HANDLE hStdin;
+    static HANDLE hStdin;
+    static HANDLE hStdout;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     int columns, rows;
 
@@ -114,6 +115,8 @@ public:
 
     void AddChild(ConsolePollingText* child);
     void ClearChild();
+
+    void Draw() override;
 };
 
 
@@ -129,7 +132,6 @@ public:
     friend class Transform;
 
     friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height);
-    friend bool DDANZIT_Initialize(const wchar_t* windowName, unsigned int width, unsigned int height, const wchar_t** pfilePath, unsigned int resourceSize);
     friend void DDANZIT_Run();
     friend void DDANZIT_Finalize();
 

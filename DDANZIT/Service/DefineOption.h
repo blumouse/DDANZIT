@@ -9,6 +9,13 @@ enum class Tag
 	Background,
 };
 
+
+typedef enum class FontIndex
+{
+	None = -1,
+
+} Font;
+
 // 이따구로 써도 될까..?
 typedef enum class SpriteIndex
 {
@@ -19,6 +26,34 @@ typedef enum class SpriteIndex
 	// 스프라이트 리소스는 0번부터 (인덱스)
 
 } Sprite;
+
+typedef enum class MusicIndex
+{
+	None = -1,
+	// 리소스는 0번부터 (인덱스)
+	zzz = 0,
+	kanden = 1,
+
+} Music;
+
+typedef enum class VideoIndex
+{
+	None = -1,
+	//리소스는 0번부터 (인덱스)
+	Aria = 0,
+	GungWoo = 1,
+	Suna = 2,
+
+} Video;
+
+
+typedef enum class SFXIndex
+{
+	None = -1,
+	//리소스는 0번부터 (인덱스)
+	hit = 0,
+
+} SFX;
 
 
 
@@ -48,6 +83,8 @@ typedef enum class SpriteIndex
 
 #define MAX_COMPONENT_NUM				20
 
+
+#define FRAME_LATE						60
 
 
 //

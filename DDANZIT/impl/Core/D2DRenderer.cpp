@@ -119,7 +119,8 @@ bool D2DRenderer::D2DRenderInitialize(HWND hwnd)
 
     // 이것도..
     ComPtr<ID2D1Effect> colorMatrixEffect;
-    d2dContext->CreateEffect(CLSID_D2D1ColorMatrix, &colorMatrixEffect);
+    hr = d2dContext->CreateEffect(CLSID_D2D1ColorMatrix, &colorMatrixEffect);
+    if (FAILED(hr)) return false;
 
 
     // 8. 멤버로 저장
@@ -132,7 +133,6 @@ bool D2DRenderer::D2DRenderInitialize(HWND hwnd)
     m_targetBitmap = targetBitmap;
     m_brush = brush;
     m_colorMatrixEffect = colorMatrixEffect;
-
 
 	return true;
 }

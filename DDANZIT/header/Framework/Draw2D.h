@@ -7,6 +7,7 @@
 
 class GameObject;
 class SpriteRenderer;
+class Text;
 
 #ifdef USE_DEBUG
 
@@ -49,6 +50,7 @@ private:
 	GameObject* gameObject;
 
 	SpriteRenderer* spriteRenderer;
+	Text* text;
 
 #ifdef USE_DEBUG
 

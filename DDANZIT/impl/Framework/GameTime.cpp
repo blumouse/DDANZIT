@@ -2,6 +2,7 @@
 
 
 GameTimer* Time::pGameTimer = nullptr;
+float Time::frameCount = 0.0f;
 float Time::fFrameCount = 0.0f;
 float Time::timeScale = 1.0f;
 
@@ -48,5 +49,5 @@ float Time::deltaTime()
 
 float Time::fixedDeltaTime()
 {
-    return 200.0f;
+    return 20.0f;
 }
