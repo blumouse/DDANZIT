@@ -187,7 +187,7 @@ private:
     void HandleDebugConsoleInput();
 
     void OnDebugConsoleClick(int x, int y);
-    void ExecuteCommand(std::string cmd);
+    void ExecuteCommand(const std::string& cmd);
 
     void BuildManage();
     void DrawManage();

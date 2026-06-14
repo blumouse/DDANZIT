@@ -179,7 +179,7 @@ public:
 
 	static void Destroy(GameObject* gameObject);
 
-	static GameObject* Find(std::string name);
+	static GameObject* Find(const std::string& name);
 	static GameObject* FindWithTag(Tag tag);
 
 

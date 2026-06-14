@@ -68,7 +68,7 @@ public:
 	std::vector<GameObject*> GetObjectList();
 
 	GameObject* GetObjectByTag(Tag tag);
-	GameObject* GetObjectByName(std::string name);
+	GameObject* GetObjectByName(const std::string& name);
 
 #pragma endregion
 

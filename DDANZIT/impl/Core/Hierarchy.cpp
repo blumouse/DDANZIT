@@ -150,7 +150,7 @@ GameObject* Hierarchy::GetObjectByTag(Tag tag)
 	return nullptr;
 }
 
-GameObject* Hierarchy::GetObjectByName(string name)
+GameObject* Hierarchy::GetObjectByName(const std::string& name)
 {
 	for (GameObject* go : pGameObjectList)
 	{

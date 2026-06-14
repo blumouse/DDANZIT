@@ -9,6 +9,8 @@
 
 #ifdef USE_DEBUG_TUI
 #include <stack>
+#include <sstream>
+
 #include "SceneManager.h"
 #include "Scene.h"
 #include "Hierarchy.h"
@@ -562,11 +564,107 @@ void Debug::HandleDebugConsoleInput()
 	}
 }
 
-void Debug::ExecuteCommand(std::string cmd)
+void Debug::ExecuteCommand(const std::string& cmd)
 {
 	// TODO: 파싱...
 	// 근데 무슨 명령어 쓰지
+
+	if (cmd.empty())
+		return;
+	if (highlightedObject == nullptr || highlightedObject->isKilled)
+		return;
+
+
+	// [A] 공백 기준으로 문자열 쪼개기 (Tokenize)
+	std::stringstream ss(cmd);
+	std::string token;
+	std::vector<std::string> tokens;
+	while (ss >> token)
+		tokens.push_back(token);
+
+	// 첫 번째 단어는 명령어 이름, 나머지는 인자(Arguments)
+	std::string cmdName = tokens[0];
+	tokens.erase(tokens.begin());
+
+
+	if (cmdName == "setname")
+	{
+		highlightedObject->_name = tokens[0];
+		ChangedHierarchyInfo();
+		BuildInspector();
+	}
+	else if (cmdName == "setactive")
+	{
+		if (tokens[0] == "true")
+			highlightedObject->SetActive(true);
+		else if (tokens[0] == "false")
+			highlightedObject->SetActive(false);
+		else
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << " true / false             ";
+			return;
+		}
+		BuildInspector();
+	}
+	else if (cmdName == "setparent")
+	{
+		if (tokens[0] == "root")
+			highlightedObject->_transform->SetParent(nullptr);
+		else
+		{
+			auto go = highlightedObject->Find(tokens[0]);
+			if (go == nullptr)
+			{
+				DebugConsole::gotoxy(2, 18);
+				cout << "인자 값이 잘못되었습니다: " << cmdName << ": 이름을 찾을 수 없음        ";
+				return;
+			}
+
+			highlightedObject->_transform->SetParent(go->_transform);
+		}
+
+	}
+	else if (cmdName == "setpos" || cmdName == "setposition")
+	{
+
+	}
+	else if (cmdName == "setscale")
+	{
+
+	}
+	else if (cmdName == "setangle")
+	{
+
+	}
+	else if (cmdName == "setposworld" || cmdName == "setpositionworld")
+	{
+
+	}
+	else if (cmdName == "setscaleworld")
+	{
+
+	}
+	else if (cmdName == "setangleworld")
+	{
+
+	}
+	else if (cmdName == "setdepth")
+	{
+
+	}
+	else
+	{
+		DebugConsole::gotoxy(2, 18);
+		cout << "알 수 없는 명령어입니다: " << cmdName << "            ";
+		return;
+	}
+
+
+	DebugConsole::gotoxy(2, 18);
+	cout << "명령 실행됨: " << cmdName << "                  ";
 }
+
 
 
 void Debug::OnDebugConsoleClick(int x, int y)
@@ -580,6 +678,7 @@ void Debug::OnDebugConsoleClick(int x, int y)
 
 	highlightedObject = nullptr;
 	inspector->ClearChild();
+	DebugConsole::clearArea(inspector->x + 1, inspector->y + 1, inspector->width - 2, inspector->height - 2);
 	inspector->Draw();
 }
 
@@ -595,12 +694,22 @@ void Debug::BuildManage()
 
 	manage->AddChild(new ConsoleButton(30, 1, 14, 1, "[Pause/Resume]", [&]() {
 		if (!Application::_isPause)
+		{
 			Application::Pause();
+			DebugConsole::gotoxy(2, 18);
+			cout << "Game Paused          ";
+		}
 		else
+		{
 			Application::Resume();
+			DebugConsole::gotoxy(2, 18);
+			cout << "Game Resumed         ";
+		}
 		}));
 	manage->AddChild(new ConsoleButton(1, 21, 7, 1, "[Clear]", [&]() {
 		ClearConsole();
+		DebugConsole::gotoxy(2, 18);
+		cout << "Console Cleared           ";
 		}));
 	manage->AddChild(new ConsoleText(4, 17, 11, 1, "=== CMD ==="));
 
@@ -720,6 +829,7 @@ void Debug::BuildInspector()
 		{
 			highlightedObject = nullptr;
 			inspector->ClearChild();
+			DebugConsole::clearArea(inspector->x + 1, inspector->y + 1, inspector->width - 2, inspector->height - 2);
 			inspector->Draw();
 			return;
 		}
@@ -904,6 +1014,7 @@ void Debug::UpdateInspector()
 		{
 			highlightedObject = nullptr;
 			inspector->ClearChild();
+			DebugConsole::clearArea(inspector->x + 1, inspector->y + 1, inspector->width - 2, inspector->height - 2);
 			inspector->Draw();
 			return;
 		}
@@ -941,8 +1052,6 @@ void Debug::DrawDebugConsole()
 		DrawSceneList();
 		isSceneChanged = false;
 	}
-
-	DebugConsole::gotoxy(139, 39);
 }
 
 #pragma endregion

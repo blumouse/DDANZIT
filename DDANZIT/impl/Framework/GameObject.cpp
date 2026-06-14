@@ -651,7 +651,7 @@ void GameObject::Destroy(GameObject* gameObject)
 	}
 }
 
-GameObject* GameObject::Find(string name) 
+GameObject* GameObject::Find(const std::string& name)
 {
 	for (Scene* scene : SceneManager::pLoadedSceneList)
 	{
