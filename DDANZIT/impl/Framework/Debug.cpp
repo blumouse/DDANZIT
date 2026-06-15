@@ -10,6 +10,7 @@
 #ifdef USE_DEBUG_TUI
 #include <stack>
 #include <sstream>
+#include <charconv>
 
 #include "SceneManager.h"
 #include "Scene.h"
@@ -29,6 +30,19 @@
 #endif // USE_DEBUG
 
 using namespace std;
+
+
+#pragma region Helper
+
+bool TryParseFloat(const std::string& str, float& out_value) 
+{
+	auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), out_value);
+
+	return ec == std::errc();
+}
+
+#pragma endregion
+
 
 
 #pragma region DebugMethod
@@ -623,35 +637,98 @@ void Debug::ExecuteCommand(const std::string& cmd)
 
 			highlightedObject->_transform->SetParent(go->_transform);
 		}
-
 	}
 	else if (cmdName == "setpos" || cmdName == "setposition")
 	{
+		float x;	float y;
 
+		if (!TryParseFloat(tokens[0], x) || !TryParseFloat(tokens[1], y))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->_localPosition.x = x;
+		highlightedObject->_transform->_localPosition.y = y;
 	}
 	else if (cmdName == "setscale")
 	{
+		float x;	float y;
 
+		if (!TryParseFloat(tokens[0], x) || !TryParseFloat(tokens[1], y))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->SetLocalScale(Vector2(x, y));
 	}
 	else if (cmdName == "setangle")
 	{
+		float a;
 
+		if (!TryParseFloat(tokens[0], a))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->SetLocalAngle(a);
 	}
 	else if (cmdName == "setposworld" || cmdName == "setpositionworld")
 	{
+		float x;	float y;
 
+		if (!TryParseFloat(tokens[0], x) || !TryParseFloat(tokens[1], y))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->SetPosition(Vector2(x, y));
 	}
 	else if (cmdName == "setscaleworld")
 	{
+		float x;	float y;
 
+		if (!TryParseFloat(tokens[0], x) || !TryParseFloat(tokens[1], y))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->SetScale(Vector2(x, y));
 	}
 	else if (cmdName == "setangleworld")
 	{
+		float a;
 
+		if (!TryParseFloat(tokens[0], a))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->SetAngle(a);
 	}
 	else if (cmdName == "setdepth")
 	{
+		float d;
 
+		if (!TryParseFloat(tokens[0], d))
+		{
+			DebugConsole::gotoxy(2, 18);
+			cout << "인자 값이 잘못되었습니다: " << cmdName << ": float 형식이 아님        ";
+			return;
+		}
+
+		highlightedObject->_transform->SetDepth(d);
 	}
 	else
 	{
