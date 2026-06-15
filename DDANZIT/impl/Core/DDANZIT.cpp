@@ -373,6 +373,8 @@ void DDANZIT_Run()
                 if (Application::_isPause)
                     continue;
 
+                input.UpdateGamepad();
+
 
                 while (gameTime.fFrameCount >= gameTime.fixedDeltaTime())
                 {
@@ -387,7 +389,7 @@ void DDANZIT_Run()
                 }
                 gameTime.fFrameCount += gameTime.deltaTime();
 
-                if (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
+                if (gameTime.frameCount >= 1000.0f / (float)FRAME_RATE)
                 {
                     // gameCore._OnMouse...();
 
@@ -431,8 +433,8 @@ void DDANZIT_Run()
                     }
 
 
-                    while (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
-                        gameTime.frameCount -= 1000.0f / (float)FRAME_LATE;
+                    while (gameTime.frameCount >= 1000.0f / (float)FRAME_RATE)
+                        gameTime.frameCount -= 1000.0f / (float)FRAME_RATE;
                 }
                 gameTime.frameCount += gameTime.unscaledDeltaTime();
             }

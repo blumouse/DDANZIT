@@ -84,7 +84,7 @@ typedef enum class SFXIndex
 #define MAX_COMPONENT_NUM				20
 
 
-#define FRAME_LATE						60
+#define FRAME_RATE						60
 
 
 //

@@ -2,10 +2,9 @@
 
 #include "INC_Windows.h"
 #include "Utillity.h"
+
 #include <string>
 #include <bitset>
-
-using Vector2 = learning::Vector2f;
 
 
 // 이외거는 직접 캐스팅해서 쓰세요 -> (KeyCode)VK_어쩌구
@@ -43,6 +42,33 @@ enum class KeyCode
     Num0 = '0',
 };
 
+struct Gamepad {
+    bool isConnected;
+    WORD buttons;
+
+    bool abutton;
+    bool bbutton;
+    bool xbutton;
+    bool ybutton;
+
+    bool buttonEast;
+    bool buttonWest;
+    bool buttonNorth;
+    bool buttonSouth;
+
+    bool leftShoulder;
+    bool rightShoulder;
+    bool leftStickButton;
+    bool rightStickButton;
+    bool startButton;
+    bool selectButton;
+
+    float leftTrigger;
+    float rightTrigger;
+    float leftStickX, leftStickY;
+    float rightStickX, rightStickY;
+};
+
 // 레거시 스타일로 처리합시다
 class Input
 {
@@ -63,6 +89,10 @@ private:
     static std::bitset<256> isKey;
     static std::bitset<256> isKeyUp;
 
+public:
+    static Gamepad pad1;
+    static Gamepad pad2;
+
 
 	// 윈도우 단 내부 콜백들..
 private:
@@ -72,6 +102,8 @@ private:
     void _OnKeyUp(KeyCode keyCode);
 
     void Tick();
+
+    void UpdateGamepad();
 
 public:
     static Vector2 mousePosition();
