@@ -324,6 +324,9 @@ public:
 
     bool SetMp3Volume(MusicIndex id, float volume);
     bool SetMp3PositionSeconds(MusicIndex id, double seconds);
+    bool FadeInMp3(MusicIndex id, float targetVolume, float durationSeconds, bool restart = true);
+    bool FadeOutMp3(MusicIndex id, float durationSeconds, bool stopWhenDone = true);
+    void UpdateMp3Fades(float deltaSeconds);
 
     double GetMp3PositionSeconds(MusicIndex id) const;
     double GetMp3LengthSeconds(MusicIndex id) const;
@@ -338,6 +341,7 @@ public:
 
     double GetMp4PositionSeconds(VideoIndex id) const;
     double GetMp4LengthSeconds(VideoIndex id) const;
+    bool IsMp4PlaybackEnded(VideoIndex id) const;
 
     bool PlaySfx(SFXIndex id, float volume = 1.0f, bool allowOverlap = true);
     void StopSfx(SFXIndex id);
@@ -352,12 +356,23 @@ public:
 private:
     BeatMediaSystem();
 
+    struct Mp3Fade
+    {
+        MusicIndex id = MusicIndex::None;
+        float startVolume = 0.0f;
+        float targetVolume = 0.0f;
+        float durationSeconds = 0.0f;
+        float elapsedSeconds = 0.0f;
+        bool stopWhenDone = false;
+    };
+
     bool CreateVideoChildWindow(HWND parentWindow);
     void DestroyVideoChildWindow();
 
     bool LoadMp3Table(const wchar_t* filePath[], int count);
     bool LoadMp4Table(const wchar_t* filePath[], int count, HWND videoWindow);
     bool LoadSfxTable(const wchar_t* filePath[], int count);
+    void CancelMp3Fade(MusicIndex id);
 
     bool IsValidMp3Id(MusicIndex id) const;
     bool IsValidMp4Id(VideoIndex id) const;
@@ -371,6 +386,8 @@ private:
     BeatXAudioContext m_xaudioContext;
 
     std::vector<std::unique_ptr<BeatMfPlayer>> m_mp3Players;
+    std::vector<float> m_mp3Volumes;
+    std::vector<Mp3Fade> m_mp3Fades;
 
     // MP4 uses one actual MFPlay player only.
     // Paths are kept in a vector and the selected video is opened at PlayMp4 time.

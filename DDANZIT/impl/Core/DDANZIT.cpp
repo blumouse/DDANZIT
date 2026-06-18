@@ -25,6 +25,7 @@
 
 #endif // RENDER_MODE_WINGDI
 
+#include <algorithm>
 #include <vector>
 #include <queue>
 
@@ -296,6 +297,7 @@ void DDANZIT_Run()
 
 
     MSG msg = { 0 };
+    float unscaledFrameCount = 0.0f;
     while (msg.message != WM_QUIT)
     {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -370,6 +372,8 @@ void DDANZIT_Run()
             /* DDANZIT_Update() */
             {
                 gameTime.Tick();
+                const float rawDeltaTimeMs = gameTime.pGameTimer != nullptr ? gameTime.pGameTimer->DeltaTimeMS() : 0.0f;
+                const float scaledDeltaTimeMs = rawDeltaTimeMs * gameTime.timeScale;
 
                 if (Application::_isPause)
                     continue;
@@ -386,12 +390,14 @@ void DDANZIT_Run()
 
                     gameTime.fFrameCount -= gameTime.fixedDeltaTime();
                 }
-                gameTime.fFrameCount += gameTime.deltaTime();
+                gameTime.fFrameCount += scaledDeltaTimeMs;
 
                 if (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
                 {
                     // gameCore._OnMouse...();
 
+                    gameTime.updateDeltaTimeMs = gameTime.frameCount;
+                    gameTime.updateUnscaledDeltaTimeMs = unscaledFrameCount;
 
                     gameCore._Update();
 
@@ -433,9 +439,13 @@ void DDANZIT_Run()
 
 
                     while (gameTime.frameCount >= 1000.0f / (float)FRAME_LATE)
+                    {
                         gameTime.frameCount -= 1000.0f / (float)FRAME_LATE;
+                        unscaledFrameCount = std::max(0.0f, unscaledFrameCount - 1000.0f / (float)FRAME_LATE);
+                    }
                 }
-                gameTime.frameCount += gameTime.unscaledDeltaTime();
+                gameTime.frameCount += scaledDeltaTimeMs;
+                unscaledFrameCount += rawDeltaTimeMs;
             }
 
 

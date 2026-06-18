@@ -1,6 +1,7 @@
 #include "BeatMediaControl.h"
 
 #include <propvarutil.h>
+#include <algorithm>
 #include <cwctype>
 #include <cstring>
 
@@ -1135,6 +1136,8 @@ void BeatMediaSystem::Shutdown()
         m_mp4Player->Close();
 
     m_mp3Players.clear();
+    m_mp3Volumes.clear();
+    m_mp3Fades.clear();
 
     DestroyVideoChildWindow();
 
@@ -1359,6 +1362,8 @@ bool BeatMediaSystem::PauseMp3(MusicIndex id)
 
 void BeatMediaSystem::StopMp3(MusicIndex id)
 {
+    CancelMp3Fade(id);
+
     BeatMfPlayer* player = GetMp3(id);
 
     if (player != nullptr)
@@ -1368,7 +1373,18 @@ void BeatMediaSystem::StopMp3(MusicIndex id)
 bool BeatMediaSystem::SetMp3Volume(MusicIndex id, float volume)
 {
     BeatMfPlayer* player = GetMp3(id);
-    return player != nullptr && player->SetVolume(volume);
+    if (player == nullptr)
+        return false;
+
+    const float clampedVolume = std::clamp(volume, 0.0f, 1.0f);
+    if (!player->SetVolume(clampedVolume))
+        return false;
+
+    int index = BeatToIndex(id);
+    if (index >= 0 && index < static_cast<int>(m_mp3Volumes.size()))
+        m_mp3Volumes[index] = clampedVolume;
+
+    return true;
 }
 
 bool BeatMediaSystem::SetMp3PositionSeconds(MusicIndex id, double seconds)
@@ -1377,6 +1393,89 @@ bool BeatMediaSystem::SetMp3PositionSeconds(MusicIndex id, double seconds)
     return player != nullptr && player->SetPositionSeconds(seconds);
 }
 
+
+bool BeatMediaSystem::FadeInMp3(MusicIndex id, float targetVolume, float durationSeconds, bool restart)
+{
+    if (!IsValidMp3Id(id))
+        return false;
+
+    CancelMp3Fade(id);
+
+    const float clampedTarget = std::clamp(targetVolume, 0.0f, 1.0f);
+    if (!SetMp3Volume(id, 0.0f))
+        return false;
+
+    if (!PlayMp3(id, restart))
+        return false;
+
+    if (durationSeconds <= 0.0f)
+        return SetMp3Volume(id, clampedTarget);
+
+    m_mp3Fades.push_back(Mp3Fade{ id, 0.0f, clampedTarget, durationSeconds, 0.0f, false });
+    return true;
+}
+
+bool BeatMediaSystem::FadeOutMp3(MusicIndex id, float durationSeconds, bool stopWhenDone)
+{
+    if (!IsValidMp3Id(id))
+        return false;
+
+    CancelMp3Fade(id);
+
+    int index = BeatToIndex(id);
+    const float startVolume =
+        index >= 0 && index < static_cast<int>(m_mp3Volumes.size()) ? m_mp3Volumes[index] : 1.0f;
+
+    if (durationSeconds <= 0.0f)
+    {
+        SetMp3Volume(id, 0.0f);
+        if (stopWhenDone)
+            StopMp3(id);
+        return true;
+    }
+
+    m_mp3Fades.push_back(Mp3Fade{ id, startVolume, 0.0f, durationSeconds, 0.0f, stopWhenDone });
+    return true;
+}
+
+void BeatMediaSystem::UpdateMp3Fades(float deltaSeconds)
+{
+    if (m_mp3Fades.empty())
+        return;
+
+    const float safeDelta = std::max(0.0f, deltaSeconds);
+
+    for (auto it = m_mp3Fades.begin(); it != m_mp3Fades.end(); )
+    {
+        Mp3Fade& fade = *it;
+        BeatMfPlayer* player = GetMp3(fade.id);
+
+        if (player == nullptr)
+        {
+            it = m_mp3Fades.erase(it);
+            continue;
+        }
+
+        fade.elapsedSeconds += safeDelta;
+        const float t = fade.durationSeconds <= 0.0f
+            ? 1.0f
+            : std::clamp(fade.elapsedSeconds / fade.durationSeconds, 0.0f, 1.0f);
+        const float volume = fade.startVolume + (fade.targetVolume - fade.startVolume) * t;
+        SetMp3Volume(fade.id, volume);
+
+        if (t >= 1.0f)
+        {
+            if (fade.stopWhenDone)
+                player->Stop();
+
+            it = m_mp3Fades.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
 double BeatMediaSystem::GetMp3PositionSeconds(MusicIndex id) const
 {
     const BeatMfPlayer* player = GetMp3(id);
@@ -1506,6 +1605,14 @@ double BeatMediaSystem::GetMp4LengthSeconds(VideoIndex id) const
     return m_mp4Player->LengthSeconds();
 }
 
+bool BeatMediaSystem::IsMp4PlaybackEnded(VideoIndex id) const
+{
+    if (!IsValidMp4Id(id) || m_mp4Player == nullptr || m_currentVideoIndex != id)
+        return false;
+
+    return m_mp4Player->IsPlaybackEnded();
+}
+
 bool BeatMediaSystem::PlaySfx(SFXIndex id, float volume, bool allowOverlap)
 {
     BeatSfxClip* clip = GetSfx(id);
@@ -1522,6 +1629,8 @@ void BeatMediaSystem::StopSfx(SFXIndex id)
 
 void BeatMediaSystem::StopAllMp3()
 {
+    m_mp3Fades.clear();
+
     for (auto& player : m_mp3Players)
     {
         if (player)
@@ -1566,6 +1675,7 @@ bool BeatMediaSystem::LoadMp3Table(const wchar_t* filePath[], int count)
         return true;
 
     m_mp3Players.reserve(count);
+    m_mp3Volumes.reserve(count);
 
     for (int i = 0; i < count; ++i)
     {
@@ -1581,6 +1691,7 @@ bool BeatMediaSystem::LoadMp3Table(const wchar_t* filePath[], int count)
         }
 
         m_mp3Players.push_back(std::move(player));
+        m_mp3Volumes.push_back(1.0f);
     }
 
     return true;
@@ -1645,6 +1756,17 @@ bool BeatMediaSystem::LoadSfxTable(const wchar_t* filePath[], int count)
     return true;
 }
 
+void BeatMediaSystem::CancelMp3Fade(MusicIndex id)
+{
+    for (auto it = m_mp3Fades.begin(); it != m_mp3Fades.end(); )
+    {
+        if (it->id == id)
+            it = m_mp3Fades.erase(it);
+        else
+            ++it;
+    }
+}
+
 bool BeatMediaSystem::IsValidMp3Id(MusicIndex id) const
 {
     int index = BeatToIndex(id);
@@ -1667,10 +1789,6 @@ void BeatMediaSystem::OnMfPlayerPlaybackEnded(BeatMfPlayer* player)
 {
     if (m_mp4Player != nullptr && player == m_mp4Player.get())
     {
-        if (m_mp4Player != nullptr)
-            m_mp4Player->Close();
-
-        m_currentVideoIndex = static_cast<VideoIndex>(-1);
-        HideVideoAndRefreshParent();
+        return;
     }
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -138,6 +138,21 @@
     <ClCompile Include="aria.cpp" />
     <ClCompile Include="BeatMediaControl.cpp" />
     <ClCompile Include="characterAnimation.cpp" />
+    <ClCompile Include="Game\UI\HealthBarObject.cpp" />
+    <ClCompile Include="Game\UI\HealthBarObserver.cpp" />
+    <ClCompile Include="Game\Effect\RhythmEffectController.cpp" />
+    <ClCompile Include="Game\Effect\RhythmEffectObject.cpp" />
+    <ClCompile Include="Game\Enemy\RhythmEnemyController.cpp" />
+    <ClCompile Include="Game\Enemy\RhythmEnemyObject.cpp" />
+    <ClCompile Include="Game\Manager\RhythmGameManager.cpp" />
+    <ClCompile Include="Game\Manager\RhythmGameManagerObject.cpp" />
+    <ClCompile Include="Game\Manager\RhythmGameStates.cpp" />
+    <ClCompile Include="Game\GuardAttack\RhythmGuardAttackController.cpp" />
+    <ClCompile Include="Game\GuardAttack\RhythmGuardAttackObject.cpp" />
+    <ClCompile Include="Game\Player\PlayerActionHitboxScript.cpp" />
+    <ClCompile Include="Game\Common\RhythmTypes.cpp" />
+    <ClCompile Include="Game\UI\UiBoxObject.cpp" />
+    <ClCompile Include="Game\UI\UiTextObject.cpp" />
     <ClCompile Include="gungwoo.cpp" />
     <ClCompile Include="impl\CodeEdit.cpp" />
     <ClCompile Include="impl\Core\D2DRenderer.cpp" />
@@ -166,11 +181,7 @@
     <ClCompile Include="impl\Framework\SceneManager.cpp" />
     <ClCompile Include="impl\Framework\GameTime.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MyObject.cpp" />
-    <ClCompile Include="MyObject.h" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Script.cpp" />
-    <ClCompile Include="Script.h" />
     <ClCompile Include="suna.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Util\GameTimer.cpp" />
@@ -181,6 +192,22 @@
     <ClInclude Include="aria.h" />
     <ClInclude Include="BeatMediaControl.h" />
     <ClInclude Include="characterAnimation.h" />
+    <ClInclude Include="Game\UI\HealthBarObject.h" />
+    <ClInclude Include="Game\UI\HealthBarObserver.h" />
+    <ClInclude Include="Game\Effect\RhythmEffectController.h" />
+    <ClInclude Include="Game\Effect\RhythmEffectObject.h" />
+    <ClInclude Include="Game\Enemy\RhythmEnemyController.h" />
+    <ClInclude Include="Game\Enemy\RhythmEnemyObject.h" />
+    <ClInclude Include="Game\Manager\RhythmGameManager.h" />
+    <ClInclude Include="Game\Manager\RhythmGameManagerObject.h" />
+    <ClInclude Include="Game\Manager\RhythmGameStates.h" />
+    <ClInclude Include="Game\GuardAttack\RhythmGuardAttackController.h" />
+    <ClInclude Include="Game\GuardAttack\RhythmGuardAttackObject.h" />
+    <ClInclude Include="Game\Player\PlayerActionHitboxScript.h" />
+    <ClInclude Include="Game\Common\RhythmTypes.h" />
+    <ClInclude Include="Game\Common\StateMachine.h" />
+    <ClInclude Include="Game\UI\UiBoxObject.h" />
+    <ClInclude Include="Game\UI\UiTextObject.h" />
     <ClInclude Include="gungwoo.h" />
     <ClInclude Include="header\Core\D2DRenderer.h" />
     <ClInclude Include="header\Core\DDANZIT_Core.h" />

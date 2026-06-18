@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Component.h"
-
+#include "D2DRenderer.h"
 #include "Utillity.h"
 
 class Rigidbody2D;
@@ -13,7 +13,6 @@ enum class ColliderType
 	Circle,
 	Capsule,
 };
-
 
 
 class Collider2D : public Component
@@ -237,7 +236,7 @@ public:
 #pragma endregion
 
 
-
+	
 #pragma region Methods
 
 private:

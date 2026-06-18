@@ -55,7 +55,7 @@ float GameTimer::DeltaTime()const
 
 float GameTimer::DeltaTimeMS() const
 {
-	return (float)(mDeltaTime * 1000.0);
+	return (float)(mDeltaTime * 1000.0f);
 }
 
 void GameTimer::Reset()

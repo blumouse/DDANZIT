@@ -89,7 +89,6 @@ bool DDANZIT_Core::InitGraphicSettings(HWND hWnd)
 
     
     // 폰트용
-    ComPtr<IDWriteFactory> writeFactory;
     DWriteCreateFactory(
         DWRITE_FACTORY_TYPE_SHARED,
         __uuidof(IDWriteFactory),
@@ -863,6 +862,7 @@ void DDANZIT_Core::_Clear()
     for (int i = MAX_LAYER_NUM - 1; i >= 0; i--)
     {
         drawCommandLists[i].clear();
+        UIDrawCommandLists[i].clear(); //건들였습니다: UI 텍스트 커맨드도 프레임마다 비워 누적 렌더링을 막습니다.
         debugDrawCommandLists[i].clear();
     }
 }

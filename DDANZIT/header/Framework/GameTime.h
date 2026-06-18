@@ -1,4 +1,4 @@
-#pragma once
+癤�#pragma once
 
 #include "GameTimer.h"
 
@@ -18,6 +18,8 @@ private:
     static float frameCount;
     static float fFrameCount;
     static float timeScale;
+    static float updateDeltaTimeMs;
+    static float updateUnscaledDeltaTimeMs;
 
 private:
     void Init();
@@ -29,8 +31,9 @@ private:
     static void Resume();
 
 public:
-    static float unscaledDeltaTime();
-    static float deltaTime();   // 밀리초니까 1000.0f 나눠서 쓰는게 좋을지도
+    static float unscaledDeltaTime(); // milliseconds without timeScale
+    static float deltaTime();     // milliseconds, legacy engine convention
+    static float deltaTimeMs();   // milliseconds
     static float fixedDeltaTime();
 };
 

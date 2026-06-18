@@ -611,6 +611,18 @@ void Camera::Render(ID2D1DeviceContext4* d2dcontext, ID2D1SolidColorBrush* d2dbr
 			}
 			else if (cmd.uiDrawType == UIDrawType::Text)
 			{
+				if ((int)cmd.fontIndex < 0 || (int)cmd.fontIndex >= (int)DDANZIT_Core::fontResourceList.size()) //건들였습니다: 폰트 로딩 실패/잘못된 인덱스면 안전하게 건너뜁니다.
+				{
+					Debug::Log("Render: 폰트 인덱스가 잘못되었습니다.");
+					continue;
+				}
+
+				if (cmd.fontSizeIndex < 0 || cmd.fontSizeIndex >= (int)DDANZIT_Core::fontResourceList[(int)cmd.fontIndex].size()) //건들였습니다: 폰트 크기 인덱스도 범위를 확인합니다.
+				{
+					Debug::Log("Render: 폰트 크기 인덱스가 잘못되었습니다.");
+					continue;
+				}
+
 				IDWriteTextFormat* pFont = DDANZIT_Core::fontResourceList[(int)cmd.fontIndex][cmd.fontSizeIndex].Get();
 
 				if (pFont == nullptr)

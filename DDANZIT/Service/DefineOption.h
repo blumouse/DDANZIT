@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 enum class Tag
@@ -13,21 +13,41 @@ enum class Tag
 typedef enum class FontIndex
 {
 	None = -1,
+	Default = 0, //UI í…ìŠ¤íŠ¸ê°€ ì‚¬ìš©í•  ê¸°ë³¸ í°íŠ¸ ìŠ¬ë¡¯ì…ë‹ˆë‹¤.
 
 } Font;
 
-// ÀÌµû±¸·Î ½áµµ µÉ±î..?
+// ì´ë”°êµ¬ë¡œ ì¨ë„ ë ê¹Œ..?
 typedef enum class SpriteIndex
 {
 	None = -1,
 	Sqaure = -2,
 	Circle = -3,
 	Capsule = -4,
-	// ½ºÇÁ¶óÀÌÆ® ¸®¼Ò½º´Â 0¹øºÎÅÍ (ÀÎµ¦½º)
+	// ìŠ¤í”„ë¼ì´íŠ¸ ë¦¬ì†ŒìŠ¤ëŠ” 0ë²ˆë¶€í„° (ì¸ë±ìŠ¤)
 
 	suna = 0,
 	gung = 1,
 	aria = 2,
+	enemy = 3, //ìˆ˜ì •ì™„ í”„ë¡œì íŠ¸ì˜ ì  ìŠ¤í”„ë¼ì´íŠ¸ì…ë‹ˆë‹¤.
+	attackRange = 4, //ë°©í–¥ ì…ë ¥ ê³µê²© ë²”ìœ„ í‘œì‹œì…ë‹ˆë‹¤.
+	block = 5, //ìŠ¤í˜ì´ìŠ¤ ê°€ë“œ ì…ë ¥ í‘œì‹œì…ë‹ˆë‹¤.
+	attacked_sp = 6, //í”Œë ˆì´ì–´ê°€ ë§‰ì•„ì•¼ í•˜ëŠ” ê°€ë“œ ê³µê²© ìŠ¤í”„ë¼ì´íŠ¸ì…ë‹ˆë‹¤.
+	yellowLight = 7, //ì ‘ê·¼ ê²½ê³ ë“±ì…ë‹ˆë‹¤.
+	redLight = 8, //ë¹ ë¥¸ ì ‘ê·¼/ê°€ë“œ ê³µê²© ê²½ê³ ë“±ì…ë‹ˆë‹¤.
+	enemyWalk = 9,
+	menuStatic = 10,
+	zzzPanel = 11,
+	kandenPanel = 12,
+	parry = 13,
+	blueLight = 14,
+	gameBackground = 15,
+	ultiCommand = 16,
+	HoYoHoYoPanel = 17,
+	PixelGalaxyPanel = 18,
+	SABMGPanel = 19,
+	TripleCounterPanel = 20,
+	YoruNoOdorikoPanel = 21,
 	
 } Sprite;
 
@@ -35,19 +55,32 @@ typedef enum class SpriteIndex
 typedef enum class MusicIndex
 {
 	None = -1,
-	// ¸®¼Ò½º´Â 0¹øºÎÅÍ (ÀÎµ¦½º)
+	// ë¦¬ì†ŒìŠ¤ëŠ” 0ë²ˆë¶€í„° (ì¸ë±ìŠ¤)
 	zzz = 0,
 	kanden = 1,
+	choseMusic = 2,
+	zzzHighlight = 3,
+	kandenHighlight = 4,
+	HoYoHoYo = 5,
+	PixelGalaxy = 6,
+	SABMG = 7,
+	TripleCounter = 8,
+	YoruNoOdoriko = 9,
+	HoYoHoYoHighlight = 10,
+	PixelGalaxyHighlight = 11,
+	SABMGHighlight = 12,
+	TripleCounterHighlight = 13,
+	YoruNoOdorikoHighlight = 14,
 
 } Music;
 
 typedef enum class VideoIndex
 {
 	None = -1,
-	//¸®¼Ò½º´Â 0¹øºÎÅÍ (ÀÎµ¦½º)
-	Aria = 0,
-	GungWoo = 1,
-	Suna = 2,
+	//ë¦¬ì†ŒìŠ¤ëŠ” 0ë²ˆë¶€í„° (ì¸ë±ìŠ¤)
+	Suna = 0,
+	Aria = 1,
+	GungWoo = 2,
 
 } Video;
 
@@ -55,8 +88,16 @@ typedef enum class VideoIndex
 typedef enum class SFXIndex
 {
 	None = -1,
-	//¸®¼Ò½º´Â 0¹øºÎÅÍ (ÀÎµ¦½º)
+	//ë¦¬ì†ŒìŠ¤ëŠ” 0ë²ˆë¶€í„° (ì¸ë±ìŠ¤)
 	hit = 0,
+	televisionStatic = 1,
+	tvUiMoved = 2,
+	alarm = 3,
+	ariaUltimateFinish = 4,
+	sunaUltimateFinish = 5,
+	wooUltimateFinish = 6,
+	parry = 7,
+	aodThreeHitsMix = 8,
 
 } SFX;
 
@@ -68,7 +109,7 @@ typedef enum class SFXIndex
 
 
 #define USE_DEBUG
-#define USE_DEBUG_TUI
+//#define USE_DEBUG_TUI
 //#define USE_EDITOR
 
 
@@ -94,7 +135,7 @@ typedef enum class SFXIndex
 //
 //
 //
-// ¿©±ä ¶Ç ºĞ¸®ÇÏ´Â°Ô ³´³ª?
+// ì—¬ê¸´ ë˜ ë¶„ë¦¬í•˜ëŠ”ê²Œ ë‚«ë‚˜?
 
 
 #define HIERARCY_ROOT					nullptr

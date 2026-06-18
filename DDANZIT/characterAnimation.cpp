@@ -1,4 +1,4 @@
-#include "characterAnimation.h"
+ï»¿#include "characterAnimation.h"
 
 #include "DDANZITEngine.h"
 
@@ -8,7 +8,7 @@ characterAnimation::characterAnimation(GameObject* gameObject) : MonoBehavior(ga
 	EnableUpdate();
 }
 
-// ÀÎ½ºÅÏÆ® ÇÏ°í½ÍÀ¸¸é º¹»ç»ý¼ºÀÚ / Å¬·Ð ÇÔ¼ö ÀçÁ¤ÀÇµµ ÇÏ¼Å¾ß ÇØ¿ä
+// ì¸ìŠ¤í„´íŠ¸ í•˜ê³ ì‹¶ìœ¼ë©´ ë³µì‚¬ìƒì„±ìž / í´ë¡  í•¨ìˆ˜ ìž¬ì •ì˜ë„ í•˜ì…”ì•¼ í•´ìš”
 
 void characterAnimation::Awake()
 {
@@ -16,27 +16,37 @@ void characterAnimation::Awake()
 	spRender = gameObject()->GetComponent<SpriteRenderer>();
 }
 
-//¾Ö´Ï¸ÞÀÌ¼Çº° »óÅÂ ³ª´©±â
-//½ºÇÁ¶óÀÌÆ® ÀÌ¹ÌÁö Å©±â ¸ÂÃß±â
+//ì• ë‹ˆë©”ì´ì…˜ë³„ ìƒíƒœ ë‚˜ëˆ„ê¸°
+//ìŠ¤í”„ë¼ì´íŠ¸ ì´ë¯¸ì§€ í¬ê¸° ë§žì¶”ê¸°
 
 void characterAnimation::Update() 
-{	
-	elapsedTime += Time::deltaTime();
+{
+    elapsedTime += Time::unscaledDeltaTime();
 
-	if (elapsedTime >=0.5f/*frameDuration */ )
-	{
-		elapsedTime = 0.0f;
-		spRender->currentAtlas.pixel_OffsetX++;
-		if (spRender->currentAtlas.pixel_OffsetX % 9 == 0) {
-			spRender->currentAtlas.pixel_OffsetY++;
-			spRender->currentAtlas.pixel_OffsetX = 0;
-		}
-		//ÀÓ½Ã
-		if (spRender->currentAtlas.pixel_OffsetY >= 3) {
-			spRender->currentAtlas.pixel_OffsetX = 0;
-			spRender->currentAtlas.pixel_OffsetY = 0;
-		}
-	}
+    if (spRender == nullptr)
+        return;
+
+    const float frameStep =
+        frameDuration / static_cast<float>(27);
+
+    while (elapsedTime >= frameStep)
+    {
+        elapsedTime -= frameStep;
+
+        spRender->currentAtlas.pixel_OffsetX++;
+
+        if (spRender->currentAtlas.pixel_OffsetX >= 9)
+        {
+            spRender->currentAtlas.pixel_OffsetX = 0;
+            spRender->currentAtlas.pixel_OffsetY++;
+        }
+
+        if (spRender->currentAtlas.pixel_OffsetY >= 3)
+        {
+            spRender->currentAtlas.pixel_OffsetX = 0;
+            spRender->currentAtlas.pixel_OffsetY = 0;
+        }
+    }
 }
 
 void characterAnimation::SetDuration(float time) {
